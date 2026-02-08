@@ -16,6 +16,8 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Telegram Mini App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <script>
         tailwind.config = {
@@ -81,7 +83,14 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
 
-        // --- DATA ---
+        // --- TMA & DATA ---
+        const BOT_TOKEN = "8429700148:AAGH4n4-QwddMTtC6TIaC4b-NbFKajN54GU";
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
         const AVATARS = [
             "https://via.placeholder.com/150/1d4ed8/ffffff?text=User1",
             "https://via.placeholder.com/150/7e22ce/ffffff?text=User2",
@@ -346,7 +355,18 @@
         // --- MAIN APP ---
         function App() {
             const [activeTab, setActiveTab] = useState('home');
-            const [user, setUser] = useState({ name: "Alex_Drifter", avatar: AVATARS[0], balance: 5000, xp: 0, level: 1, car: null, jobProgress: {} });
+            const [user, setUser] = useState(() => {
+                const tgUser = tg?.initDataUnsafe?.user;
+                return {
+                    name: tgUser ? `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}` : "Alex_Drifter",
+                    avatar: tgUser?.photo_url || AVATARS[0],
+                    balance: 5000,
+                    xp: 0,
+                    level: 1,
+                    car: null,
+                    jobProgress: {}
+                };
+            });
             const [notification, setNotification] = useState(null);
             const [selectedJobId, setSelectedJobId] = useState(null);
             const [selectedCaseId, setSelectedCaseId] = useState(null);
