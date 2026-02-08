@@ -109,6 +109,7 @@
             { id: "c2", name: "Ibishu Covet", type: "sedan", price: 12000, img: "https://via.placeholder.com/300x200?text=Covet" },
             { id: "c3", name: "Gavril D-Series", type: "suv", price: 25000, img: "https://via.placeholder.com/300x200?text=D-Series" },
             { id: "c4", name: "Civetta Scintilla", type: "hyper", price: 250000, img: "https://via.placeholder.com/300x200?text=Scintilla" },
+            { id: "c5", name: "ETK 800", type: "sedan", price: 45000, img: "https://via.placeholder.com/300x200?text=ETK+800" },
         ];
 
         const BUSINESS_DATA = [
@@ -373,6 +374,12 @@
             const [activeGame, setActiveGame] = useState(null);
             const [working, setWorking] = useState(false);
 
+            const [discounts] = useState(() => {
+                const count = 2;
+                const shuffled = [...CARS_DATA].sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count).map(c => ({ id: c.id, off: Math.floor(Math.random() * 20) + 5 }));
+            });
+
             const showNotify = (text, type = 'success') => { setNotification({ text, type }); setTimeout(() => setNotification(null), 3000); };
 
             const handleWork = (id) => {
@@ -392,17 +399,43 @@
             };
 
             const renderHome = () => (
-                <div className="space-y-8 animate-fade-in pb-28">
+                <div className="space-y-6 animate-fade-in pb-28">
                     <div className="relative h-72 rounded-b-[3rem] overflow-hidden">
                         <img src="https://via.placeholder.com/600x400?text=BeamNG+RP+Majestic" className="w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A] flex flex-col justify-end p-8">
                             <Badge color="yellow" className="w-fit mb-3">Spring 2026</Badge>
-                            <h1 className="text-5xl font-black italic tracking-tighter">MAJESTIC<span className="text-blue-500 font-light not-italic ml-2">RP</span></h1>
+                            <h1 className="text-5xl font-black italic tracking-tighter uppercase">Majestic<span className="text-blue-500 font-light not-italic ml-2">RP</span></h1>
                         </div>
                     </div>
+
+                    <div className="px-6">
+                        <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-500/30">
+                            <div className="flex justify-between items-center mb-4">
+                                <Badge color="blue">Новости</Badge>
+                                <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Сегодня</span>
+                            </div>
+                            <h3 className="text-xl font-black mb-2 italic uppercase">Скидки в салоне!</h3>
+                            <p className="text-sm text-gray-400 mb-4 leading-relaxed">Только сегодня вы можете приобрести автомобили с выгодой до 25%!</p>
+                            <div className="space-y-3">
+                                {discounts.map(d => {
+                                    const car = CARS_DATA.find(c => c.id === d.id);
+                                    return (
+                                        <div key={d.id} className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><SafeIcon name="Car" size={18} className="text-blue-400" /></div>
+                                                <div className="text-xs font-bold">{car.name}</div>
+                                            </div>
+                                            <div className="text-emerald-400 font-black">-{d.off}%</div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </Card>
+                    </div>
+
                     <div className="px-6 grid grid-cols-2 gap-4">
-                        <Card onClick={() => setActiveTab('jobs')} className="flex flex-col items-center gap-3 py-6"><SafeIcon name="Briefcase" className="text-blue-400" size={28} /><span className="font-bold">Карьера</span></Card>
-                        <Card onClick={() => setActiveTab('dealer')} className="flex flex-col items-center gap-3 py-6"><SafeIcon name="Car" className="text-purple-400" size={28} /><span className="font-bold">Автосалон</span></Card>
+                        <Card onClick={() => setActiveTab('jobs')} className="flex flex-col items-center gap-4 py-8"><div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400"><SafeIcon name="Briefcase" size={32} /></div><span className="font-black uppercase text-xs tracking-widest">Карьера</span></Card>
+                        <Card onClick={() => setActiveTab('dealer')} className="flex flex-col items-center gap-4 py-8"><div className="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400"><SafeIcon name="Car" size={32} /></div><span className="font-black uppercase text-xs tracking-widest">Автосалон</span></Card>
                     </div>
                 </div>
             );
@@ -438,12 +471,152 @@
             };
 
             const renderProfile = () => (
-                <div className="p-8 flex flex-col items-center space-y-8 animate-fade-in pb-28">
-                    <img src={user.avatar} className="w-32 h-32 rounded-full border-4 border-blue-500 shadow-2xl" />
-                    <h2 className="text-3xl font-black italic">{user.name}</h2>
-                    <div className="w-full space-y-2">
-                        <div className="flex justify-between text-xs font-bold uppercase text-gray-400"><span>Level {user.level}</span><span>{user.xp}/1000 XP</span></div>
-                        <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/5"><div className="h-full bg-blue-500" style={{ width: `${(user.xp % 1000) / 10}%` }}></div></div>
+                <div className="p-8 space-y-8 animate-fade-in pb-28">
+                    <div className="flex flex-col items-center gap-6">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-2xl animate-pulse"></div>
+                            <img src={user.avatar} className="w-32 h-32 rounded-full border-4 border-white/10 shadow-2xl relative z-10" />
+                            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-600 rounded-full border-4 border-[#0B0F1A] flex items-center justify-center z-20 shadow-xl"><SafeIcon name="Camera" size={16} /></div>
+                        </div>
+                        <div className="text-center">
+                            <h2 className="text-3xl font-black italic tracking-tight uppercase">{user.name}</h2>
+                            <p className="text-xs text-gray-500 font-bold uppercase mt-1 tracking-widest">Гражданин штата</p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <Card className="text-center bg-white/[0.02] border-white/5 py-4">
+                            <div className="text-[10px] text-gray-500 font-black uppercase mb-1">Баланс</div>
+                            <div className="text-lg font-black text-emerald-400">${user.balance.toLocaleString()}</div>
+                        </Card>
+                        <Card className="text-center bg-white/[0.02] border-white/5 py-4">
+                            <div className="text-[10px] text-gray-500 font-black uppercase mb-1">Уровень</div>
+                            <div className="text-lg font-black text-blue-400">{user.level}</div>
+                        </Card>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex justify-between items-end px-2">
+                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Прогресс XP</span>
+                            <span className="text-xs font-black text-blue-400">{user.xp % 1000} / 1000</span>
+                        </div>
+                        <div className="h-4 bg-white/5 rounded-full overflow-hidden border border-white/5 p-1"><div className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-500" style={{ width: `${(user.xp % 1000) / 10}%` }}></div></div>
+                    </div>
+
+                    <div className="space-y-4 pt-4">
+                        <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Ваше имущество</h4>
+                        <Card className="flex items-center gap-4 py-4 bg-white/[0.02] border-white/5 opacity-50">
+                            <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-gray-600"><SafeIcon name="Home" size={24} /></div>
+                            <div className="flex-1 text-xs font-bold text-gray-500">Нет недвижимости</div>
+                            <Button variant="ghost" size="sm" className="text-[10px] uppercase">Купить</Button>
+                        </Card>
+                    </div>
+                </div>
+            );
+
+            const renderDealer = () => (
+                <div className="p-6 space-y-6 pb-28 animate-fade-in">
+                    <h2 className="text-3xl font-black italic uppercase">Автосалон</h2>
+                    <div className="grid gap-6">
+                        {CARS_DATA.map(car => {
+                            const discount = discounts.find(d => d.id === car.id);
+                            const finalPrice = discount ? Math.floor(car.price * (1 - discount.off / 100)) : car.price;
+                            return (
+                                <Card key={car.id} className="overflow-hidden p-0 border-white/5">
+                                    <div className="relative h-48">
+                                        <img src={car.img} className="w-full h-full object-cover" />
+                                        {discount && <div className="absolute top-4 right-4 bg-red-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-xl">-{discount.off}%</div>}
+                                    </div>
+                                    <div className="p-5 flex justify-between items-center">
+                                        <div>
+                                            <h4 className="font-black text-lg italic uppercase">{car.name}</h4>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className={`text-emerald-400 font-black ${discount ? 'text-lg' : ''}`}>${finalPrice.toLocaleString()}</span>
+                                                {discount && <span className="text-xs text-gray-500 line-through">${car.price.toLocaleString()}</span>}
+                                            </div>
+                                        </div>
+                                        <Button size="sm" onClick={() => { if (user.balance >= finalPrice) { setUser(p => ({ ...p, balance: p.balance - finalPrice, car: car.id })); showNotify('Успешная покупка!'); } else showNotify('Недостаточно денег', 'danger'); }} className="uppercase text-[10px] py-3 px-6">Купить</Button>
+                                    </div>
+                                </Card>
+                            )
+                        })}
+                    </div>
+                </div>
+            );
+
+            const renderForbes = () => (
+                <div className="p-6 space-y-6 pb-28 animate-fade-in">
+                    <h2 className="text-3xl font-black italic uppercase">Forbes List</h2>
+                    <div className="space-y-4">
+                        {FORBES_DATA.sort((a, b) => b.balance - a.balance).map((item, idx) => (
+                            <div key={item.id} className={`flex items-center gap-4 p-4 rounded-3xl border ${idx === 0 ? 'bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_30px_rgba(234,179,8,0.1)]' : 'bg-white/5 border-white/5'}`}>
+                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl italic ${idx === 0 ? 'bg-yellow-500 text-black' : 'bg-gray-800 text-white'}`}>{idx + 1}</div>
+                                <div className="flex-1">
+                                    <div className="font-black italic uppercase tracking-tight">{item.name}</div>
+                                    <div className="text-xs font-bold text-emerald-400">${item.balance.toLocaleString()}</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-[8px] text-gray-500 uppercase font-black">Level</div>
+                                    <div className="text-sm font-black">{item.level}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            const renderBank = () => (
+                <div className="p-6 space-y-8 pb-28 animate-fade-in">
+                    <h2 className="text-3xl font-black italic uppercase">MAJESTIC BANK</h2>
+                    <Card className="bg-gradient-to-br from-emerald-600/20 to-blue-600/20 border-emerald-500/30 py-8 relative overflow-hidden">
+                        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+                        <div className="text-center relative z-10">
+                            <div className="text-[10px] text-emerald-400 font-black uppercase tracking-widest mb-2">Общий баланс</div>
+                            <div className="text-4xl font-black italic tracking-tighter">${user.balance.toLocaleString()}</div>
+                        </div>
+                    </Card>
+
+                    <div className="grid gap-4">
+                        <Card className="flex items-center justify-between py-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-red-400/10 flex items-center justify-center text-red-400"><SafeIcon name="CreditCard" /></div>
+                                <div><div className="font-black text-sm uppercase">Налоги и кредиты</div><div className="text-[10px] text-gray-500 font-bold">$0 к оплате</div></div>
+                            </div>
+                            <Button variant="ghost" size="sm" className="text-[10px] uppercase">Оплатить</Button>
+                        </Card>
+                        <Card className="flex items-center justify-between py-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-400/10 flex items-center justify-center text-blue-400"><SafeIcon name="TrendingUp" /></div>
+                                <div><div className="font-black text-sm uppercase">Инвестиции</div><div className="text-[10px] text-gray-500 font-bold">Доступно с 5 уровня</div></div>
+                            </div>
+                            <Button variant="ghost" size="sm" className="text-[10px] uppercase" disabled>Открыть</Button>
+                        </Card>
+                    </div>
+                </div>
+            );
+
+            const renderBusiness = () => (
+                <div className="p-6 space-y-6 pb-28 animate-fade-in">
+                    <h2 className="text-3xl font-black italic uppercase">Бизнесы</h2>
+                    <div className="grid gap-6">
+                        {BUSINESS_DATA.map(biz => (
+                            <Card key={biz.id} className="overflow-hidden p-0 border-white/5">
+                                <img src={biz.img} className="w-full h-40 object-cover" />
+                                <div className="p-5">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h4 className="font-black text-lg italic uppercase">{biz.name}</h4>
+                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-relaxed mt-1">{biz.desc}</p>
+                                        </div>
+                                        <Badge color="green">+${biz.income}/ч</Badge>
+                                    </div>
+                                    <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-4">
+                                        <span className="text-emerald-400 font-black text-xl">${biz.price.toLocaleString()}</span>
+                                        <Button size="sm" onClick={() => { if (user.balance >= biz.price) { setUser(p => ({ ...p, balance: p.balance - biz.price })); showNotify('Бизнес куплен!'); } else showNotify('Недостаточно денег', 'danger'); }} className="uppercase text-[10px] py-3 px-6">Вложиться</Button>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
                     </div>
                 </div>
             );
@@ -459,11 +632,18 @@
                         {activeTab === 'home' && renderHome()}
                         {activeTab === 'jobs' && (selectedJobId ? renderJobDetail() : renderJobs())}
                         {activeTab === 'profile' && renderProfile()}
+                        {activeTab === 'dealer' && renderDealer()}
+                        {activeTab === 'forbes' && renderForbes()}
+                        {activeTab === 'business' && renderBusiness()}
+                        {activeTab === 'bank' && renderBank()}
                         {activeTab === 'more' && (
                             <div className="p-6 grid grid-cols-2 gap-4 animate-fade-in pb-28">
-                                <Card onClick={() => setSelectedCaseId('case_start')} className="col-span-2 py-10 flex flex-col items-center bg-yellow-500/10 border-yellow-500/20"><SafeIcon name="Gift" className="text-yellow-500 mb-2" size={32} /><span className="font-black italic">КЕЙСЫ</span></Card>
-                                <Card onClick={() => setActiveGame('roulette')} className="py-6 flex flex-col items-center"><SafeIcon name="Disc" className="text-red-400 mb-2" /><span className="font-bold">Рулетка</span></Card>
-                                <Card onClick={() => setActiveGame('crash')} className="py-6 flex flex-col items-center"><SafeIcon name="Zap" className="text-blue-400 mb-2" /><span className="font-bold">Краш</span></Card>
+                                <Card onClick={() => setSelectedCaseId('case_start')} className="col-span-2 py-10 flex flex-col items-center bg-yellow-500/10 border-yellow-500/20"><SafeIcon name="Gift" className="text-yellow-500 mb-2" size={32} /><span className="font-black italic uppercase tracking-widest text-xs">КЕЙСЫ</span></Card>
+                                <Card onClick={() => setActiveGame('roulette')} className="py-8 flex flex-col items-center gap-2"><div className="w-12 h-12 rounded-xl bg-red-400/10 flex items-center justify-center text-red-400"><SafeIcon name="Disc" /></div><span className="font-black uppercase text-[10px] tracking-widest">Рулетка</span></Card>
+                                <Card onClick={() => setActiveGame('crash')} className="py-8 flex flex-col items-center gap-2"><div className="w-12 h-12 rounded-xl bg-blue-400/10 flex items-center justify-center text-blue-400"><SafeIcon name="Zap" /></div><span className="font-black uppercase text-[10px] tracking-widest">Краш</span></Card>
+                                <Card onClick={() => setActiveTab('forbes')} className="py-8 flex flex-col items-center gap-2"><div className="w-12 h-12 rounded-xl bg-yellow-400/10 flex items-center justify-center text-yellow-400"><SafeIcon name="BarChart3" /></div><span className="font-black uppercase text-[10px] tracking-widest">Forbes</span></Card>
+                                <Card onClick={() => setActiveTab('business')} className="py-8 flex flex-col items-center gap-2"><div className="w-12 h-12 rounded-xl bg-purple-400/10 flex items-center justify-center text-purple-400"><SafeIcon name="Briefcase" /></div><span className="font-black uppercase text-[10px] tracking-widest">Бизнес</span></Card>
+                                <Card onClick={() => setActiveTab('bank')} className="py-8 flex flex-col items-center gap-2"><div className="w-12 h-12 rounded-xl bg-emerald-400/10 flex items-center justify-center text-emerald-400"><SafeIcon name="Building2" /></div><span className="font-black uppercase text-[10px] tracking-widest">Банк</span></Card>
                             </div>
                         )}
                     </div>
