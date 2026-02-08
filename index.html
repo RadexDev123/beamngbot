@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BeamNG RP Majestic</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- React & Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    boxShadow: { 'premium': '0 20px 50px rgba(0,0,0,0.3)', 'inner-glow': 'inset 0 0 20px rgba(255,255,255,0.05)' },
+                    animation: {
+                        'pulse-glow': 'pulse-glow 3s infinite',
+                        'bounce-in': 'bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                        'fade-in': 'fadeIn 0.4s ease-out',
+                        'slide-in': 'slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
+                    },
+                    keyframes: {
+                        'pulse-glow': { '0%, 100%': { opacity: 0.4, transform: 'scale(1)' }, '50%': { opacity: 0.7, transform: 'scale(1.05)' } },
+                        'bounceIn': { '0%': { opacity: 0, transform: 'scale(0.3) translateY(20px)' }, '100%': { opacity: 1, transform: 'scale(1) translateY(0)' } },
+                        'fadeIn': { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+                        'slideIn': { '0%': { transform: 'translateX(30px)', opacity: 0 }, '100%': { transform: 'translateX(0)', opacity: 1 } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0B0F1A;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card-bright {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .cubic-bezier {
+            transition-timing-function: cubic-bezier(0.15, 0, 0.1, 1);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        // --- DATA ---
+        const AVATARS = [
+            "https://via.placeholder.com/150/1d4ed8/ffffff?text=User1",
+            "https://via.placeholder.com/150/7e22ce/ffffff?text=User2",
+            "https://via.placeholder.com/150/047857/ffffff?text=User3",
+            "https://via.placeholder.com/150/be123c/ffffff?text=User4",
+        ];
+
+        const JOBS_DATA = {
+            taxi: { id: "taxi", req_user_lvl: 1, title: "Такси", iconName: "Car", levels: { 1: { name: "Бомбила", car: "Ibishu Pigeon", salary: 15, req_mins: 100, img: "https://via.placeholder.com/600x300?text=Taxi" }, 2: { name: "Комфорт", car: "Ibishu Pessima", salary: 30, req_mins: 300, img: "https://via.placeholder.com/600x300?text=Taxi+Lvl2" }, 3: { name: "Бизнес", car: "ETK 800", salary: 60, req_mins: 0, img: "https://via.placeholder.com/600x300?text=Taxi+Lvl3" } } },
+            bus: { id: "bus", req_user_lvl: 2, title: "Автобус", iconName: "Bus", levels: { 1: { name: "Новичок", car: "Wentward", salary: 50, req_mins: 200, img: "https://via.placeholder.com/600x300?text=Bus" }, 2: { name: "Водитель", car: "City Bus", salary: 90, req_mins: 500, img: "https://via.placeholder.com/600x300?text=Bus+Lvl2" }, 3: { name: "Мастер", car: "Coach", salary: 150, req_mins: 0, img: "https://via.placeholder.com/600x300?text=Bus+Lvl3" } } },
+            police: { id: "police", req_user_lvl: 3, title: "Полиция", iconName: "Siren", levels: { 1: { name: "Кадет", car: "Sunburst Police", salary: 100, req_mins: 400, img: "https://via.placeholder.com/600x300?text=Police" }, 2: { name: "Офицер", car: "Grand Marshal", salary: 200, req_mins: 800, img: "https://via.placeholder.com/600x300?text=Police+Lvl2" }, 3: { name: "Шериф", car: "Roamer", salary: 350, req_mins: 0, img: "https://via.placeholder.com/600x300?text=Police+Lvl3" } } }
+        };
+
+        const CARS_DATA = [
+            { id: "c1", name: "Ibishu Pigeon", type: "van", price: 5000, img: "https://via.placeholder.com/300x200?text=Pigeon" },
+            { id: "c2", name: "Ibishu Covet", type: "sedan", price: 12000, img: "https://via.placeholder.com/300x200?text=Covet" },
+            { id: "c3", name: "Gavril D-Series", type: "suv", price: 25000, img: "https://via.placeholder.com/300x200?text=D-Series" },
+            { id: "c4", name: "Civetta Scintilla", type: "hyper", price: 250000, img: "https://via.placeholder.com/300x200?text=Scintilla" },
+        ];
+
+        const BUSINESS_DATA = [
+            { id: "b1", name: "Бургерная", price: 50000, income: 500, desc: "Ларёк на пляже", img: "https://via.placeholder.com/300x200?text=Burgers" },
+            { id: "b2", name: "Заправка", price: 200000, income: 2500, desc: "В центре города", img: "https://via.placeholder.com/300x200?text=Gas+Station" },
+        ];
+
+        const FORBES_DATA = [
+            { id: 1, name: "Admin_God", balance: 999999999, level: 100 },
+            { id: 2, name: "DriftKing", balance: 5400000, level: 45 },
+        ];
+
+        const CASES_DATA = [
+            { id: "case_start", name: "Кейс Новичка", price: 2000, img: "https://via.placeholder.com/300x200?text=Starter+Case", items: [{ id: "m1", type: "money", value: 500, name: "$500", rarity: "common", img: "https://via.placeholder.com/100?text=$500" }, { id: "m2", type: "money", value: 3000, name: "$3,000", rarity: "rare", img: "https://via.placeholder.com/100?text=$3K" }, { id: "x1", type: "xp", value: 100, name: "100 XP", rarity: "common", img: "https://via.placeholder.com/100?text=100XP" }, { id: "c1", type: "car", value: "c1", name: "Ibishu Pigeon", rarity: "legendary", img: "https://via.placeholder.com/100?text=Pigeon" }] },
+            { id: "case_street", name: "Форсаж", price: 15000, img: "https://via.placeholder.com/300x200?text=Street+Case", items: [{ id: "m3", type: "money", value: 5000, name: "$5,000", rarity: "common", img: "https://via.placeholder.com/100?text=$5K" }, { id: "c2", type: "car", value: "c2", name: "Ibishu Covet", rarity: "epic", img: "https://via.placeholder.com/100?text=Covet" }, { id: "c3", type: "car", value: "c3", name: "Gavril D-Series", rarity: "legendary", img: "https://via.placeholder.com/100?text=D-Series" }] }
+        ];
+
+        const RARITY_COLORS = { common: "gray", rare: "blue", epic: "purple", legendary: "yellow" };
+        const RARITY_CHANCES = { common: 50, rare: 30, epic: 15, legendary: 5 };
+        const ROULETTE_SEGMENTS = [10, 2, 5, 2, 3, 2, 5, 2, 3, 2, 5, 2, 3, 2, 5, 2, 3, 2, 3, 2];
+        const SEGMENT_COLORS = { 2: '#f3f4f6', 3: '#ef4444', 5: '#22c55e', 10: '#eab308' };
+
+        // --- UI COMPONENTS ---
+        const SafeIcon = ({ name, size = 24, className, ...props }) => {
+            const iconData = window.lucide && window.lucide.icons ? window.lucide.icons[name] : null;
+            if (!iconData) return <span className={`text-[8px] bg-gray-800 px-1 rounded ${className}`}>{name}</span>;
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+                    {iconData.map((child, index) => { const [tag, attrs] = child; return React.createElement(tag, { ...attrs, key: index }); })}
+                </svg>
+            );
+        };
+
+        const Button = ({ children, onClick, variant = 'primary', className = '', disabled = false, size = 'md' }) => {
+            const baseStyle = "rounded-2xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 relative overflow-hidden group";
+            const sizes = { sm: "py-2 px-4 text-xs", md: "py-3.5 px-6 text-sm", lg: "py-4.5 px-8 text-base" };
+            const variants = {
+                primary: "bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-[0_4px_12px_rgba(37,99,235,0.3)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.45)]",
+                secondary: "bg-white/10 text-white backdrop-blur-md border border-white/10",
+                success: "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white",
+                danger: "bg-red-500/10 text-red-400 border border-red-500/20",
+                ghost: "text-gray-400 hover:text-white hover:bg-white/5",
+            };
+            return (
+                <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${sizes[size]} ${variants[variant]} ${disabled ? 'opacity-40 cursor-not-allowed' : ''} ${className}`}>
+                    {children}
+                </button>
+            );
+        };
+
+        const Card = ({ children, className = '', onClick }) => (
+            <div onClick={onClick} className={`glass-card rounded-3xl p-5 border border-white/10 shadow-premium transition-all ${onClick ? 'cursor-pointer active:scale-[0.98] hover:border-white/20' : ''} ${className}`}>
+                {children}
+            </div>
+        );
+
+        const Badge = ({ children, color = 'blue', className = '' }) => {
+            const colors = { blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20', yellow: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20', green: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', red: 'bg-red-500/10 text-red-400 border-red-500/20' };
+            return <span className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest border ${colors[color]} ${className}`}>{children}</span>;
+        };
+
+        const NavButton = ({ icon, label, active, onClick }) => (
+            <button onClick={onClick} className={`flex flex-col items-center justify-center w-14 h-full transition-all ${active ? 'text-blue-500 scale-105' : 'text-gray-600 hover:text-gray-400'}`}>
+                <SafeIcon name={icon} size={22} /><span className="text-[10px] mt-1 font-medium">{label}</span>
+            </button>
+        );
+
+        // --- GAMES ---
+        const RouletteGame = ({ close, user, setUser, showNotify }) => {
+            const [bet, setBet] = useState(100);
+            const [spinning, setSpinning] = useState(false);
+            const [rotation, setRotation] = useState(0);
+            const [history, setHistory] = useState([2, 5, 2, 3, 2]);
+            const [spinCount, setSpinCount] = useState(0);
+
+            const spin = (selectedMultiplier) => {
+                if (user.balance < bet) { showNotify("Не хватает денег", "danger"); return; }
+                setUser(p => ({ ...p, balance: p.balance - bet }));
+                setSpinning(true);
+                const rand = Math.random() * 100;
+                let winMultiplier = 2;
+                if (rand < 5) winMultiplier = 10;
+                else if (rand < 20) winMultiplier = 5;
+                else if (rand < 50) winMultiplier = 3;
+                const indices = ROULETTE_SEGMENTS.map((val, idx) => val === winMultiplier ? idx : -1).filter(idx => idx !== -1);
+                const winIndex = indices[Math.floor(Math.random() * indices.length)];
+                const step = 360 / ROULETTE_SEGMENTS.length;
+                const targetAngle = -(winIndex * step + (step / 2));
+                const newCount = spinCount + 5;
+                setSpinCount(newCount);
+                setRotation(-(newCount * 360) + targetAngle + (Math.random() * 14 - 7));
+                setTimeout(() => {
+                    setSpinning(false);
+                    setHistory(prev => [winMultiplier, ...prev].slice(0, 10));
+                    if (selectedMultiplier === winMultiplier) {
+                        const win = bet * winMultiplier;
+                        setUser(p => ({ ...p, balance: p.balance + win }));
+                        showNotify(`ПОБЕДА! x${winMultiplier} (+$${win})`, 'success');
+                    } else showNotify(`Выпало x${winMultiplier}`, 'danger');
+                }, 5000);
+            };
+
+            const getGradient = () => {
+                let grad = 'conic-gradient(';
+                let angle = 0; const step = 360 / ROULETTE_SEGMENTS.length;
+                ROULETTE_SEGMENTS.forEach((seg, i) => { grad += `${SEGMENT_COLORS[seg]} ${angle}deg ${angle + step}deg${i === ROULETTE_SEGMENTS.length - 1 ? '' : ','}`; angle += step; });
+                return grad + ')';
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in">
+                    <div className="p-6 flex justify-between items-center border-b border-white/5">
+                        <button onClick={close} disabled={spinning} className="w-10 h-10 glass-card rounded-full flex items-center justify-center"><SafeIcon name="ArrowLeft" /></button>
+                        <div className="text-emerald-400 font-mono font-bold">${user.balance.toLocaleString()}</div>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-44 z-30"><div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-white"></div></div>
+                        <div className="w-80 h-80 rounded-full border-[12px] border-white/5 shadow-2xl relative">
+                            <div className="w-full h-full rounded-full transition-transform duration-[5000ms] cubic-bezier" style={{ background: getGradient(), transform: `rotate(${rotation}deg)` }} />
+                        </div>
+                    </div>
+                    <div className="p-8 bg-[#0B0F1A] border-t border-white/5 space-y-6">
+                        <input type="number" value={bet} disabled={spinning} onChange={e => setBet(Number(e.target.value))} className="w-full bg-white/5 p-4 rounded-2xl text-center font-black border border-white/10 outline-none" />
+                        <div className="grid grid-cols-4 gap-4">
+                            {[2, 3, 5, 10].map(m => <button key={m} disabled={spinning} onClick={() => spin(m)} className={`py-6 rounded-2xl font-black text-xl hover:scale-105 transition-all ${m === 2 ? 'bg-gray-100' : m === 3 ? 'bg-red-500' : m === 5 ? 'bg-emerald-500' : 'bg-yellow-500'}`}>{m}x</button>)}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CrashGame = ({ close, user, setUser, showNotify }) => {
+            const [bet, setBet] = useState(100);
+            const [multiplier, setMultiplier] = useState(1.00);
+            const [gameState, setGameState] = useState('idle');
+            const [crashPoint, setCrashPoint] = useState(0);
+
+            useEffect(() => {
+                let interval;
+                if (gameState === 'running') {
+                    interval = setInterval(() => {
+                        setMultiplier(prev => {
+                            const next = prev + 0.01 + (prev * 0.002);
+                            if (next >= crashPoint) { setGameState('crashed'); return crashPoint; }
+                            return next;
+                        });
+                    }, 50);
+                }
+                return () => clearInterval(interval);
+            }, [gameState, crashPoint]);
+
+            const startGame = () => {
+                if (user.balance < bet) { showNotify("Не хватает денег", "danger"); return; }
+                setUser(p => ({ ...p, balance: p.balance - bet }));
+                setCrashPoint(1.2 + Math.random() * 5.0);
+                setMultiplier(1.00);
+                setGameState('running');
+            };
+
+            const cashOut = () => {
+                if (gameState !== 'running') return;
+                setGameState('cashed');
+                const win = Math.floor(bet * multiplier);
+                setUser(p => ({ ...p, balance: p.balance + win }));
+                showNotify(`Забрал: $${win}`, 'success');
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col p-6 animate-fade-in">
+                    <div className="flex justify-between items-center mb-10"><button onClick={close} disabled={gameState === 'running'} className="w-10 h-10 glass-card rounded-full flex items-center justify-center"><SafeIcon name="ArrowLeft" /></button><div className="text-emerald-400 font-bold">${user.balance.toLocaleString()}</div></div>
+                    <div className="flex-1 glass-card rounded-[3rem] flex flex-col items-center justify-center">
+                        <div className={`text-8xl font-black italic ${gameState === 'crashed' ? 'text-red-500' : 'text-white'}`}>{multiplier.toFixed(2)}x</div>
+                        <div className="text-xs font-bold text-gray-500 uppercase mt-4 tracking-widest">{gameState === 'running' ? 'Ракета летит...' : 'Ожидание'}</div>
+                    </div>
+                    <div className="mt-8 space-y-4">
+                        <input type="number" value={bet} disabled={gameState === 'running'} onChange={e => setBet(Number(e.target.value))} className="w-full bg-white/5 p-5 rounded-[2rem] text-center font-black border border-white/10 outline-none" />
+                        {gameState === 'running' ? <Button onClick={cashOut} variant="success" className="w-full h-20 text-xl uppercase">Забрать ${(bet * multiplier).toFixed(0)}</Button> : <Button onClick={startGame} className="w-full h-20 text-xl uppercase">Старт</Button>}
+                    </div>
+                </div>
+            );
+        };
+
+        const CaseOpening = ({ caseId, close, user, setUser, showNotify }) => {
+            const box = CASES_DATA.find(c => c.id === caseId);
+            const [status, setStatus] = useState('idle');
+            const [offset, setOffset] = useState(0);
+            const [wonItem, setWonItem] = useState(null);
+            const itemsTape = useMemo(() => {
+                const arr = [];
+                for (let i = 0; i < 50; i++) {
+                    const r = Math.random() * 100;
+                    let acc = 0, sel = box.items[0];
+                    for (let it of box.items) { if (r <= (acc + RARITY_CHANCES[it.rarity])) { sel = it; break; } acc += RARITY_CHANCES[it.rarity]; }
+                    arr.push(sel);
+                }
+                return arr;
+            }, [box]);
+
+            const spin = () => {
+                if (user.balance < box.price) { showNotify('Недостаточно средств', 'danger'); return; }
+                setUser(p => ({ ...p, balance: p.balance - box.price }));
+                setStatus('spinning');
+                setOffset(35 * 140 - (window.innerWidth / 2) + 70);
+                setTimeout(() => { setWonItem(itemsTape[35]); setStatus('won'); }, 5500);
+            };
+
+            const take = () => {
+                if (wonItem.type === 'money') setUser(p => ({ ...p, balance: p.balance + wonItem.value }));
+                if (wonItem.type === ' car' && user.car !== wonItem.value) setUser(p => ({ ...p, car: wonItem.value }));
+                close();
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                    <div className="p-6 flex justify-between items-center border-b border-white/5"><button onClick={close} disabled={status === 'spinning'} className="w-10 h-10 glass-card rounded-full flex items-center justify-center"><SafeIcon name="ArrowLeft" /></button><div className="font-black italic">{box.name}</div><div className="text-emerald-400 font-bold">${user.balance.toLocaleString()}</div></div>
+                    <div className="flex-1 relative flex flex-col justify-center">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-44 w-0.5 bg-yellow-500 z-20 shadow-[0_0_20px_#eab308]"></div>
+                        <div className="relative h-44 w-full overflow-hidden">
+                            <div className="flex absolute top-0 h-full left-0 pl-[50vw] transition-transform duration-[5500ms] cubic-bezier" style={{ transform: `translateX(-${offset}px)`, gap: '10px' }}>
+                                {itemsTape.map((it, i) => (
+                                    <div key={i} className={`w-[130px] h-full glass-card border-b-4 shrink-0 flex flex-col items-center justify-center p-4 border-${RARITY_COLORS[it.rarity]}-500/50`}>
+                                        <img src={it.img} className="w-16 h-16 object-contain" />
+                                        <div className="text-[10px] font-black mt-2 uppercase">{it.name}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        {status === 'idle' && <div className="mt-20 px-10"><Button onClick={spin} className="w-full h-16 text-lg uppercase">Открыть за ${box.price}</Button></div>}
+                    </div>
+                    {status === 'won' && (
+                        <div className="absolute inset-0 bg-black/90 flex items-center justify-center p-8 z-50 animate-fade-in">
+                            <Card className="w-full max-w-xs text-center p-8 border-yellow-500/30">
+                                <div className="text-yellow-500 font-black uppercase text-xs mb-8 tracking-widest">Поздравляем</div>
+                                <img src={wonItem.img} className="w-32 h-32 mx-auto mb-8 drop-shadow-2xl" />
+                                <div className="text-2xl font-black mb-10 italic uppercase">{wonItem.name}</div>
+                                <Button onClick={take} variant="success" className="w-full py-4 uppercase">Забрать</Button>
+                            </Card>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        function App() {
+            const [activeTab, setActiveTab] = useState('home');
+            const [user, setUser] = useState({ name: "Alex_Drifter", avatar: AVATARS[0], balance: 5000, xp: 0, level: 1, car: null, jobProgress: {} });
+            const [notification, setNotification] = useState(null);
+            const [selectedJobId, setSelectedJobId] = useState(null);
+            const [selectedCaseId, setSelectedCaseId] = useState(null);
+            const [activeGame, setActiveGame] = useState(null);
+            const [working, setWorking] = useState(false);
+
+            const showNotify = (text, type = 'success') => { setNotification({ text, type }); setTimeout(() => setNotification(null), 3000); };
+
+            const handleWork = (id) => {
+                setWorking(true);
+                setTimeout(() => {
+                    setUser(p => {
+                        const prog = p.jobProgress[id] || { level: 1, mins: 0 };
+                        const job = JOBS_DATA[id];
+                        const lvlData = job.levels[prog.level];
+                        let nLvl = prog.level, nMins = prog.mins + 30;
+                        if (lvlData.req_mins > 0 && nMins >= lvlData.req_mins) { nLvl++; nMins = 0; showNotify('Повышение!'); }
+                        else showNotify(`+$${lvlData.salary * 30}`, 'success');
+                        return { ...p, balance: p.balance + lvlData.salary * 30, xp: p.xp + 15, jobProgress: { ...p.jobProgress, [id]: { level: nLvl, mins: nMins } } };
+                    });
+                    setWorking(false);
+                }, 1500);
+            };
+
+            const renderHome = () => (
+                <div className="space-y-8 animate-fade-in pb-28">
+                    <div className="relative h-72 rounded-b-[3rem] overflow-hidden">
+                        <img src="https://via.placeholder.com/600x400?text=BeamNG+RP+Majestic" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A] flex flex-col justify-end p-8">
+                            <Badge color="yellow" className="w-fit mb-3">Spring 2026</Badge>
+                            <h1 className="text-5xl font-black italic tracking-tighter">MAJESTIC<span className="text-blue-500 font-light not-italic ml-2">RP</span></h1>
+                        </div>
+                    </div>
+                    <div className="px-6 grid grid-cols-2 gap-4">
+                        <Card onClick={() => setActiveTab('jobs')} className="flex flex-col items-center gap-3 py-6"><SafeIcon name="Briefcase" className="text-blue-400" size={28} /><span className="font-bold">Карьера</span></Card>
+                        <Card onClick={() => setActiveTab('dealer')} className="flex flex-col items-center gap-3 py-6"><SafeIcon name="Car" className="text-purple-400" size={28} /><span className="font-bold">Автосалон</span></Card>
+                    </div>
+                </div>
+            );
+
+            const renderJobs = () => (
+                <div className="p-6 space-y-6 pb-28 animate-fade-in">
+                    <h2 className="text-3xl font-black italic">КАРЬЕРА</h2>
+                    {Object.values(JOBS_DATA).map(j => (
+                        <Card key={j.id} onClick={() => setSelectedJobId(j.id)} className="flex items-center gap-4 py-4">
+                            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400"><SafeIcon name={j.iconName} size={28} /></div>
+                            <div className="font-bold text-lg">{j.title}</div>
+                        </Card>
+                    ))}
+                </div>
+            );
+
+            const renderJobDetail = () => {
+                const j = JOBS_DATA[selectedJobId];
+                const p = user.jobProgress[selectedJobId] || { level: 1, mins: 0 };
+                const lvl = j.levels[p.level];
+                return (
+                    <div className="p-6 animate-slide-in pb-28">
+                        <button onClick={() => setSelectedJobId(null)} className="mb-6"><SafeIcon name="ArrowLeft" /></button>
+                        <img src={lvl.img} className="w-full h-44 object-cover rounded-3xl mb-6 shadow-2xl" />
+                        <h2 className="text-3xl font-black mb-8 italic">{lvl.name}</h2>
+                        <div className="grid grid-cols-2 gap-4 mb-8">
+                            <Card className="text-center"><div className="text-[10px] text-gray-500 uppercase font-black mb-1">Зарплата</div><div className="text-xl font-bold">${lvl.salary}/30м</div></Card>
+                            <Card className="text-center"><div className="text-[10px] text-gray-500 uppercase font-black mb-1">Минуты</div><div className="text-xl font-bold">{p.mins}</div></Card>
+                        </div>
+                        <Button onClick={() => handleWork(j.id)} disabled={working} variant="success" className="w-full h-16 uppercase text-lg">{working ? 'Работаем...' : 'Начать смену'}</Button>
+                    </div>
+                )
+            };
+
+            const renderProfile = () => (
+                <div className="p-8 flex flex-col items-center space-y-8 animate-fade-in pb-28">
+                    <img src={user.avatar} className="w-32 h-32 rounded-full border-4 border-blue-500 shadow-2xl" />
+                    <h2 className="text-3xl font-black italic">{user.name}</h2>
+                    <div className="w-full space-y-2">
+                        <div className="flex justify-between text-xs font-bold uppercase text-gray-400"><span>Level {user.level}</span><span>{user.xp}/1000 XP</span></div>
+                        <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/5"><div className="h-full bg-blue-500" style={{ width: `${(user.xp % 1000) / 10}%` }}></div></div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen bg-[#0B0F1A] text-white relative shadow-2xl overflow-hidden font-sans">
+                    <div className="sticky top-0 z-30 bg-[#0B0F1A]/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-white/5">
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold italic"><SafeIcon name="Wallet" size={16} />${user.balance.toLocaleString()}</div>
+                        <Badge color="blue">Level {user.level}</Badge>
+                    </div>
+
+                    <div className="min-h-screen">
+                        {activeTab === 'home' && renderHome()}
+                        {activeTab === 'jobs' && (selectedJobId ? renderJobDetail() : renderJobs())}
+                        {activeTab === 'profile' && renderProfile()}
+                        {activeTab === 'more' && (
+                            <div className="p-6 grid grid-cols-2 gap-4 animate-fade-in pb-28">
+                                <Card onClick={() => setSelectedCaseId('case_start')} className="col-span-2 py-10 flex flex-col items-center bg-yellow-500/10 border-yellow-500/20"><SafeIcon name="Gift" className="text-yellow-500 mb-2" size={32} /><span className="font-black italic">КЕЙСЫ</span></Card>
+                                <Card onClick={() => setActiveGame('roulette')} className="py-6 flex flex-col items-center"><SafeIcon name="Disc" className="text-red-400 mb-2" /><span className="font-bold">Рулетка</span></Card>
+                                <Card onClick={() => setActiveGame('crash')} className="py-6 flex flex-col items-center"><SafeIcon name="Zap" className="text-blue-400 mb-2" /><span className="font-bold">Краш</span></Card>
+                            </div>
+                        )}
+                    </div>
+
+                    {selectedCaseId && <CaseOpening caseId={selectedCaseId} close={() => setSelectedCaseId(null)} user={user} setUser={setUser} showNotify={showNotify} />}
+                    {activeGame === 'roulette' && <RouletteGame close={() => setActiveGame(null)} user={user} setUser={setUser} showNotify={showNotify} />}
+                    {activeGame === 'crash' && <CrashGame close={() => setActiveGame(null)} user={user} setUser={setUser} showNotify={showNotify} />}
+
+                    {notification && <div className={`fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-premium z-50 flex items-center gap-3 font-bold animate-bounce-in glass-card-bright border-white/20 ${notification.type === 'danger' ? 'text-red-400' : 'text-emerald-400'}`}>{notification.text}</div>}
+
+                    <div className="fixed bottom-0 left-0 right-0 p-4 z-40 bg-gradient-to-t from-[#0B0F1A] to-transparent">
+                        <div className="max-w-md mx-auto glass-card-bright rounded-[2.5rem] px-2 py-2 flex justify-between items-center shadow-2xl border-white/10">
+                            <NavButton icon="Home" label="Главная" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+                            <NavButton icon="Briefcase" label="Карьера" active={activeTab === 'jobs'} onClick={() => setActiveTab('jobs')} />
+                            <div className="relative -mt-12" onClick={() => setActiveTab('dealer')}><div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-40 animate-pulse"></div><div className={`w-16 h-16 rounded-full flex items-center justify-center border-4 border-[#0B0F1A] shadow-2xl relative z-10 transition-all ${activeTab === 'dealer' ? 'bg-blue-600 scale-110' : 'bg-gray-800'}`}><SafeIcon name="Car" size={28} /></div></div>
+                            <NavButton icon="User" label="Профиль" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
+                            <NavButton icon="MoreHorizontal" label="Ещё" active={activeTab === 'more'} onClick={() => setActiveTab('more')} />
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
