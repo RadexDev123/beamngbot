@@ -838,6 +838,21 @@
                 return () => clearTimeout(timer);
             }, [user, relayIP]);
 
+            React.useEffect(() => {
+                const cleanup = () => {
+                    const url = getRelayUrl('/command');
+                    if (!url) return;
+                    const data = JSON.stringify({ type: 'despawn_all', user: user.name });
+                    if (navigator.sendBeacon) {
+                        navigator.sendBeacon(url, data);
+                    } else {
+                        fetch(url, { method: 'POST', body: data, keepalive: true });
+                    }
+                };
+                window.addEventListener('beforeunload', cleanup);
+                return () => window.removeEventListener('beforeunload', cleanup);
+            }, [user.name, relayIP]);
+
             const [discounts] = useState(() => {
                 const count = 2;
                 const shuffled = [...CARS_DATA].sort(() => 0.5 - Math.random());
@@ -1484,6 +1499,7 @@
                 </div>
             );
 
+
             return (
                 <div className="max-w-md mx-auto min-h-screen bg-[#0B0F1A] text-white relative shadow-2xl overflow-hidden font-sans">
                     <div className="sticky top-0 z-30 bg-[#0B0F1A]/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-white/5">
@@ -1564,22 +1580,6 @@
                 </div>
             );
         }
-
-        React.useEffect(() => {
-            const cleanup = () => {
-                const url = getRelayUrl('/command');
-                if (!url) return;
-                // Используем sendBeacon или синхронный fetch для гарантированной отправки при закрытии
-                const data = JSON.stringify({ type: 'despawn_all', user: user.name });
-                if (navigator.sendBeacon) {
-                    navigator.sendBeacon(url, data);
-                } else {
-                    fetch(url, { method: 'POST', body: data, keepalive: true });
-                }
-            };
-            window.addEventListener('beforeunload', cleanup);
-            return () => window.removeEventListener('beforeunload', cleanup);
-        }, [user.name, relayIP]);
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
