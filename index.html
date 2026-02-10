@@ -437,7 +437,8 @@
             const [activeTab, setActiveTab] = useState('home');
             const [user, setUser] = useState(() => {
                 const tgUser = tg?.initDataUnsafe?.user;
-                return {
+                const localData = localStorage.getItem('user_data');
+                const defaultUser = {
                     id: tgUser?.id || 0,
                     name: tgUser ? `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}` : "Alex_Drifter",
                     avatar: tgUser?.photo_url || AVATARS[0],
@@ -446,8 +447,21 @@
                     level: 1,
                     garage: [],
                     businesses: [],
-                    jobProgress: {} // { jobID: { level: 1, km: 0 } }
+                    jobProgress: {}
                 };
+
+                if (localData) {
+                    try {
+                        const parsed = JSON.parse(localData);
+                        // Если ID совпадает с текущим пользователем Telegram, используем локальные данные
+                        if (parsed.id === (tgUser?.id || 0)) {
+                            return { ...defaultUser, ...parsed };
+                        }
+                    } catch (e) {
+                        console.error("Local storage parse error", e);
+                    }
+                }
+                return defaultUser;
             });
 
             const isAdmin = useMemo(() => ADMIN_IDS.includes(Number(user.id)), [user.id]);
@@ -485,6 +499,10 @@
             useEffect(() => {
                 const saveUserData = async () => {
                     if (!user.id) return;
+
+                    // Сохраняем локально В ЛЮБОМ СЛУЧАЕ
+                    localStorage.setItem('user_data', JSON.stringify(user));
+
                     try {
                         const garageModels = user.garage.map(cid => {
                             const car = CARS_DATA.find(c => c.id === cid);
@@ -497,7 +515,7 @@
                             body: JSON.stringify({ ...user, garageModels })
                         });
                     } catch (e) {
-                        console.error("Auto-save failed", e);
+                        console.error("Auto-save to server failed", e);
                     }
                 };
                 const timer = setTimeout(saveUserData, 2000);
