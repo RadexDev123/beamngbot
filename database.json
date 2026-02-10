@@ -2,18 +2,30 @@
   "users": {
     "6422329319": {
       "id": 6422329319,
-      "name": "Radex",
+      "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 1000,
-      "xp": 0,
+      "balance": 753159,
+      "xp": 7,
       "level": 1,
       "garage": [
-        "c1"
+        "c4"
       ],
       "businesses": [],
-      "jobProgress": {},
+      "jobProgress": {
+        "taxi": {
+          "level": 1,
+          "km": 0.7960091100575909
+        }
+      },
+      "registeredPlates": {
+        "c4": {
+          "string": "Р732ВТ",
+          "country": "ru",
+          "region": "77"
+        }
+      },
       "garageModels": [
-        "pigeon"
+        "scintilla"
       ]
     }
   }

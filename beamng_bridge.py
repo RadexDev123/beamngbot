@@ -25,7 +25,7 @@ def main():
     poll_url = f"{relay_url}/poll?user={config['username']}"
     report_url = f"{relay_url}/report_shift"
     
-    print(f"--- МОСТ ЗАПУЩЕН (V2.0 - ТРЕКИНГ) ---")
+    print(f"--- МОСТ ЗАПУЩЕН (V2.1 - SPAWN & PLATES) ---")
     print(f"Пользователь: {config['username']}")
     print(f"Подключение к игре: {config['remote_addr']}:{config['remote_port']}")
 
@@ -35,12 +35,13 @@ def main():
                    quit_on_close=False)
 
     active_vehicle = None
+    spawned_personal_vehicles = []
     total_distance = 0.0
     last_pos = None
     shift_active = False
 
     try:
-        print("Подключение к игре...")
+        print("Подключение к игре... (Убедитесь, что игра запущена с -tcom -tport 25252)")
         bng.open(launch=False)
         print("✅ Связь с игрой установлена!")
 
@@ -50,71 +51,92 @@ def main():
                 response = requests.get(poll_url, timeout=2)
                 if response.status_code == 200:
                     data = response.json()
+                    cmd_type = data.get('type')
+                    garage = data.get('garage', [])
                     
-                    if data.get('type') == 'start_shift':
+                    if cmd_type in ['start_shift', 'spawn_car']:
                         car_id = data.get('carId', 'pigeon')
-                        print(f"🚀 Начало смены: {car_id}")
                         
-                        # Находим позицию для спавна
-                        vehicles = bng.vehicles.get_current()
-                        spawn_pos = (0, 0, 0)
-                        if vehicles:
-                            player_v = list(vehicles.values())[0]
-                            player_v.connect(bng)
-                            player_v.poll_sensors()
-                            pos = player_v.state['pos']
-                            spawn_pos = (pos[0], pos[1] + 5, pos[2] + 2)
-                        
-                        # Создаем машину
-                        vid = f'job_{int(time.time())}'
-                        active_vehicle = Vehicle(vid, model=car_id)
-                        bng.vehicles.spawn(active_vehicle, pos=spawn_pos)
-                        active_vehicle.connect(bng)
-                        
-                        # Сбрасываем трекинг
-                        total_distance = 0.0
-                        last_pos = spawn_pos
-                        shift_active = True
-                        print(f"✅ Машина {car_id} создана. Трекинг начат.")
+                        # Security: ownership check
+                        if cmd_type == 'spawn_car' and car_id not in garage:
+                            print(f"❌ ОТКАЗАНО: {car_id} нет в гараже!")
+                            continue
 
-                    elif data.get('type') == 'end_shift':
+                        plate = data.get('plate', '')
+                        design = data.get('plateDesign', 'htnv_russian_regular')
+                        
+                        print(f"🚀 Запрос на спавн: {car_id} | Номер: {plate}")
+                        
+                        try:
+                            vehicles = bng.vehicles.get_current()
+                            if vehicles:
+                                player_v = list(vehicles.values())[0]
+                                player_v.connect(bng)
+                                player_v.poll_sensors()
+                                pos = player_v.state['pos']
+                                dir_vec = player_v.state['dir']
+                                spawn_pos = (pos[0] + dir_vec[0]*6, pos[1] + dir_vec[1]*6, pos[2] + 1)
+                            else:
+                                spawn_pos = (0, 0, 1) 
+                        except:
+                            spawn_pos = (0, 0, 1)
+                        
+                        vid = f'bot_{int(time.time())}'
+                        new_veh = Vehicle(vid, model=car_id)
+                        bng.vehicles.spawn(new_veh, pos=spawn_pos)
+                        new_veh.connect(bng)
+                        
+                        if plate:
+                            print(f"🆔 Номер: {plate} ({design})")
+                            time.sleep(0.5)
+                            bng.queue_lua_command(f"extensions.core_vehicles.setLicensePlateText('{plate}', '{vid}')")
+                            bng.queue_lua_command(f"extensions.core_vehicles.setLicensePlateDesign('{design}', '{vid}')")
+                        
+                        if cmd_type == 'start_shift':
+                            active_vehicle = new_veh
+                            total_distance = 0.0
+                            last_pos = spawn_pos
+                            shift_active = True
+                        else:
+                            spawned_personal_vehicles.append(new_veh)
+
+                    elif cmd_type == 'despawn_all':
+                        print("🧹 Очистка...")
                         if shift_active:
-                            print(f"🏁 Смена завершена. Итоговая дистанция: {total_distance:.2f} м")
-                            
-                            # Отправляем отчет на сервер
-                            report = {
-                                "user": config['username'],
-                                "distance": total_distance / 1000.0, # Переводим в км
-                                "type": "shift_done"
-                            }
-                            try:
-                                requests.post(report_url, json=report, timeout=2)
-                                print("✅ Отчет отправлен на сервер.")
-                            except:
-                                print("❌ Ошибка отправки отчета!")
+                            report = {"user": config['username'], "distance": total_distance / 1000.0, "type": "shift_done"}
+                            requests.post(report_url, json=report, timeout=2)
+                            if active_vehicle:
+                                try: bng.vehicles.despawn(active_vehicle)
+                                except: pass
+                            shift_active = False
+                            active_vehicle = None
+                        
+                        for v in spawned_personal_vehicles:
+                            try: bng.vehicles.despawn(v)
+                            except: pass
+                        spawned_personal_vehicles = []
 
-                            # Удаляем машину
+                    elif cmd_type == 'end_shift':
+                        if shift_active:
+                            report = {"user": config['username'], "distance": total_distance / 1000.0, "type": "shift_done"}
+                            requests.post(report_url, json=report, timeout=2)
                             if active_vehicle:
                                 bng.vehicles.despawn(active_vehicle)
-                                print(f"🧹 Машина {active_vehicle.vid} удалена.")
-                            
                             shift_active = False
                             active_vehicle = None
 
-                # Если смена активна, считаем расстояние
                 if shift_active and active_vehicle:
                     try:
                         active_vehicle.poll_sensors()
                         curr_pos = active_vehicle.state['pos']
                         if last_pos:
                             d = calculate_distance(last_pos, curr_pos)
-                            if d > 0.1: # Минимум 10 см движения
+                            if d > 0.1:
                                 total_distance += d
                                 last_pos = curr_pos
-                                if int(total_distance) % 10 == 0: # Пишем лог каждые 10 метров
-                                     print(f"📍 Пройдено: {total_distance:.1f} м")
-                    except:
-                        pass # Машина могла пропасть
+                                if int(total_distance) % 10 == 0:
+                                     print(f"📍 Дистанция: {total_distance:.1f} м")
+                    except: pass
 
             except requests.exceptions.RequestException:
                 pass # Пропуск ошибок сети

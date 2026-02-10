@@ -902,15 +902,25 @@
                 const car = CARS_DATA.find(c => c.id === id);
                 const model = car ? car.car : 'pigeon';
 
+                // Для htnv мода номер должен быть слитным (A000AA000)
+                const fullPlateText = (plateData.string + plateData.region).replace(/\s/g, '');
+
                 sendGameCommand({
                     type: 'spawn_car',
                     carId: model,
                     user: user.name,
-                    plate: plateData.string,
-                    plateRegion: plateData.region,
-                    plateCountry: plateData.country
+                    plate: fullPlateText,
+                    plateDesign: 'htnv_russian_regular' // Дизайн из мода пользователя
                 });
                 showNotify('Запрос на спавн отправлен!', 'success');
+            };
+
+            const handleDespawnCar = () => {
+                sendGameCommand({
+                    type: 'despawn_all',
+                    user: user.name
+                });
+                showNotify('Запрос на удаление авто отправлен', 'success');
             };
 
             const handleSellCar = (carId, index) => {
@@ -1202,6 +1212,7 @@
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <Button variant="danger" size="sm" onClick={() => handleSellCar(carId, i)} className="text-[8px] uppercase px-2 py-1 h-8">Продать</Button>
+                                                    {plate && <Button variant="secondary" size="sm" onClick={handleDespawnCar} className="text-[8px] uppercase px-2 py-1 h-8">Убрать</Button>}
                                                     <Button variant={plate ? "ghost" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId)} disabled={!plate} className={`text-[8px] uppercase px-3 py-1 h-8 ${!plate ? 'opacity-20' : ''}`}>Спавн</Button>
                                                 </div>
                                             </Card>
@@ -1553,6 +1564,22 @@
                 </div>
             );
         }
+
+        React.useEffect(() => {
+            const cleanup = () => {
+                const url = getRelayUrl('/command');
+                if (!url) return;
+                // Используем sendBeacon или синхронный fetch для гарантированной отправки при закрытии
+                const data = JSON.stringify({ type: 'despawn_all', user: user.name });
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon(url, data);
+                } else {
+                    fetch(url, { method: 'POST', body: data, keepalive: true });
+                }
+            };
+            window.addEventListener('beforeunload', cleanup);
+            return () => window.removeEventListener('beforeunload', cleanup);
+        }, [user.name, relayIP]);
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
