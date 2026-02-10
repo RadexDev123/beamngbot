@@ -88,9 +88,11 @@ def main():
                         new_veh.connect(bng)
                         
                         if plate:
-                            print(f"🆔 Номер: {plate} ({design})")
-                            time.sleep(0.5)
-                            bng.queue_lua_command(f"extensions.core_vehicles.setLicensePlateText('{plate}', '{vid}')")
+                            plate_upper = plate.upper()
+                            print(f"🆔 Установка номера: {plate_upper} ({design})")
+                            # Даем машине время на инициализацию Lua
+                            time.sleep(1.5)
+                            bng.queue_lua_command(f"extensions.core_vehicles.setLicensePlateText('{plate_upper}', '{vid}')")
                             bng.queue_lua_command(f"extensions.core_vehicles.setLicensePlateDesign('{design}', '{vid}')")
                         
                         if cmd_type == 'start_shift':
