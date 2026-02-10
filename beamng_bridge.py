@@ -56,6 +56,7 @@ def main():
                     
                     if cmd_type in ['start_shift', 'spawn_car']:
                         car_id = data.get('carId', 'pigeon')
+                        mafia_target = data.get('mafiaTarget')
                         
                         # Security: ownership check
                         if cmd_type == 'spawn_car' and car_id not in garage:
@@ -97,6 +98,19 @@ def main():
                             total_distance = 0.0
                             last_pos = spawn_pos
                             shift_active = True
+                            
+                            if mafia_target:
+                                target_model = mafia_target.get('model', 'pessima')
+                                print(f"🕵️ ЗАДАНИЕ МАФИИ: Угнать {mafia_target.get('name')} ({mafia_target.get('color')})")
+                                # Рандомные точки спавна
+                                spawn_points = [(100, 100, 5), (-100, 200, 5), (300, -100, 5), (50, -300, 5)]
+                                import random
+                                t_pos = random.choice(spawn_points)
+                                t_vid = f'target_{int(time.time())}'
+                                t_veh = Vehicle(t_vid, model=target_model)
+                                bng.vehicles.spawn(t_veh, pos=t_pos)
+                                spawned_personal_vehicles.append(t_veh) # Для очистки
+                                print(f"📍 Цель заспавнена в [{t_pos[0]}, {t_pos[1]}]")
                         else:
                             spawned_personal_vehicles.append(new_veh)
 

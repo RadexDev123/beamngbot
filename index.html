@@ -100,9 +100,15 @@
         ];
 
         const JOBS_DATA = {
-            taxi: { id: "taxi", req_user_lvl: 1, title: "Такси", iconName: "Car", color: "yellow", levels: { 1: { name: "Бомбила", car: "pigeon", salary: 200, req_km: 10, img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Комфорт", car: "pessima", salary: 200, req_km: 30, img: "https://images.unsplash.com/photo-1520050206274-a1ae446cb3cc?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Бизнес", car: "etk800", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop" } } },
-            bus: { id: "bus", req_user_lvl: 2, title: "Автобус", iconName: "Bus", color: "blue", levels: { 1: { name: "Новичок", car: "citybus", salary: 200, req_km: 20, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Водитель", car: "citybus", salary: 200, req_km: 50, img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "citybus", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1494515843206-f3117d3f51b7?q=80&w=1000&auto=format&fit=crop" } } },
-            police: { id: "police", req_user_lvl: 3, title: "Полиция", iconName: "Siren", color: "indigo", levels: { 1: { name: "Кадет", car: "sunburst", salary: 200, req_km: 40, img: "https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Офицер", car: "fullsize", salary: 200, req_km: 80, img: "https://images.unsplash.com/photo-1621251918365-184583d7396c?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Шериф", car: "roamer", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1590133323090-f89918f9ad3d?q=80&w=1000&auto=format&fit=crop" } } }
+            taxi: { id: "taxi", tier: 1, req_user_lvl: 1, title: "Такси", iconName: "Car", color: "yellow", levels: { 1: { name: "Бомбила", car: "pessima", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Комфорт", car: "sunburst", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1520050206274-a1ae446cb3cc?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Бизнес", car: "etk800", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop" } } },
+            courier: { id: "courier", tier: 1, req_user_lvl: 1, title: "Курьер", iconName: "Package", color: "orange", levels: { 1: { name: "Вело-доставка", car: "pigeon", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1526367790999-0150786486a9?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Авто-курьер", car: "pessima", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1521316730702-829ad38679b9?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Служба доставки", car: "van", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1549194388-f61be84a6e9e?q=80&w=1000&auto=format&fit=crop" } } },
+            marshrutka: { id: "marshrutka", tier: 2, req_user_lvl: 2, title: "Маршрутчик", iconName: "Users", color: "emerald", levels: { 1: { name: "Линия 1", car: "van", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1557223562-6c77ff16210f?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Линия 2", car: "van", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1464219789935-c2d9d9aba644?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "van", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1556122071-e404be9153bf?q=80&w=1000&auto=format&fit=crop" } } },
+            bus: { id: "bus", tier: 2, req_user_lvl: 2, title: "Автобус", iconName: "Bus", color: "blue", levels: { 1: { name: "Пригород", car: "citybus", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Городской", car: "citybus", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "citybus", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1494515843206-f3117d3f51b7?q=80&w=1000&auto=format&fit=crop" } } },
+            ambulance: { id: "ambulance", tier: 3, req_user_lvl: 3, title: "Скорая помощь", iconName: "Ambulance", color: "red", levels: { 1: { name: "Санитар", car: "van", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1587748823463-c362a11f81d2?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Фельдшер", car: "roamer", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1516515429572-1b68098261e3?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Реанимация", car: "van", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1578330861461-9c173599a09c?q=80&w=1000&auto=format&fit=crop" } } },
+            trucker: { id: "trucker", tier: 3, req_user_lvl: 3, title: "Дальнобойщик", iconName: "Truck", color: "teal", levels: { 1: { name: "Новичок", car: "tseries", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1501700493717-9c9dc863bb08?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Дальнобой", car: "tseries", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1586191582056-a15cf111867f?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "tseries", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=1000&auto=format&fit=crop" } } },
+            police: { id: "police", tier: 4, req_user_lvl: 4, title: "Полиция", iconName: "Siren", color: "indigo", levels: { 1: { name: "Кадет", car: "sunburst", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Офицер", car: "fullsize", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1621251918365-184583d7396c?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Шериф", car: "roamer", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1590133323090-f89918f9ad3d?q=80&w=1000&auto=format&fit=crop" } } },
+            government: { id: "government", tier: 4, req_user_lvl: 4, title: "Правительство", iconName: "Building2", color: "slate", levels: { 1: { name: "Чиновник", car: "pessima", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1541872703-74c5e443d1fe?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Министр", car: "etk800", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Президент", car: "scintilla", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop" } } },
+            mafia: { id: "mafia", tier: 4, req_user_lvl: 4, title: "Мафиозник", iconName: "Skull", color: "zinc", levels: { 1: { name: "Шнырь", car: "pessima", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Гангстер", car: "roamer", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Босс", car: "vivace", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1505312019124-7476579b69b6?q=80&w=1000&auto=format&fit=crop" } } }
         };
 
         const CARS_DATA = [
@@ -773,6 +779,8 @@
             const [working, setWorking] = useState(false);
             const [showEditProfile, setShowEditProfile] = useState(false);
             const [showAdminPanel, setShowAdminPanel] = useState(false);
+            const [mafiaTarget, setMafiaTarget] = useState(null);
+            const [spawnedVehicles, setSpawnedVehicles] = useState([]); // Array of carIds
 
             useEffect(() => {
                 const loadUserData = async () => {
@@ -894,18 +902,37 @@
                 const p = user.jobProgress[id] || { level: 1, km: 0 };
                 const lvl = job.levels[p.level];
 
-                // Для рабочих машин можно использовать дефолтный номер или какой-то уникальный
-                // Но если пользователь хочет, можем попробовать найти машину в гараже с таким же типом
-                // Для простоты пока просто передаем 'WORKPLATE' или пусто
+                let mafiaData = {};
+                if (id === 'mafia') {
+                    const models = ['Ibishu Pessima', 'Hirochi Sunburst', 'ETK 800', 'Cherrier Vivace', 'Bruckell Bastion'];
+                    const modelIds = ['pessima', 'sunburst', 'etk800', 'vivace', 'bastion'];
+                    const colors = ['Красный', 'Черный', 'Белый', 'Синий', 'Зеленый'];
+                    const idx = Math.floor(Math.random() * models.length);
+                    const target = {
+                        name: models[idx],
+                        model: modelIds[idx],
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        reward: 5000 + (p.level * 3000)
+                    };
+                    setMafiaTarget(target);
+                    mafiaData = { mafiaTarget: target };
+                }
+
                 setWorking(true);
                 sendGameCommand({
                     type: 'start_shift',
                     carId: lvl.car,
                     user: user.name,
-                    plate: 'SERVICE',
-                    plateCountry: 'ru'
+                    plate: id === 'police' ? 'POLICE' : id === 'ambulance' ? 'MEDIC' : 'SERVICE',
+                    plateCountry: 'ru',
+                    ...mafiaData
                 });
-                showNotify('Смена начата! Машина заспавлена.', 'success');
+
+                if (id === 'mafia') {
+                    showNotify(`ЦЕЛЬ: ${mafiaData.mafiaTarget.name} (${mafiaData.mafiaTarget.color})`, 'warning');
+                } else {
+                    showNotify('Смена начата! Машина заспавлена.', 'success');
+                }
             };
 
             const handleSpawnCar = (id) => {
@@ -917,6 +944,7 @@
                 const car = CARS_DATA.find(c => c.id === id);
                 const model = car ? car.car : 'pigeon';
 
+                setSpawnedVehicles(prev => [...prev, model]);
                 // Для htnv мода номер должен быть слитным (A000AA000)
                 const fullPlateText = (plateData.string + plateData.region).replace(/\s/g, '');
 
@@ -930,9 +958,13 @@
                 showNotify('Запрос на спавн отправлен!', 'success');
             };
 
-            const handleDespawnCar = () => {
+            const handleDespawnCar = (carId) => {
+                const car = CARS_DATA.find(c => c.id === carId || c.car === carId);
+                const modelId = car ? car.car : carId;
+
+                setSpawnedVehicles(prev => prev.filter(id => id !== modelId));
                 sendGameCommand({
-                    type: 'despawn_all',
+                    type: 'despawn_all', // Мост деспавнит всё, что мы заспавнили
                     user: user.name
                 });
                 showNotify('Запрос на удаление авто отправлен', 'success');
@@ -1059,26 +1091,35 @@
             );
 
             const renderJobs = () => (
-                <div className="p-6 space-y-6 pb-28 animate-fade-in">
+                <div className="p-6 space-y-8 pb-28 animate-fade-in">
                     <h2 className="text-3xl font-black italic uppercase">Карьера</h2>
-                    <div className="space-y-4">
-                        {Object.values(JOBS_DATA).map(j => {
-                            const p = user.jobProgress[j.id] || { level: 1, mins: 0 };
-                            return (
-                                <Card key={j.id} onClick={() => setSelectedJobId(j.id)} className="flex items-center gap-4 py-5 group">
-                                    <div className={`w-16 h-16 rounded-2xl bg-${j.color}-500/10 flex items-center justify-center text-${j.color}-400 group-hover:scale-110 transition-transform`}><SafeIcon name={j.iconName} size={32} /></div>
-                                    <div className="flex-1">
-                                        <div className="font-black text-lg italic uppercase">{j.title}</div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <Badge color={user.level >= j.req_user_lvl ? 'green' : 'red'}>{user.level >= j.req_user_lvl ? 'Доступно' : `Ур. ${j.req_user_lvl}`}</Badge>
-                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Ранг {p.level}/3</span>
-                                        </div>
-                                    </div>
-                                    <SafeIcon name="ChevronRight" size={20} className="text-gray-700" />
-                                </Card>
-                            )
-                        })}
-                    </div>
+                    {[1, 2, 3, 4].map(tier => (
+                        <div key={tier} className="space-y-4">
+                            <h3 className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                                <div className="h-px flex-1 bg-white/5"></div>
+                                Уровень {tier}
+                                <div className="h-px flex-1 bg-white/5"></div>
+                            </h3>
+                            <div className="space-y-3">
+                                {Object.values(JOBS_DATA).filter(j => j.tier === tier).map(j => {
+                                    const p = user.jobProgress[j.id] || { level: 1, km: 0 };
+                                    return (
+                                        <Card key={j.id} onClick={() => setSelectedJobId(j.id)} className="flex items-center gap-4 py-5 group bg-white/[0.02] border-white/5">
+                                            <div className={`w-14 h-14 rounded-2xl bg-${j.color}-500/10 flex items-center justify-center text-${j.color}-400 group-hover:scale-110 transition-transform`}><SafeIcon name={j.iconName} size={28} /></div>
+                                            <div className="flex-1">
+                                                <div className="font-black text-base italic uppercase">{j.title}</div>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <Badge color={user.level >= j.req_user_lvl ? 'green' : 'red'}>{user.level >= j.req_user_lvl ? 'Доступно' : `Ур. ${j.req_user_lvl}`}</Badge>
+                                                    <span className="text-[8px] text-gray-500 font-bold uppercase tracking-widest">Ранг {p.level}/3</span>
+                                                </div>
+                                            </div>
+                                            <SafeIcon name="ChevronRight" size={16} className="text-gray-700" />
+                                        </Card>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             );
 
@@ -1123,9 +1164,18 @@
 
                         <div className="pt-4">
                             {working ? (
-                                <Button onClick={() => handleFinishShift(j.id)} variant="danger" className="w-full h-16 uppercase text-lg italic tracking-tighter">
-                                    Завершить смену
-                                </Button>
+                                <div className="space-y-4">
+                                    {selectedJobId === 'mafia' && mafiaTarget && (
+                                        <Card className="bg-red-900/20 border-red-500/30 p-4 border-2 animate-pulse">
+                                            <div className="text-[10px] text-red-400 font-black uppercase tracking-widest mb-1">Текущая цель</div>
+                                            <div className="text-lg font-black italic uppercase">{mafiaTarget.name}</div>
+                                            <div className="text-xs text-gray-400 uppercase font-bold">{mafiaTarget.color}</div>
+                                        </Card>
+                                    )}
+                                    <Button onClick={() => { handleFinishShift(j.id); setSpawnedVehicles([]); setMafiaTarget(null); }} variant="danger" className="w-full h-16 uppercase text-lg italic tracking-tighter">
+                                        Завершить смену
+                                    </Button>
+                                </div>
                             ) : (
                                 <Button onClick={() => handleWork(j.id)} disabled={user.level < j.req_user_lvl} variant="primary" className="w-full h-16 uppercase text-lg italic tracking-tighter">
                                     {user.level < j.req_user_lvl ? `Нужен ${j.req_user_lvl} уровень` : 'Выйти на смену'}
@@ -1227,8 +1277,8 @@
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <Button variant="danger" size="sm" onClick={() => handleSellCar(carId, i)} className="text-[8px] uppercase px-2 py-1 h-8">Продать</Button>
-                                                    {plate && <Button variant="secondary" size="sm" onClick={handleDespawnCar} className="text-[8px] uppercase px-2 py-1 h-8">Убрать</Button>}
-                                                    <Button variant={plate ? "ghost" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId)} disabled={!plate} className={`text-[8px] uppercase px-3 py-1 h-8 ${!plate ? 'opacity-20' : ''}`}>Спавн</Button>
+                                                    {spawnedVehicles.includes(car.car) && <Button variant="secondary" size="sm" onClick={() => handleDespawnCar(car.car)} className="text-[8px] uppercase px-2 py-1 h-8">Убрать</Button>}
+                                                    {!spawnedVehicles.includes(car.car) && <Button variant={plate ? "ghost" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId)} disabled={!plate} className={`text-[8px] uppercase px-3 py-1 h-8 ${!plate ? 'opacity-20' : ''}`}>Спавн</Button>}
                                                 </div>
                                             </Card>
                                         );

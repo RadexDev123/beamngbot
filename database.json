@@ -4,11 +4,11 @@
       "id": 6422329319,
       "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 753159,
+      "balance": 867579,
       "xp": 7,
       "level": 1,
       "garage": [
-        "c4"
+        "c2"
       ],
       "businesses": [],
       "jobProgress": {
@@ -22,10 +22,15 @@
           "string": "Р732ВТ",
           "country": "ru",
           "region": "77"
+        },
+        "c2": {
+          "string": "Т829ВК",
+          "country": "ru",
+          "region": "77"
         }
       },
       "garageModels": [
-        "scintilla"
+        "covet"
       ]
     }
   }
