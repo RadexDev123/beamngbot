@@ -491,9 +491,12 @@
                         return;
                     }
 
+                    const url = getRelayUrl(`/get_user?id=${user.id}`);
+                    if (!url) return;
+
                     console.log("Checking server for user data...");
                     try {
-                        const res = await fetch(`http://${relayIP}:3000/get_user?id=${user.id}`);
+                        const res = await fetch(url);
                         const data = await res.json();
                         if (data && data.status !== 'not_found') {
                             console.log("Loaded from server:", data);
@@ -517,13 +520,16 @@
                 localStorage.setItem('user_data', JSON.stringify(user));
 
                 const saveToServer = async () => {
+                    const url = getRelayUrl('/save_user');
+                    if (!url) return;
+
                     try {
                         const garageModels = user.garage.map(cid => {
                             const car = CARS_DATA.find(c => c.id === cid);
                             return car ? car.car : null;
                         }).filter(c => c !== null);
 
-                        await fetch(`http://${relayIP}:3000/save_user`, {
+                        await fetch(url, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ ...user, garageModels })
@@ -543,11 +549,26 @@
                 return shuffled.slice(0, count).map(c => ({ id: c.id, off: Math.floor(Math.random() * 20) + 5 }));
             });
 
+            const getRelayUrl = (path) => {
+                let base = relayIP.trim();
+                if (!base) return '';
+                // Если введено с протоколом (например https://...), используем как есть
+                if (base.startsWith('http')) {
+                    // Убираем слеш в конце если есть
+                    base = base.replace(/\/$/, '');
+                    return `${base}${path}`;
+                }
+                // Если просто IP или localhost, добавляем http и порт 3000
+                return `http://${base}:3000${path}`;
+            };
+
             const showNotify = (text, type = 'success') => { setNotification({ text, type }); setTimeout(() => setNotification(null), 3000); };
 
             const sendGameCommand = async (command) => {
+                const url = getRelayUrl('/command');
+                if (!url) return;
                 try {
-                    const res = await fetch(`http://${relayIP}:3000/command`, {
+                    const res = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ ...command, user: user.name })
