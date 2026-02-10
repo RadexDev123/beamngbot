@@ -1,45 +1,130 @@
--- BeamNG.drive Integration Mod (Beamng RP)
--- Place this file in your Userpath/scripts/modules/ (e.g. Documents/BeamNG.drive/scripts/modules/integration_mod.lua)
--- Or load it via main.lua
-
+-- BEAMNG RP MOD (REPAIR V22 - THE FINAL FIX)
 local M = {}
 
-local POLL_INTERVAL = 2 -- seconds
+-- Принудительно загружаем HTTP модуль (стандарт для 0.33.3)
+extensions.load('core_http')
+
+local POLL_INTERVAL = 4
 local timer = 0
-local RELAY_URL = "http://localhost:3000/poll"
+local config = { serverIP = "127.0.0.1", username = "Player", allowedVehicles = {} }
+local lastSpawnedByBot = ""
+
+-- Загрузка конфига
+local function loadConfig()
+    local path = "integration_mod_config.json"
+    local content = readFile(path)
+    if content then
+        local ok, data = pcall(jsonDecode, content)
+        if ok and data then
+            if data.serverIP then config.serverIP = data.serverIP end
+            if data.username then config.username = data.username end
+        end
+    end
+end
+loadConfig()
+
+local RELAY_URL = "http://" .. config.serverIP .. ":3000/poll?user=" .. config.username
+
+-- ХОРОШИЙ ХЕЛПЕР (V22): Используем core_http.get
+local function httpCall(url, callback)
+    if not extensions.core_http then
+        print("[BOT RP] ОШИБКА: Модуль core_http не найден. Попробуйте обновить игру или переустановить мод.")
+        return
+    end
+
+    -- В 0.33.3 это самый чистый способ
+    extensions.core_http.get(url, function(res)
+        if res and res.body then
+            callback(res.body)
+        end
+    end)
+end
+
+local function spawnCar(modelName)
+    local model = tostring(modelName or "pigeon"):lower()
+    print("[BOT RP] Команда на спавн: " .. model)
+    -- Используем queueAllObjectLua для надежности в песочнице
+    be:queueAllObjectLua(string.format("if extensions.core_vehicles then extensions.core_vehicles.spawnVehicle('%s', nil, be:getPlayerVehicle(0):getPosition()+vec3(0,5,2), quat(0,0,0,1)) end", model))
+    lastSpawnedByBot = model
+end
+
+-- Команды для проверки в консоли (~)
+-- Важно: Писать именно так, как ты называешь файл (например extensions.botRP.testSpawn)
+M.testSpawn = function()
+    spawnCar("pigeon")
+end
+
+M.testConnect = function()
+    print("[BOT RP] Пинг сервера " .. RELAY_URL .. " ...")
+    httpCall(RELAY_URL, function(body)
+        print("[BOT RP] СВЯЗЬ УСТАНОВЛЕНА! Получен ответ.")
+        print("Тело ответа: " .. tostring(body))
+    end)
+end
 
 local function onUpdate(dt)
     timer = timer + dt
     if timer < POLL_INTERVAL then return end
     timer = 0
 
-    -- Simple HTTP Get using core_online (or socket if available)
-    -- Note: BeamNG's Lua environment has specific ways to handle HTTP
-    -- This is a template using common internal functions
-    
-    core_online.apiCall('GET', RELAY_URL, nil, function(response)
-        if not response or not response.body then return end
-        
-        local data = jsonDecode(response.body)
-        if data and data.type == "spawn_car" then
-            print("Received spawn command for: " .. tostring(data.carId))
-            
-            -- Find car internal name (could be passed in data)
-            local carName = data.carId or "pigeon"
-            
-            -- Spawn vehicle
-            local options = {
-                model = carName,
-                config = data.config or nil,
-                licenseText = "RP BOT"
-            }
-                
-            core_vehicles.spawnVehicle(options.model, options.config, options.pos, options.rot)
-            guihooks.trigger('Message', {msg = "Бот заспавнил машину: " .. carName, category = "info", icon = "directions_car"})
+    httpCall(RELAY_URL, function(body)
+        local ok, data = pcall(jsonDecode, body)
+        if ok and data then
+            -- Синхронизируем список разрешенных машин
+            if data.garage then
+                config.allowedVehicles = data.garage
+            end
+
+            if data.type ~= "none" then
+                print("[BOT RP] Найдена команда: " .. tostring(data.type))
+                if data.type == "start_shift" or data.type == "spawn_car" then
+                    print("[BOT RP] Запрос на спавн: " .. tostring(data.carId))
+                    spawnCar(data.carId)
+                end
+            end
         end
     end)
 end
 
-M.onUpdate = onUpdate
+local function onVehicleSpawned(vid)
+    local v = be:getObjectByID(vid)
+    if not v then return end
+    
+    local model = v:getJBeamResource()
+    print("[BOT RP] Заспавнена машина: " .. tostring(model))
 
+    -- Проверяем, разрешена ли эта машина
+    local isAllowed = false
+    
+    -- 1. Была ли заспавнена через бот только что?
+    if model == lastSpawnedByBot then
+        isAllowed = true
+        lastSpawnedByBot = "" -- Сбрасываем флаг
+    end
+
+    -- 2. Есть ли она в купленных?
+    if not isAllowed then
+        for _, allowedModel in ipairs(config.allowedVehicles) do
+            if model == allowedModel then
+                isAllowed = true
+                break
+            end
+        end
+    end
+
+    -- 3. Если не разрешена - удаляем
+    if not isAllowed then
+        print("[BOT RP] !!! МАШИНА НЕ КУПЛЕНА: " .. model .. " !!!")
+        guihooks.trigger('Message', {msg = "Эта машина не куплена в ТГ боте! Она будет удалена.", category = "warning", icon = "warning"})
+        
+        -- Удаляем через 1 секунду, чтобы игрок успел увидеть сообщение
+        be:queueAllObjectLua(string.format("if be:getObjectByID(%d) then be:getObjectByID(%d):delete() end", vid, vid))
+    end
+end
+
+print("\n\n[BOT RP] --- МОД ЗАГРУЖЕН (V22 - FINAL) ---")
+print("[BOT RP] Используйте команды: testSpawn() и testConnect()")
+
+M.onUpdate = onUpdate
+M.onVehicleSpawned = onVehicleSpawned
 return M

@@ -463,24 +463,46 @@
             const [showAdminPanel, setShowAdminPanel] = useState(false);
 
             useEffect(() => {
-                const syncGarage = async () => {
+                const loadUserData = async () => {
+                    if (!user.id) return;
                     try {
-                        const ownedModels = user.garage.map(id => {
-                            const car = CARS_DATA.find(c => c.id === id);
+                        const res = await fetch(`http://${relayIP}:3000/get_user?id=${user.id}`);
+                        const data = await res.json();
+                        if (data && data.status !== 'not_found') {
+                            setUser(prev => ({
+                                ...prev,
+                                ...data,
+                                id: user.id
+                            }));
+                        }
+                    } catch (e) {
+                        console.error("Failed to load user data", e);
+                    }
+                };
+                loadUserData();
+            }, [user.id, relayIP]);
+
+            useEffect(() => {
+                const saveUserData = async () => {
+                    if (!user.id) return;
+                    try {
+                        const garageModels = user.garage.map(cid => {
+                            const car = CARS_DATA.find(c => c.id === cid);
                             return car ? car.car : null;
                         }).filter(c => c !== null);
 
-                        await fetch(`http://${relayIP}:3000/sync_garage`, {
+                        await fetch(`http://${relayIP}:3000/save_user`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ user: user.name, vehicles: ownedModels })
+                            body: JSON.stringify({ ...user, garageModels })
                         });
                     } catch (e) {
-                        console.error("Garage sync failed", e);
+                        console.error("Auto-save failed", e);
                     }
                 };
-                if (user.name) syncGarage();
-            }, [user.garage, user.name, relayIP]);
+                const timer = setTimeout(saveUserData, 2000);
+                return () => clearTimeout(timer);
+            }, [user, relayIP]);
 
             const [discounts] = useState(() => {
                 const count = 2;
