@@ -72,16 +72,14 @@ local function spawnCar(modelName, plateText, plateRegion)
             if extensions.core_vehicles then
                 local vid = extensions.core_vehicles.spawnVehicle('%s', nil, pos, quat(0,0,0,1))
                 if vid and '%s' ~= '' then
-                    -- Ставим текст номера (может сработать не сразу, но setTimeout тут нет)
-                    -- В некоторых версиях работает core_vehicles, в других extensions.core_vehicles
-                    local cv = extensions.core_vehicles
-                    if cv and cv.setLicensePlateText then
-                        cv.setLicensePlateText('%s', vid)
-                    end
+                    local pText = string.upper('%s')
+                    -- Даем немного времени через простую задержку (в коде это сложно, но core_vehicles.setLicensePlateText обычно ставит отложенно)
+                    extensions.core_vehicles.setLicensePlateText(pText, vid)
+                    extensions.core_vehicles.setLicensePlateDesign('htnv_russian_regular', vid)
                 end
             end
         end)()
-    ]], model, plate, fullPlate)
+    ]], model, plate, plate)
     
     be:queueAllObjectLua(luaCmd)
     lastSpawnedByBot = model

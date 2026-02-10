@@ -90,10 +90,12 @@ def main():
                         if plate:
                             plate_upper = plate.upper()
                             print(f"🆔 Установка номера: {plate_upper} ({design})")
-                            # Даем машине время на инициализацию Lua
-                            time.sleep(1.5)
-                            bng.queue_lua_command(f"extensions.core_vehicles.setLicensePlateText('{plate_upper}', '{vid}')")
-                            bng.queue_lua_command(f"extensions.core_vehicles.setLicensePlateDesign('{design}', '{vid}')")
+                            # Увеличиваем задержку, так как спавн может быть долгим
+                            time.sleep(2.0)
+                            # Пробуем несколько способов для надежности
+                            lua_cmd = f"local v = be:getObjectByID('{vid}'); if v then v:setLicensePlateText('{plate_upper}'); extensions.core_vehicles.setLicensePlateDesign('{design}', '{vid}') end"
+                            bng.queue_lua_command(lua_cmd)
+                            print(f"✅ Команда на номер отправлена")
                         
                         if cmd_type == 'start_shift':
                             active_vehicle = new_veh
@@ -113,6 +115,10 @@ def main():
                                 bng.vehicles.spawn(t_veh, pos=t_pos)
                                 spawned_personal_vehicles.append(t_veh) # Для очистки
                                 print(f"📍 Цель заспавнена в [{t_pos[0]}, {t_pos[1]}]")
+                                
+                                # Ставим "краденые" номера или просто случайные
+                                time.sleep(1.0)
+                                bng.queue_lua_command(f"local v = be:getObjectByID('{t_vid}'); if v then v:setLicensePlateText('STOLEN'); extensions.core_vehicles.setLicensePlateDesign('htnv_russian_regular', '{t_vid}') end")
                         else:
                             spawned_personal_vehicles.append(new_veh)
 
