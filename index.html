@@ -100,13 +100,13 @@
         ];
 
         const JOBS_DATA = {
-            taxi: { id: "taxi", tier: 1, req_user_lvl: 1, title: "Такси", iconName: "Car", color: "yellow", levels: { 1: { name: "Бомбила", car: "etk800", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1603386090075-bc8f26233d35?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Комфорт", car: "sunburst", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1520050206274-a1ae446cb3cc?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Бизнес", car: "etk800", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop" } } },
+            taxi: { id: "taxi", tier: 1, req_user_lvl: 1, title: "Такси", iconName: "Car", color: "yellow", levels: { 1: { name: "Бомбила", car: "etk800", livery: "taxi", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1603386090075-bc8f26233d35?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Комфорт", car: "sunburst", livery: "taxi", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1520050206274-a1ae446cb3cc?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Бизнес", car: "etk800", livery: "taxi", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop" } } },
             courier: { id: "courier", tier: 1, req_user_lvl: 1, title: "Курьер", iconName: "Package", color: "orange", levels: { 1: { name: "Вело-доставка", car: "pigeon", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1526367790999-0150786486a9?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Авто-курьер", car: "pessima", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1521316730702-829ad38679b9?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Служба доставки", car: "van", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1549194388-f61be84a6e9e?q=80&w=1000&auto=format&fit=crop" } } },
             marshrutka: { id: "marshrutka", tier: 2, req_user_lvl: 2, title: "Маршрутчик", iconName: "Users", color: "emerald", levels: { 1: { name: "Линия 1", car: "van", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1557223562-6c77ff16210f?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Линия 2", car: "van", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1464219789935-c2d9d9aba644?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "van", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1556122071-e404be9153bf?q=80&w=1000&auto=format&fit=crop" } } },
             bus: { id: "bus", tier: 2, req_user_lvl: 2, title: "Автобус", iconName: "Bus", color: "blue", levels: { 1: { name: "Пригород", car: "citybus", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Городской", car: "citybus", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "citybus", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1494515843206-f3117d3f51b7?q=80&w=1000&auto=format&fit=crop" } } },
-            ambulance: { id: "ambulance", tier: 3, req_user_lvl: 3, title: "Скорая помощь", iconName: "Ambulance", color: "red", levels: { 1: { name: "Санитар", car: "van", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1587748823463-c362a11f81d2?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Фельдшер", car: "roamer", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1516515429572-1b68098261e3?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Реанимация", car: "van", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1578330861461-9c173599a09c?q=80&w=1000&auto=format&fit=crop" } } },
+            ambulance: { id: "ambulance", tier: 3, req_user_lvl: 3, title: "Скорая помощь", iconName: "Ambulance", color: "red", levels: { 1: { name: "Санитар", car: "van", livery: "ambulance", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1587748823463-c362a11f81d2?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Фельдшер", car: "roamer", livery: "ambulance", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1516515429572-1b68098261e3?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Реанимация", car: "van", livery: "ambulance", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1578330861461-9c173599a09c?q=80&w=1000&auto=format&fit=crop" } } },
             trucker: { id: "trucker", tier: 3, req_user_lvl: 3, title: "Дальнобойщик", iconName: "Truck", color: "teal", levels: { 1: { name: "Новичок", car: "tseries", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1501700493717-9c9dc863bb08?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Дальнобой", car: "tseries", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1586191582056-a15cf111867f?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "tseries", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1519003722824-194d4455a60c?q=80&w=1000&auto=format&fit=crop" } } },
-            police: { id: "police", tier: 4, req_user_lvl: 4, title: "Полиция", iconName: "Siren", color: "indigo", levels: { 1: { name: "Кадет", car: "sunburst", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Офицер", car: "fullsize", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1621251918365-184583d7396c?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Шериф", car: "roamer", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1590133323090-f89918f9ad3d?q=80&w=1000&auto=format&fit=crop" } } },
+            police: { id: "police", tier: 4, req_user_lvl: 4, title: "Полиция", iconName: "Siren", color: "indigo", levels: { 1: { name: "Кадет", car: "sunburst", livery: "police", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Офицер", car: "fullsize", livery: "police", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1621251918365-184583d7396c?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Шериф", car: "roamer", livery: "police", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1590133323090-f89918f9ad3d?q=80&w=1000&auto=format&fit=crop" } } },
             government: { id: "government", tier: 4, req_user_lvl: 4, title: "Правительство", iconName: "Building2", color: "slate", levels: { 1: { name: "Чиновник", car: "pessima", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1541872703-74c5e443d1fe?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Министр", car: "etk800", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Президент", car: "scintilla", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop" } } },
             mafia: { id: "mafia", tier: 4, req_user_lvl: 4, title: "Мафиозник", iconName: "Skull", color: "zinc", levels: { 1: { name: "Шнырь", car: "pessima", salary: 200, req_km: 100, img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Гангстер", car: "roamer", salary: 200, req_km: 200, img: "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Босс", car: "vivace", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1505312019124-7476579b69b6?q=80&w=1000&auto=format&fit=crop" } } }
         };
@@ -122,6 +122,12 @@
         const BUSINESS_DATA = [
             { id: "b1", name: "Бургерная", price: 50000, income: 500, desc: "Ларёк на пляже", img: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=400&auto=format" },
             { id: "b2", name: "Заправка", price: 200000, income: 2500, desc: "В центре города", img: "https://images.unsplash.com/photo-1542382156909-9ae37b3f56fd?q=80&w=400&auto=format" },
+        ];
+
+        const REAL_ESTATE_DATA = [
+            { id: "h1", name: "Трейлер в лесу", price: 150000, dailyTax: 150, baseSlots: 2, garageUpgradePrice: 50000, img: "https://images.unsplash.com/photo-1549488344-cbb6c34ce08b?q=80&w=400&auto=format" },
+            { id: "h2", name: "Квартира в хрущевке", price: 800000, dailyTax: 800, baseSlots: 4, garageUpgradePrice: 200000, img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=400&auto=format" },
+            { id: "h3", name: "Современный коттедж", price: 5000000, dailyTax: 5000, baseSlots: 8, garageUpgradePrice: 1000000, img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400&auto=format" },
         ];
 
         const FORBES_DATA = [
@@ -201,141 +207,6 @@
         );
 
         // --- GAMES ---
-        const RouletteGame = ({ close, user, setUser, showNotify }) => {
-            const [bet, setBet] = useState(100);
-            const [spinning, setSpinning] = useState(false);
-            const [rotation, setRotation] = useState(0);
-            const [history, setHistory] = useState([2, 5, 2, 3, 2]);
-            const [spinCount, setSpinCount] = useState(0);
-
-            const spin = (selectedMultiplier) => {
-                if (user.balance < bet) { showNotify("Не хватает денег", "danger"); return; }
-                setUser(p => ({ ...p, balance: p.balance - bet }));
-                setSpinning(true);
-                const rand = Math.random() * 100;
-                let winMultiplier = 2;
-                if (rand < 5) winMultiplier = 10;
-                else if (rand < 20) winMultiplier = 5;
-                else if (rand < 50) winMultiplier = 3;
-                const indices = ROULETTE_SEGMENTS.map((val, idx) => val === winMultiplier ? idx : -1).filter(idx => idx !== -1);
-                const winIndex = indices[Math.floor(Math.random() * indices.length)];
-                const step = 360 / ROULETTE_SEGMENTS.length;
-                const targetAngle = -(winIndex * step + (step / 2));
-                const newCount = spinCount + 5;
-                setSpinCount(newCount);
-                setRotation(-(newCount * 360) + targetAngle + (Math.random() * 14 - 7));
-                setTimeout(() => {
-                    setSpinning(false);
-                    setHistory(prev => [winMultiplier, ...prev].slice(0, 10));
-                    if (selectedMultiplier === winMultiplier) {
-                        const win = bet * winMultiplier;
-                        setUser(p => ({ ...p, balance: p.balance + win }));
-                        showNotify(`ПОБЕДА! x${winMultiplier} (+₽${win.toLocaleString()})`, 'success');
-                    } else showNotify(`Выпало x${winMultiplier}`, 'danger');
-                }, 5000);
-            };
-
-            const getSegments = () => {
-                let angle = 0; const step = 360 / ROULETTE_SEGMENTS.length;
-                return ROULETTE_SEGMENTS.map((seg, i) => {
-                    const currentAngle = angle;
-                    angle += step;
-                    return (
-                        <div key={i} className="absolute inset-0 flex items-start justify-center" style={{ transform: `rotate(${currentAngle + step / 2}deg)` }}>
-                            <div className="mt-4 text-[10px] font-black" style={{ color: seg === 2 ? '#333' : 'white' }}>{seg}x</div>
-                        </div>
-                    );
-                });
-            };
-
-            const getGradient = () => {
-                let grad = 'conic-gradient(';
-                let angle = 0; const step = 360 / ROULETTE_SEGMENTS.length;
-                ROULETTE_SEGMENTS.forEach((seg, i) => { grad += `${SEGMENT_COLORS[seg]} ${angle}deg ${angle + step}deg${i === ROULETTE_SEGMENTS.length - 1 ? '' : ','}`; angle += step; });
-                return grad + ')';
-            };
-
-            return (
-                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in">
-                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
-                        <button onClick={close} disabled={spinning} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
-                        <div className="font-black italic uppercase tracking-tighter text-lg">Рулетка</div>
-                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />₽{user.balance.toLocaleString()}</div>
-                    </div>
-                    <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-44 z-30"><div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-white"></div></div>
-                        <div className="w-80 h-80 rounded-full border-[12px] border-white/5 shadow-2xl relative">
-                            <div className="w-full h-full rounded-full transition-transform duration-[5000ms] cubic-bezier overflow-hidden relative" style={{ background: getGradient(), transform: `rotate(${rotation}deg)` }}>
-                                {getSegments()}
-                            </div>
-                        </div>
-                    </div>
-                    <div className="p-8 bg-[#0B0F1A] border-t border-white/5 space-y-6">
-                        <input type="number" value={bet} disabled={spinning} onChange={e => setBet(Number(e.target.value))} className="w-full bg-white/5 p-4 rounded-2xl text-center font-black border border-white/10 outline-none" />
-                        <div className="grid grid-cols-4 gap-4">
-                            {[2, 3, 5, 10].map(m => <button key={m} disabled={spinning} onClick={() => spin(m)} className={`py-6 rounded-2xl font-black text-xl hover:scale-105 transition-all ${m === 2 ? 'bg-gray-100' : m === 3 ? 'bg-red-500' : m === 5 ? 'bg-emerald-500' : 'bg-yellow-500'}`}>{m}x</button>)}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const CrashGame = ({ close, user, setUser, showNotify }) => {
-            const [bet, setBet] = useState(100);
-            const [multiplier, setMultiplier] = useState(1.00);
-            const [gameState, setGameState] = useState('idle');
-            const [crashPoint, setCrashPoint] = useState(0);
-
-            useEffect(() => {
-                let interval;
-                if (gameState === 'running') {
-                    interval = setInterval(() => {
-                        setMultiplier(prev => {
-                            const next = prev + 0.01 + (prev * 0.002);
-                            if (next >= crashPoint) { setGameState('crashed'); return crashPoint; }
-                            return next;
-                        });
-                    }, 50);
-                }
-                return () => clearInterval(interval);
-            }, [gameState, crashPoint]);
-
-            const startGame = () => {
-                if (user.balance < bet) { showNotify("Не хватает денег", "danger"); return; }
-                setUser(p => ({ ...p, balance: p.balance - bet }));
-                setCrashPoint(1.2 + Math.random() * 5.0);
-                setMultiplier(1.00);
-                setGameState('running');
-            };
-
-            const cashOut = () => {
-                if (gameState !== 'running') return;
-                setGameState('cashed');
-                const win = Math.floor(bet * multiplier);
-                setUser(p => ({ ...p, balance: p.balance + win }));
-                showNotify(`Забрал: ₽${win}`, 'success');
-            };
-
-            return (
-                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
-                    <div className="p-6 flex justify-between items-center border-b border-white/5">
-                        <button onClick={close} disabled={gameState === 'running'} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" /></button>
-                        <div className="font-black italic uppercase tracking-tighter">Краш</div>
-                        <div className="text-emerald-400 font-bold">₽{user.balance.toLocaleString()}</div>
-                    </div>
-                    <div className="flex-1 p-6 flex flex-col justify-center gap-8">
-                        <div className="flex-1 glass-card rounded-[3rem] flex flex-col items-center justify-center">
-                            <div className={`text-8xl font-black italic ${gameState === 'crashed' ? 'text-red-500' : 'text-white'}`}>{multiplier.toFixed(2)}x</div>
-                            <div className="text-xs font-bold text-gray-500 uppercase mt-4 tracking-widest">{gameState === 'running' ? 'Ракета летит...' : 'Ожидание'}</div>
-                        </div>
-                        <div className="mt-8 space-y-4">
-                            <input type="number" value={bet} disabled={gameState === 'running'} onChange={e => setBet(Number(e.target.value))} className="w-full bg-white/5 p-5 rounded-[2rem] text-center font-black border border-white/10 outline-none" />
-                            {gameState === 'running' ? <Button onClick={cashOut} variant="success" className="w-full h-20 text-xl uppercase">Забрать ${(bet * multiplier).toFixed(0)}</Button> : <Button onClick={startGame} className="w-full h-20 text-xl uppercase">Старт</Button>}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
 
         const CaseOpening = ({ caseId, close, user, setUser, showNotify }) => {
             const box = CASES_DATA.find(c => c.id === caseId);
@@ -764,7 +635,10 @@
                     garage: [],
                     businesses: [],
                     jobProgress: {},
-                    registeredPlates: {} // carId -> plateData { string, country, region }
+                    registeredPlates: {}, // carId -> plateData { string, country, region }
+                    realEstate: [], // Array of house IDs
+                    houseUpgrades: {}, // houseId -> { garage: 0-3, workshop: bool }
+                    garageSlots: 1
                 };
 
                 if (localData) {
@@ -790,13 +664,29 @@
             const [notification, setNotification] = useState(null);
             const [selectedJobId, setSelectedJobId] = useState(null);
             const [selectedCaseId, setSelectedCaseId] = useState(null);
-            const [activeGame, setActiveGame] = useState(null);
+            const [viewingUser, setViewingUser] = useState(null); // { name, avatar, balance, level, garage, realEstate, houseUpgrades, businesses }
             const [showCases, setShowCases] = useState(false);
             const [working, setWorking] = useState(false);
             const [showEditProfile, setShowEditProfile] = useState(false);
             const [showAdminPanel, setShowAdminPanel] = useState(false);
-            const [mafiaTarget, setMafiaTarget] = useState(null);
+            const [leaderboard, setLeaderboard] = useState([]);
+            const [dealerFilter, setDealerFilter] = useState({ sort: 'price_asc', type: 'all' });
             const [spawnedVehicles, setSpawnedVehicles] = useState([]); // Array of carIds
+
+            useEffect(() => {
+                const fetchLeaderboard = async () => {
+                    const url = getRelayUrl('/get_leaderboard');
+                    if (!url) return;
+                    try {
+                        const res = await fetch(url);
+                        const data = await res.json();
+                        if (Array.isArray(data)) setLeaderboard(data);
+                    } catch (e) {
+                        console.error("Failed to fetch leaderboard", e);
+                    }
+                };
+                if (activeTab === 'forbes') fetchLeaderboard();
+            }, [activeTab, relayIP]);
 
             useEffect(() => {
                 const loadUserData = async () => {
@@ -941,6 +831,7 @@
                     user: user.name,
                     plate: id === 'police' ? 'POLICE' : id === 'ambulance' ? 'MEDIC' : 'SERVICE',
                     plateCountry: 'ru',
+                    livery: lvl.livery, // Новое поле для раскраски
                     ...mafiaData
                 });
 
@@ -1238,7 +1129,58 @@
 
                     <div className="space-y-8">
                         <div>
-                            <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2 mb-4">Имущество</h4>
+                            <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2 mb-4">Моя Недвижимость</h4>
+                            {user.realEstate.length === 0 ? (
+                                <Card className="flex items-center gap-4 py-4 bg-white/[0.02] border-white/5 opacity-50">
+                                    <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-gray-600"><SafeIcon name="Home" size={24} /></div>
+                                    <div className="flex-1 text-xs font-bold text-gray-500">Нет недвижимости</div>
+                                    <Button variant="ghost" size="sm" onClick={() => setActiveTab('realestate')} className="text-[10px] uppercase">Купить</Button>
+                                </Card>
+                            ) : (
+                                <div className="grid gap-4">
+                                    {user.realEstate.map(houseId => {
+                                        const house = REAL_ESTATE_DATA.find(h => h.id === houseId);
+                                        const upg = user.houseUpgrades[houseId] || { garage: 0, workshop: false };
+                                        return (
+                                            <Card key={houseId} className="p-0 overflow-hidden border-white/5 bg-white/[0.03]">
+                                                <div className="flex items-center gap-4 p-4 border-b border-white/5">
+                                                    <img src={house.img} className="w-16 h-16 rounded-xl object-cover" />
+                                                    <div className="flex-1">
+                                                        <div className="font-black text-sm uppercase italic">{house.name}</div>
+                                                        <div className="text-[10px] text-gray-500 font-bold uppercase mt-1">Мест: {house.baseSlots + (upg.garage * 2)}</div>
+                                                    </div>
+                                                    <Badge color="red">₽{house.dailyTax}/д</Badge>
+                                                </div>
+                                                <div className="p-4 grid grid-cols-2 gap-3">
+                                                    <div className="space-y-1">
+                                                        <div className="text-[8px] text-gray-500 font-black uppercase">Гараж ({upg.garage}/3)</div>
+                                                        <Button size="sm" variant="secondary" disabled={upg.garage >= 3} onClick={() => handleUpgradeHouse(houseId, 'garage')} className="w-full text-[8px] h-8 p-0">
+                                                            {upg.garage >= 3 ? "Макс" : `+2 ГМ (₽${(house.garageUpgradePrice * (upg.garage + 1)).toLocaleString()})`}
+                                                        </Button>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="text-[8px] text-gray-500 font-black uppercase">Продажа (₽{(house.price * 0.7).toLocaleString()})</div>
+                                                        <Button size="sm" variant="danger" onClick={() => {
+                                                            if (confirm(`Продать ${house.name} за ₽${(house.price * 0.7).toLocaleString()}? Все машины в гараже останутся, но лимит мест уменьшится.`)) {
+                                                                setUser(prev => ({
+                                                                    ...prev,
+                                                                    balance: prev.balance + (house.price * 0.7),
+                                                                    realEstate: prev.realEstate.filter(id => id !== houseId)
+                                                                }));
+                                                                showNotify('Недвижимость продана!');
+                                                            }
+                                                        }} className="w-full text-[8px] h-8 p-0">Продать</Button>
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2 mb-4">Имущество (Бизнес)</h4>
                             {user.businesses.length === 0 ? (
                                 <Card className="flex items-center gap-4 py-4 bg-white/[0.02] border-white/5 opacity-50">
                                     <div className="w-12 h-12 rounded-xl bg-gray-800 flex items-center justify-center text-gray-600"><SafeIcon name="Building2" size={24} /></div>
@@ -1280,7 +1222,6 @@
                                         return (
                                             <Card key={i} className="flex flex-col gap-3 p-4 bg-white/[0.04] border-white/5 relative overflow-hidden group hover:bg-white/[0.06] transition-all">
                                                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-all"></div>
-
                                                 <div className="flex items-center gap-4 relative z-10">
                                                     <img src={car.img} className="w-16 h-16 rounded-xl object-cover border border-white/10 shadow-lg" />
                                                     <div className="flex-1">
@@ -1297,15 +1238,10 @@
                                                         </div>
                                                     </div>
                                                 </div>
-
                                                 <div className="grid grid-cols-2 gap-2 mt-2 relative z-10">
-                                                    <Button variant="danger" size="sm" onClick={() => handleSellCar(carId, i)} className="text-[10px] uppercase font-black py-2 h-10 bg-red-500/5 border-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all">
-                                                        Продать
-                                                    </Button>
+                                                    <Button variant="danger" size="sm" onClick={() => { if (confirm(`Вы уверены, что хотите продать ${car.name} за ₽${Math.floor(car.price * 0.6).toLocaleString()}?`)) handleSellCar(carId, i); }} className="text-[10px] uppercase font-black py-2 h-10 bg-red-500/5 border-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all">Продать (₽{Math.floor(car.price * 0.6).toLocaleString()})</Button>
                                                     {spawnedVehicles.includes(car.car) ? (
-                                                        <Button variant="secondary" size="sm" onClick={() => handleDespawnCar(car.car)} className="text-[10px] uppercase font-black py-2 h-10 bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white transition-all">
-                                                            Убрать
-                                                        </Button>
+                                                        <Button variant="secondary" size="sm" onClick={() => { if (confirm(`Убрать ${car.name} из игры?`)) handleDespawnCar(car.car); }} className="text-[10px] uppercase font-black py-2 h-10 bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white transition-all">Убрать</Button>
                                                     ) : (
                                                         <Button variant={plate ? "primary" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId)} disabled={!plate} className={`text-[10px] uppercase font-black py-2 h-10 ${!plate ? 'opacity-20' : 'bg-blue-600/20 border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white shadow-lg active:scale-95 transition-all'}`}>
                                                             {plate ? 'Спавн' : 'ГИБДД...'}
@@ -1322,43 +1258,98 @@
                 </div>
             );
 
-            const renderDealer = () => (
-                <div className="p-6 space-y-6 pb-28 animate-fade-in">
-                    <h2 className="text-3xl font-black italic uppercase">Автосалон</h2>
-                    <div className="grid gap-6">
-                        {CARS_DATA.map(car => {
-                            const discount = discounts.find(d => d.id === car.id);
-                            const finalPrice = discount ? Math.floor(car.price * (1 - discount.off / 100)) : car.price;
-                            return (
-                                <Card key={car.id} className="overflow-hidden p-0 border-white/5">
-                                    <div className="relative h-48">
-                                        <img src={car.img} className="w-full h-full object-cover" />
-                                        {discount && <div className="absolute top-4 right-4 bg-red-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-xl">-{discount.off}%</div>}
-                                    </div>
-                                    <div className="p-5 flex justify-between items-center">
-                                        <div>
-                                            <h4 className="font-black text-lg italic uppercase">{car.name}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className={`text-emerald-400 font-black ${discount ? 'text-lg' : ''}`}>₽{finalPrice.toLocaleString()}</span>
-                                                {discount && <span className="text-xs text-gray-500 line-through">₽{car.price.toLocaleString()}</span>}
-                                            </div>
+            const renderDealer = () => {
+                const types = ['all', ...new Set(CARS_DATA.map(c => c.type))];
+                let filtered = [...CARS_DATA];
+                if (dealerFilter.type !== 'all') filtered = filtered.filter(c => c.type === dealerFilter.type);
+
+                filtered.sort((a, b) => {
+                    if (dealerFilter.sort === 'price_asc') return a.price - b.price;
+                    if (dealerFilter.sort === 'price_desc') return b.price - a.price;
+                    if (dealerFilter.sort === 'name') return a.name.localeCompare(b.name);
+                    return 0;
+                });
+
+                return (
+                    <div className="p-6 space-y-6 pb-28 animate-fade-in">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-3xl font-black italic uppercase">Автосалон</h2>
+                            <div className="flex gap-2">
+                                <select
+                                    value={dealerFilter.type}
+                                    onChange={(e) => setDealerFilter(p => ({ ...p, type: e.target.value }))}
+                                    className="bg-white/5 border border-white/10 rounded-lg text-[10px] px-2 py-1 outline-none font-bold uppercase"
+                                >
+                                    {types.map(t => <option key={t} value={t} className="bg-[#0B0F1A]">{t}</option>)}
+                                </select>
+                                <select
+                                    value={dealerFilter.sort}
+                                    onChange={(e) => setDealerFilter(p => ({ ...p, sort: e.target.value }))}
+                                    className="bg-white/5 border border-white/10 rounded-lg text-[10px] px-2 py-1 outline-none font-bold uppercase"
+                                >
+                                    <option value="price_asc" className="bg-[#0B0F1A]">Цена ↑</option>
+                                    <option value="price_desc" className="bg-[#0B0F1A]">Цена ↓</option>
+                                    <option value="name" className="bg-[#0B0F1A]">А-Я</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="grid gap-6">
+                            {filtered.map(car => {
+                                const discount = discounts.find(d => d.id === car.id);
+                                const finalPrice = discount ? Math.floor(car.price * (1 - discount.off / 100)) : car.price;
+                                return (
+                                    <Card key={car.id} className="overflow-hidden p-0 border-white/5">
+                                        <div className="relative h-48">
+                                            <img src={car.img} className="w-full h-full object-cover" />
+                                            {discount && <div className="absolute top-4 right-4 bg-red-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-xl">-{discount.off}%</div>}
+                                            <div className="absolute bottom-4 left-4"><Badge color="blue">{car.type}</Badge></div>
                                         </div>
-                                        <Button size="sm" onClick={() => { if (user.balance >= finalPrice) { setUser(p => ({ ...p, balance: p.balance - finalPrice, garage: [...p.garage, car.id] })); showNotify('Успешная покупка!'); } else showNotify('Недостаточно денег', 'danger'); }} className="uppercase text-[10px] py-3 px-6">Купить</Button>
-                                    </div>
-                                </Card>
-                            )
-                        })}
+                                        <div className="p-5 flex justify-between items-center">
+                                            <div>
+                                                <h4 className="font-black text-lg italic uppercase">{car.name}</h4>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className={`text-emerald-400 font-black ${discount ? 'text-lg' : ''}`}>₽{finalPrice.toLocaleString()}</span>
+                                                    {discount && <span className="text-xs text-gray-500 line-through">₽{car.price.toLocaleString()}</span>}
+                                                </div>
+                                            </div>
+                                            <Button size="sm" onClick={() => {
+                                                const totalSlots = 1 + user.realEstate.reduce((acc, id) => {
+                                                    const h = REAL_ESTATE_DATA.find(x => x.id === id);
+                                                    const upg = user.houseUpgrades[id] || { garage: 0 };
+                                                    return acc + h.baseSlots + (upg.garage * 2);
+                                                }, 0);
+                                                if (user.garage.length >= totalSlots) {
+                                                    showNotify(`Нет места! Лимит: ${totalSlots}`, 'danger');
+                                                    return;
+                                                }
+                                                if (user.balance >= finalPrice) {
+                                                    if (confirm(`Купить ${car.name} за ₽${finalPrice.toLocaleString()}?`)) {
+                                                        setUser(p => ({ ...p, balance: p.balance - finalPrice, garage: [...p.garage, car.id] }));
+                                                        showNotify('Успешная покупка!');
+                                                    }
+                                                } else showNotify('Недостаточно денег', 'danger');
+                                            }} className="uppercase text-[10px] py-3 px-6">Купить</Button>
+                                        </div>
+                                    </Card>
+                                )
+                            })}
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            };
 
             const renderForbes = () => (
                 <div className="p-6 space-y-6 pb-28 animate-fade-in">
                     <h2 className="text-3xl font-black italic uppercase">Beamng List</h2>
                     <div className="space-y-4">
-                        {FORBES_DATA.sort((a, b) => b.balance - a.balance).map((item, idx) => (
-                            <div key={item.id} className={`flex items-center gap-4 p-4 rounded-3xl border ${idx === 0 ? 'bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_30px_rgba(234,179,8,0.1)]' : 'bg-white/5 border-white/5'}`}>
+                        {leaderboard.map((item, idx) => (
+                            <div
+                                key={item.id}
+                                onClick={() => setViewingUser(item)}
+                                className={`flex items-center gap-4 p-4 rounded-3xl border cursor-pointer active:scale-95 transition-all ${idx === 0 ? 'bg-yellow-500/10 border-yellow-500/20 shadow-[0_0_30px_rgba(234,179,8,0.1)]' : 'bg-white/5 border-white/5'}`}
+                            >
                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl italic ${idx === 0 ? 'bg-yellow-500 text-black' : 'bg-gray-800 text-white'}`}>{idx + 1}</div>
+                                <img src={item.avatar} className="w-10 h-10 rounded-full border border-white/10" />
                                 <div className="flex-1">
                                     <div className="font-black italic uppercase tracking-tight">{item.name}</div>
                                     <div className="text-xs font-bold text-emerald-400">₽{item.balance.toLocaleString()}</div>
@@ -1389,6 +1380,17 @@
                                 <div className="text-4xl font-black italic tracking-tighter">₽{user.balance.toLocaleString()}</div>
                             </div>
                         </Card>
+
+                        {user.realEstate.length > 0 && (
+                            <Card className="bg-red-500/5 border-red-500/20 py-4">
+                                <div className="flex justify-between items-center">
+                                    <div className="text-[10px] text-gray-500 font-black uppercase">Налог на имущество</div>
+                                    <div className="text-red-400 font-black">
+                                        ₽{user.realEstate.reduce((acc, id) => acc + REAL_ESTATE_DATA.find(h => h.id === id).dailyTax, 0)}/сутки
+                                    </div>
+                                </div>
+                            </Card>
+                        )}
 
                         <div className="grid gap-4">
                             <Card className="flex items-center justify-between py-6">
@@ -1489,6 +1491,106 @@
                 </div>
             );
 
+            const handleBuyHouse = (houseId) => {
+                const house = REAL_ESTATE_DATA.find(h => h.id === houseId);
+                if (!house) return;
+                if (user.balance < house.price) {
+                    showNotify('Недостаточно денег!', 'danger');
+                    return;
+                }
+                if (user.realEstate.includes(houseId)) {
+                    showNotify('У вас уже есть эта недвижимость', 'warning');
+                    return;
+                }
+
+                setUser(prev => ({
+                    ...prev,
+                    balance: prev.balance - house.price,
+                    realEstate: [...prev.realEstate, houseId],
+                    houseUpgrades: {
+                        ...prev.houseUpgrades,
+                        [houseId]: { garage: 0, workshop: false }
+                    }
+                }));
+                showNotify(`Поздравляем! ${house.name} теперь ваш!`, 'success');
+            };
+
+            const handleUpgradeHouse = (houseId, type) => {
+                const house = REAL_ESTATE_DATA.find(h => h.id === houseId);
+                const upg = user.houseUpgrades[houseId] || { garage: 0, workshop: false };
+
+                if (type === 'garage') {
+                    if (upg.garage >= 3) { showNotify('Максимальный уровень!'); return; }
+                    const price = house.garageUpgradePrice * (upg.garage + 1);
+                    if (user.balance < price) { showNotify('Недостаточно денег!', 'danger'); return; }
+
+                    setUser(prev => ({
+                        ...prev,
+                        balance: prev.balance - price,
+                        houseUpgrades: {
+                            ...prev.houseUpgrades,
+                            [houseId]: { ...upg, garage: upg.garage + 1 }
+                        }
+                    }));
+                    showNotify(`Гараж расширен! Уровень ${upg.garage + 1}`, 'success');
+                } else if (type === 'workshop') {
+                    if (upg.workshop) { showNotify('Мастерская уже куплена!'); return; }
+                    const price = 500000;
+                    if (user.balance < price) { showNotify('Недостаточно денег!', 'danger'); return; }
+
+                    setUser(prev => ({
+                        ...prev,
+                        balance: prev.balance - price,
+                        houseUpgrades: {
+                            ...prev.houseUpgrades,
+                            [houseId]: { ...upg, workshop: true }
+                        }
+                    }));
+                    showNotify('Мастерская оборудована!', 'success');
+                }
+            };
+
+            const renderRealEstate = () => (
+                <div className="p-0 pb-28 animate-fade-in">
+                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl sticky top-0 z-20">
+                        <button onClick={() => setActiveTab('more')} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                        <div className="font-black italic uppercase tracking-tighter text-lg">Недвижимость</div>
+                        <div className="w-10"></div>
+                    </div>
+                    <div className="px-6 py-6 space-y-6">
+                        {REAL_ESTATE_DATA.map(house => {
+                            const isOwned = user.realEstate.includes(house.id);
+                            return (
+                                <Card key={house.id} className="overflow-hidden p-0 border-white/5">
+                                    <img src={house.img} className="w-full h-40 object-cover" />
+                                    <div className="p-5">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div>
+                                                <h4 className="font-black text-lg italic uppercase">{house.name}</h4>
+                                                <div className="flex items-center gap-3 mt-1">
+                                                    <Badge color="blue" size="sm">+{house.baseSlots} ГМ</Badge>
+                                                    <Badge color="red" size="sm">₽{house.dailyTax}/д</Badge>
+                                                </div>
+                                            </div>
+                                            {!isOwned && <span className="text-emerald-400 font-black text-xl">₽{house.price.toLocaleString()}</span>}
+                                        </div>
+                                        <Button
+                                            disabled={isOwned}
+                                            variant={isOwned ? "ghost" : "primary"}
+                                            onClick={() => handleBuyHouse(house.id)}
+                                            className="w-full uppercase h-12 font-black italic"
+                                        >
+                                            {isOwned ? "Уже во владении" : "Приобрести"}
+                                        </Button>
+                                    </div>
+                                </Card>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+
+
             const renderAdminPanel = () => (
                 <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
@@ -1539,14 +1641,6 @@
                                     <div className="w-16 h-16 rounded-2xl bg-yellow-400/10 flex items-center justify-center text-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.2)]"><SafeIcon name="Gift" size={36} /></div>
                                     <span className="font-black uppercase text-xs tracking-widest text-center">Кейсы</span>
                                 </Card>
-                                <Card onClick={() => setActiveGame('roulette')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-red-500/5 hover:bg-red-500/10 active:scale-95 transition-all">
-                                    <div className="w-16 h-16 rounded-2xl bg-red-400/10 flex items-center justify-center text-red-400 shadow-[0_0_20px_rgba(248,113,113,0.2)]"><SafeIcon name="Disc" size={36} /></div>
-                                    <span className="font-black uppercase text-xs tracking-widest text-center">Рулетка</span>
-                                </Card>
-                                <Card onClick={() => setActiveGame('crash')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-blue-500/5 hover:bg-blue-500/10 active:scale-95 transition-all">
-                                    <div className="w-16 h-16 rounded-2xl bg-blue-400/10 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(96,165,250,0.2)]"><SafeIcon name="Zap" size={36} /></div>
-                                    <span className="font-black uppercase text-xs tracking-widest text-center">Краш</span>
-                                </Card>
                                 <Card onClick={() => setActiveTab('gibdd')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-blue-600/5 border-blue-500/20 hover:bg-blue-600/10 active:scale-95 transition-all">
                                     <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)]"><SafeIcon name="Shield" size={36} /></div>
                                     <span className="font-black uppercase text-xs tracking-widest text-center">ГИБДД</span>
@@ -1564,6 +1658,10 @@
                                 <Card onClick={() => setActiveTab('business')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-purple-500/5 border-purple-500/20 hover:bg-purple-500/10 active:scale-95 transition-all text-purple-400">
                                     <div className="w-16 h-16 rounded-2xl bg-purple-400/10 flex items-center justify-center text-purple-400"><SafeIcon name="Briefcase" size={36} /></div>
                                     <span className="font-black uppercase text-xs tracking-widest text-center">Бизнесы</span>
+                                </Card>
+                                <Card onClick={() => setActiveTab('realestate')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-orange-500/5 border-orange-500/20 hover:bg-orange-500/10 active:scale-95 transition-all text-orange-400">
+                                    <div className="w-16 h-16 rounded-2xl bg-orange-400/10 flex items-center justify-center text-orange-400"><SafeIcon name="Home" size={36} /></div>
+                                    <span className="font-black uppercase text-xs tracking-widest text-center">Недвижимость</span>
                                 </Card>
                                 <Card onClick={() => setActiveTab('bank')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/10 active:scale-95 transition-all text-emerald-400">
                                     <div className="w-16 h-16 rounded-2xl bg-emerald-400/10 flex items-center justify-center text-emerald-400"><SafeIcon name="Building2" size={36} /></div>
@@ -1598,6 +1696,7 @@
                         {activeTab === 'profile' && renderProfile()}
                         {activeTab === 'dealer' && renderDealer()}
                         {activeTab === 'forbes' && renderForbes()}
+                        {activeTab === 'realestate' && renderRealEstate()}
                         {activeTab === 'business' && renderBusiness()}
                         {activeTab === 'bank' && renderBank()}
                         {activeTab === 'more' && renderMore()}
@@ -1606,10 +1705,9 @@
 
                     {selectedCaseId && <CaseOpening caseId={selectedCaseId} close={() => setSelectedCaseId(null)} user={user} setUser={setUser} showNotify={showNotify} />}
                     {showCases && <CasesList close={() => setShowCases(false)} selectCase={setSelectedCaseId} user={user} />}
-                    {activeGame === 'roulette' && <RouletteGame close={() => setActiveGame(null)} user={user} setUser={setUser} showNotify={showNotify} />}
-                    {activeGame === 'crash' && <CrashGame close={() => setActiveGame(null)} user={user} setUser={setUser} showNotify={showNotify} />}
                     {showEditProfile && renderEditProfile()}
                     {showAdminPanel && isAdmin && renderAdminPanel()}
+                    {viewingUser && renderOtherProfile()}
 
                     {notification && <div className={`fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-premium z-50 flex items-center gap-3 font-bold animate-bounce-in glass-card-bright border-white/20 ${notification.type === 'danger' ? 'text-red-400' : 'text-emerald-400'}`}>{notification.text}</div>}
 

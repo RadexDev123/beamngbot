@@ -158,6 +158,12 @@ const server = http.createServer((req, res) => {
         } else {
             res.end(JSON.stringify({ type: 'none', garage: userVehicles[username] || [] }));
         }
+    } else if (pathname === '/get_leaderboard' && req.method === 'GET') {
+        const users = Object.values(db.users)
+            .sort((a, b) => b.balance - a.balance)
+            .slice(0, 50); // Лимит 50 человек
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(users));
     } else {
         res.writeHead(404);
         res.end('Not Found');

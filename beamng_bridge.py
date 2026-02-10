@@ -87,15 +87,35 @@ def main():
                         bng.vehicles.spawn(new_veh, pos=spawn_pos)
                         new_veh.connect(bng)
                         
+                        livery = data.get('livery')
                         if plate:
                             plate_upper = plate.upper()
                             print(f"🆔 Установка номера: {plate_upper} ({design})")
                             # Увеличиваем задержку, так как спавн может быть долгим
                             time.sleep(2.0)
+                            
+                            # Ливреи: маппинг на конкретные скины моделей
+                            livery_map = {
+                                ('etk800', 'taxi'): 'etk800_skin_taxi',
+                                ('sunburst', 'police'): 'sunburst_skin_police',
+                                ('van', 'ambulance'): 'van_skin_ambulance',
+                                ('van', 'taxi'): 'van_skin_taxi',
+                                ('roamer', 'police'): 'roamer_skin_police',
+                                ('fullsize', 'police'): 'fullsize_skin_police',
+                                ('roamer', 'ambulance'): 'roamer_skin_ems'
+                            }
+                            
+                            skin_part = livery_map.get((car_id, livery), livery)
+                            
                             # Пробуем несколько способов для надежности
-                            lua_cmd = f"local v = be:getObjectByID('{vid}'); if v then v:setLicensePlateText('{plate_upper}'); extensions.core_vehicles.setLicensePlateDesign('{design}', '{vid}') end"
+                            lua_cmd = f"local v = be:getObjectByID('{vid}'); if v then v:setLicensePlateText('{plate_upper}'); extensions.core_vehicles.setLicensePlateDesign('{design}', '{vid}')"
+                            if livery:
+                                lua_cmd += f"; extensions.core_vehicle_partmgmt.setPartConfig({{['paint_design'] = '{skin_part}'}}, '{vid}')"
+                            lua_cmd += " end"
+                            
                             bng.queue_lua_command(lua_cmd)
-                            print(f"✅ Команда на номер отправлена")
+                            if livery: print(f"🎨 Ливрея: {livery} -> {skin_part}")
+                            print(f"✅ Команда на номер и ливрею отправлена")
                         
                         if cmd_type == 'start_shift':
                             active_vehicle = new_veh

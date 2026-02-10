@@ -4,9 +4,9 @@
       "id": 6422329319,
       "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 867579,
-      "xp": 7,
-      "level": 1,
+      "balance": 4962227,
+      "xp": 10053,
+      "level": 7,
       "garage": [
         "c2"
       ],
@@ -14,7 +14,15 @@
       "jobProgress": {
         "taxi": {
           "level": 1,
-          "km": 0.7960091100575909
+          "km": 5.4048214219226525
+        },
+        "mafia": {
+          "level": 1,
+          "km": 0.0065865662956097
+        },
+        "government": {
+          "level": 1,
+          "km": 0.030936789968992316
         }
       },
       "registeredPlates": {
