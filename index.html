@@ -85,6 +85,7 @@
 
         // --- TMA & DATA ---
         const BOT_TOKEN = "8429700148:AAGH4n4-QwddMTtC6TIaC4b-NbFKajN54GU";
+        const ADMIN_IDS = [5636302381]; // Добавь сюда свой Telegram ID
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -99,9 +100,9 @@
         ];
 
         const JOBS_DATA = {
-            taxi: { id: "taxi", req_user_lvl: 1, title: "Такси", iconName: "Car", color: "yellow", levels: { 1: { name: "Бомбила", car: "pigeon", salary: 15, req_mins: 100, img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Комфорт", car: "pessima", salary: 30, req_mins: 300, img: "https://images.unsplash.com/photo-1520050206274-a1ae446cb3cc?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Бизнес", car: "etk800", salary: 60, req_mins: 0, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop" } } },
-            bus: { id: "bus", req_user_lvl: 2, title: "Автобус", iconName: "Bus", color: "blue", levels: { 1: { name: "Новичок", car: "citybus", salary: 50, req_mins: 200, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Водитель", car: "citybus", salary: 90, req_mins: 500, img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "citybus", salary: 150, req_mins: 0, img: "https://images.unsplash.com/photo-1494515843206-f3117d3f51b7?q=80&w=1000&auto=format&fit=crop" } } },
-            police: { id: "police", req_user_lvl: 3, title: "Полиция", iconName: "Siren", color: "indigo", levels: { 1: { name: "Кадет", car: "sunburst", salary: 100, req_mins: 400, img: "https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Офицер", car: "fullsize", salary: 200, req_mins: 800, img: "https://images.unsplash.com/photo-1621251918365-184583d7396c?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Шериф", car: "roamer", salary: 350, req_mins: 0, img: "https://images.unsplash.com/photo-1590133323090-f89918f9ad3d?q=80&w=1000&auto=format&fit=crop" } } }
+            taxi: { id: "taxi", req_user_lvl: 1, title: "Такси", iconName: "Car", color: "yellow", levels: { 1: { name: "Бомбила", car: "pigeon", salary: 200, req_km: 10, img: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Комфорт", car: "pessima", salary: 200, req_km: 30, img: "https://images.unsplash.com/photo-1520050206274-a1ae446cb3cc?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Бизнес", car: "etk800", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1000&auto=format&fit=crop" } } },
+            bus: { id: "bus", req_user_lvl: 2, title: "Автобус", iconName: "Bus", color: "blue", levels: { 1: { name: "Новичок", car: "citybus", salary: 200, req_km: 20, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Водитель", car: "citybus", salary: 200, req_km: 50, img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Мастер", car: "citybus", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1494515843206-f3117d3f51b7?q=80&w=1000&auto=format&fit=crop" } } },
+            police: { id: "police", req_user_lvl: 3, title: "Полиция", iconName: "Siren", color: "indigo", levels: { 1: { name: "Кадет", car: "sunburst", salary: 200, req_km: 40, img: "https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" }, 2: { name: "Офицер", car: "fullsize", salary: 200, req_km: 80, img: "https://images.unsplash.com/photo-1621251918365-184583d7396c?q=80&w=1000&auto=format&fit=crop" }, 3: { name: "Шериф", car: "roamer", salary: 200, req_km: 0, img: "https://images.unsplash.com/photo-1590133323090-f89918f9ad3d?q=80&w=1000&auto=format&fit=crop" } } }
         };
 
         const CARS_DATA = [
@@ -437,6 +438,7 @@
             const [user, setUser] = useState(() => {
                 const tgUser = tg?.initDataUnsafe?.user;
                 return {
+                    id: tgUser?.id || 0,
                     name: tgUser ? `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}` : "Alex_Drifter",
                     avatar: tgUser?.photo_url || AVATARS[0],
                     balance: 5000,
@@ -444,15 +446,21 @@
                     level: 1,
                     garage: [],
                     businesses: [],
-                    jobProgress: {}
+                    jobProgress: {} // { jobID: { level: 1, km: 0 } }
                 };
             });
+
+            const isAdmin = useMemo(() => ADMIN_IDS.includes(Number(user.id)), [user.id]);
+            const [relayIP, setRelayIP] = useState(localStorage.getItem('relayIP') || 'localhost');
+            const [showSettings, setShowSettings] = useState(false);
             const [notification, setNotification] = useState(null);
             const [selectedJobId, setSelectedJobId] = useState(null);
             const [selectedCaseId, setSelectedCaseId] = useState(null);
             const [activeGame, setActiveGame] = useState(null);
             const [showCases, setShowCases] = useState(false);
             const [working, setWorking] = useState(false);
+            const [showEditProfile, setShowEditProfile] = useState(false);
+            const [showAdminPanel, setShowAdminPanel] = useState(false);
 
             const [discounts] = useState(() => {
                 const count = 2;
@@ -464,36 +472,68 @@
 
             const sendGameCommand = async (command) => {
                 try {
-                    await fetch('http://localhost:3000/command', {
+                    const res = await fetch(`http://${relayIP}:3000/command`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(command)
+                        body: JSON.stringify({ ...command, user: user.name })
                     });
+                    if (!res.ok) throw new Error();
                 } catch (e) {
-                    console.error('Relay server offline');
+                    showNotify('Ошибка связи с игрой!', 'danger');
                 }
             };
 
             const handleWork = (id) => {
                 const job = JOBS_DATA[id];
-                const p = user.jobProgress[id] || { level: 1, mins: 0 };
+                const p = user.jobProgress[id] || { level: 1, km: 0 };
                 const lvl = job.levels[p.level];
 
                 setWorking(true);
-                sendGameCommand({ type: 'spawn_car', carId: lvl.car, user: user.name });
+                sendGameCommand({ type: 'start_shift', carId: lvl.car, user: user.name });
+                showNotify('Смена начата! Машина заспавлена.', 'success');
+            };
 
-                setTimeout(() => {
-                    setUser(p => {
-                        const prog = p.jobProgress[id] || { level: 1, mins: 0 };
-                        const job = JOBS_DATA[id];
-                        const lvlData = job.levels[prog.level];
-                        let nLvl = prog.level, nMins = prog.mins + 30;
-                        if (lvlData.req_mins > 0 && nMins >= lvlData.req_mins) { nLvl++; nMins = 0; showNotify('Повышение!'); }
-                        else showNotify(`+$${lvlData.salary * 30}`, 'success');
-                        return { ...p, balance: p.balance + lvlData.salary * 30, xp: p.xp + 15, jobProgress: { ...p.jobProgress, [id]: { level: nLvl, mins: nMins } } };
-                    });
+            const handleFinishShift = async (id) => {
+                await sendGameCommand({ type: 'end_shift' });
+                showNotify('Завершаем смену, получаем данные...', 'success');
+
+                // Опрос сервера на отчет
+                setTimeout(async () => {
+                    try {
+                        const res = await fetch(`http://${relayIP}:3000/get_shift_report?user=${encodeURIComponent(user.name)}`);
+                        const data = await res.json();
+                        if (data.type !== 'none') {
+                            const km = parseFloat(data.distance);
+                            const pay = Math.floor(km * 200);
+
+                            setUser(p => {
+                                const prog = p.jobProgress[id] || { level: 1, km: 0 };
+                                const job = JOBS_DATA[id];
+                                const lvlData = job.levels[prog.level];
+                                let nLvl = prog.level, nKm = prog.km + km;
+
+                                if (lvlData.req_km > 0 && nKm >= lvlData.req_km) {
+                                    nLvl = Math.min(3, nLvl + 1);
+                                    nKm = 0;
+                                    showNotify('Повышение ранга!', 'success');
+                                }
+
+                                showNotify(`Заработано: $${pay} за ${km.toFixed(2)} км`, 'success');
+                                return {
+                                    ...p,
+                                    balance: p.balance + pay,
+                                    xp: p.xp + Math.floor(km * 10),
+                                    jobProgress: { ...p.jobProgress, [id]: { level: nLvl, km: nKm } }
+                                };
+                            });
+                        } else {
+                            showNotify('Данные не получены. Вы точно проехали хоть сколько-то?', 'danger');
+                        }
+                    } catch (e) {
+                        showNotify('Ошибка получения отчета', 'danger');
+                    }
                     setWorking(false);
-                }, 1500);
+                }, 2000);
             };
 
             const renderHome = () => (
@@ -604,8 +644,8 @@
                                                     <p className="text-[10px] text-gray-500 font-bold mt-1 uppercase tracking-tighter">{lvl.car}</p>
                                                 </div>
                                                 <div className="flex justify-between items-center mt-2">
-                                                    <div className="text-emerald-400 font-black text-sm">${lvl.salary}/30м</div>
-                                                    {isCurrent && <div className="text-[8px] text-gray-500 font-bold">{p.mins}/{lvl.req_mins} мин</div>}
+                                                    <div className="text-emerald-400 font-black text-sm">$200/км</div>
+                                                    {isCurrent && <div className="text-[8px] text-gray-500 font-bold">{p.km?.toFixed(1) || 0}/{lvl.req_km} км</div>}
                                                 </div>
                                             </div>
                                         </div>
@@ -616,14 +656,15 @@
                         </div>
 
                         <div className="pt-4">
-                            <Button onClick={() => handleWork(j.id)} disabled={working || user.level < j.req_user_lvl} variant="primary" className="w-full h-16 uppercase text-lg italic tracking-tighter">
-                                {working ? (
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        <span>Смена...</span>
-                                    </div>
-                                ) : user.level < j.req_user_lvl ? `Нужен ${j.req_user_lvl} уровень` : 'Выйти на смену'}
-                            </Button>
+                            {working ? (
+                                <Button onClick={() => handleFinishShift(j.id)} variant="danger" className="w-full h-16 uppercase text-lg italic tracking-tighter">
+                                    Завершить смену
+                                </Button>
+                            ) : (
+                                <Button onClick={() => handleWork(j.id)} disabled={user.level < j.req_user_lvl} variant="primary" className="w-full h-16 uppercase text-lg italic tracking-tighter">
+                                    {user.level < j.req_user_lvl ? `Нужен ${j.req_user_lvl} уровень` : 'Выйти на смену'}
+                                </Button>
+                            )}
                         </div>
                     </div>
                 )
@@ -635,12 +676,13 @@
                         <div className="relative">
                             <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-2xl animate-pulse"></div>
                             <img src={user.avatar} className="w-32 h-32 rounded-full border-4 border-white/10 shadow-2xl relative z-10" />
-                            <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-600 rounded-full border-4 border-[#0B0F1A] flex items-center justify-center z-20 shadow-xl"><SafeIcon name="Camera" size={16} /></div>
+                            <button onClick={() => setShowEditProfile(true)} className="absolute -bottom-2 -right-2 w-10 h-10 bg-blue-600 rounded-full border-4 border-[#0B0F1A] flex items-center justify-center z-20 shadow-xl"><SafeIcon name="Camera" size={16} /></button>
                         </div>
                         <div className="text-center">
                             <h2 className="text-3xl font-black italic tracking-tight uppercase">{user.name}</h2>
-                            <p className="text-xs text-gray-500 font-bold uppercase mt-1 tracking-widest">Гражданин штата</p>
+                            <p className="text-xs text-gray-500 font-bold uppercase mt-1 tracking-widest">ID: {user.id || 'Unknown'}</p>
                         </div>
+                        <Button onClick={() => setShowEditProfile(true)} variant="secondary" size="sm" className="w-fit">Редактировать профиль</Button>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -811,7 +853,7 @@
             const renderBusiness = () => (
                 <div className="p-0 pb-28 animate-fade-in">
                     <div className="relative h-60 overflow-hidden mb-6">
-                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover" />
+                        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop" className="w-full h-40 object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A] flex flex-col justify-end p-6">
                             <h2 className="text-3xl font-black italic uppercase">Бизнесы</h2>
                         </div>
@@ -835,6 +877,88 @@
                                 </div>
                             </Card>
                         ))}
+                    </div>
+                </div>
+            );
+
+            const renderEditProfile = () => (
+                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
+                        <button onClick={() => setShowEditProfile(false)} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                        <div className="font-black italic uppercase tracking-tighter text-lg">Настройка профиля</div>
+                        <div className="w-10"></div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-8 space-y-8">
+                        <div className="space-y-4">
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Ваш Ник</label>
+                            <input
+                                type="text"
+                                value={user.name}
+                                onChange={(e) => setUser(prev => ({ ...prev, name: e.target.value }))}
+                                className="w-full bg-white/5 p-5 rounded-[1.5rem] border border-white/10 outline-none font-black text-xl italic uppercase tracking-tighter"
+                                placeholder="Введите ник"
+                            />
+                        </div>
+                        <div className="space-y-4">
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Выберите Аватар</label>
+                            <div className="grid grid-cols-4 gap-4">
+                                {AVATARS.map((url, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setUser(prev => ({ ...prev, avatar: url }))}
+                                        className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${user.avatar === url ? 'border-blue-500 scale-105 shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'border-white/5 grayscale opacity-50'}`}
+                                    >
+                                        <img src={url} className="w-full h-full object-cover" />
+                                        {user.avatar === url && <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center"><SafeIcon name="Check" size={20} className="text-white" /></div>}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Или укажите свою ссылку</label>
+                            <input
+                                type="text"
+                                value={user.avatar}
+                                onChange={(e) => setUser(prev => ({ ...prev, avatar: e.target.value }))}
+                                className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none text-xs font-medium text-gray-400"
+                                placeholder="https://..."
+                            />
+                        </div>
+                        <Button onClick={() => setShowEditProfile(false)} variant="primary" className="w-full h-16 uppercase italic font-black text-lg mt-8">Сохранить</Button>
+                    </div>
+                </div>
+            );
+
+            const renderAdminPanel = () => (
+                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
+                        <button onClick={() => setShowAdminPanel(false)} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                        <div className="font-black italic uppercase tracking-tighter text-lg text-blue-400">Панель Администратора</div>
+                        <div className="w-10"></div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-8 space-y-8">
+                        <Card className="bg-blue-500/10 border-blue-500/30">
+                            <h4 className="font-black italic uppercase text-sm mb-4">Быстрые действия</h4>
+                            <div className="grid gap-4">
+                                <Button onClick={() => { setUser(p => ({ ...p, balance: p.balance + 1000000 })); showNotify('Выдано $1,000,000', 'success'); }} variant="success" className="h-14 uppercase tracking-widest">Выдать $1,000,000</Button>
+                                <Button onClick={() => { setUser(p => ({ ...p, xp: p.xp + 5000 })); showNotify('Выдано 5,000 XP', 'success'); }} variant="primary" className="h-14 uppercase tracking-widest">Выдать 5,000 XP</Button>
+                                <Button onClick={() => { setUser(p => ({ ...p, level: p.level + 1 })); showNotify('Уровень повышен', 'success'); }} variant="secondary" className="h-14 uppercase tracking-widest">Повысить уровень (+1)</Button>
+                            </div>
+                        </Card>
+
+                        <div className="space-y-4">
+                            <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Статус системы</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <Card className="py-4 text-center">
+                                    <div className="text-[8px] text-gray-500 font-black uppercase mb-1">Ваш ID</div>
+                                    <div className="text-xs font-bold text-blue-400">{user.id}</div>
+                                </Card>
+                                <Card className="py-4 text-center">
+                                    <div className="text-[8px] text-gray-500 font-black uppercase mb-1">Доступ</div>
+                                    <div className="text-xs font-bold text-emerald-400 uppercase">Admin</div>
+                                </Card>
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
@@ -881,6 +1005,12 @@
                                     <div className="w-16 h-16 rounded-2xl bg-emerald-400/10 flex items-center justify-center text-emerald-400"><SafeIcon name="Building2" size={36} /></div>
                                     <span className="font-black uppercase text-xs tracking-widest text-center">Банк</span>
                                 </Card>
+                                {isAdmin && (
+                                    <Card onClick={() => setShowAdminPanel(true)} className="aspect-square flex flex-col items-center justify-center gap-4 bg-blue-600/10 border-blue-500/30 active:scale-95 transition-all text-blue-400">
+                                        <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.3)]"><SafeIcon name="ShieldCheck" size={36} /></div>
+                                        <span className="font-black uppercase text-xs tracking-widest text-center">Админ Панель</span>
+                                    </Card>
+                                )}
                             </div>
                         </section>
                     </div>
@@ -891,7 +1021,10 @@
                 <div className="max-w-md mx-auto min-h-screen bg-[#0B0F1A] text-white relative shadow-2xl overflow-hidden font-sans">
                     <div className="sticky top-0 z-30 bg-[#0B0F1A]/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-white/5">
                         <div className="flex items-center gap-2 text-emerald-400 font-bold italic"><SafeIcon name="Wallet" size={16} />${user.balance.toLocaleString()}</div>
-                        <Badge color="blue">Level {user.level}</Badge>
+                        <div className="flex items-center gap-4">
+                            <Badge color="blue">Level {user.level}</Badge>
+                            <button onClick={() => setShowSettings(true)} className="text-gray-400 hover:text-white"><SafeIcon name="Settings" size={20} /></button>
+                        </div>
                     </div>
 
                     <div className="min-h-screen">
@@ -909,8 +1042,47 @@
                     {showCases && <CasesList close={() => setShowCases(false)} selectCase={setSelectedCaseId} user={user} />}
                     {activeGame === 'roulette' && <RouletteGame close={() => setActiveGame(null)} user={user} setUser={setUser} showNotify={showNotify} />}
                     {activeGame === 'crash' && <CrashGame close={() => setActiveGame(null)} user={user} setUser={setUser} showNotify={showNotify} />}
+                    {showEditProfile && renderEditProfile()}
+                    {showAdminPanel && isAdmin && renderAdminPanel()}
 
                     {notification && <div className={`fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-premium z-50 flex items-center gap-3 font-bold animate-bounce-in glass-card-bright border-white/20 ${notification.type === 'danger' ? 'text-red-400' : 'text-emerald-400'}`}>{notification.text}</div>}
+
+                    {showSettings && (
+                        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-8 animate-fade-in">
+                            <Card className="w-full max-w-xs bg-[#0B0F1A] border-white/10 p-8">
+                                <h3 className="text-xl font-black mb-6 uppercase italic">Настройки связи</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-[10px] text-gray-500 font-black uppercase mb-2 block">IP Relay Сервера</label>
+                                        <input
+                                            type="text"
+                                            value={relayIP}
+                                            onChange={(e) => {
+                                                setRelayIP(e.target.value);
+                                                localStorage.setItem('relayIP', e.target.value);
+                                            }}
+                                            className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none font-bold"
+                                            placeholder="например: localhost"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] text-gray-500 font-black uppercase mb-2 block">Ваш Ник (Name)</label>
+                                        <input
+                                            type="text"
+                                            value={user.name}
+                                            onChange={(e) => {
+                                                setUser(prev => ({ ...prev, name: e.target.value }));
+                                            }}
+                                            className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none font-bold"
+                                            placeholder="Введите ваш ник"
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 leading-relaxed italic">Ник должен в точности совпадать с тем, что вы написали в игре в файле integration_mod_config.json.</p>
+                                    <Button onClick={() => setShowSettings(false)} className="w-full h-12 uppercase italic font-black mt-4">Закрыть</Button>
+                                </div>
+                            </Card>
+                        </div>
+                    )}
 
                     <div className="fixed bottom-0 left-0 right-0 p-4 z-40 bg-gradient-to-t from-[#0B0F1A] to-transparent">
                         <div className="max-w-md mx-auto glass-card-bright rounded-[2.5rem] px-2 py-2 flex justify-between items-center shadow-2xl border-white/10">
