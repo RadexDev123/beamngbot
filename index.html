@@ -893,17 +893,41 @@
                 showNotify('Смена начата! Машина заспавлена.', 'success');
             };
 
-            const handleSpawnCar = (carId) => {
-                const plateData = user.registeredPlates[carId];
+            const handleSpawnCar = (id) => {
+                const plateData = user.registeredPlates[id];
+                if (!plateData) {
+                    showNotify('Машина не зарегистрирована в ГИБДД!', 'danger');
+                    return;
+                }
+                const car = CARS_DATA.find(c => c.id === id);
+                const model = car ? car.car : 'pigeon';
+
                 sendGameCommand({
                     type: 'spawn_car',
-                    carId: carId,
+                    carId: model,
                     user: user.name,
-                    plate: plateData ? plateData.string : '',
-                    plateRegion: plateData ? plateData.region : '',
-                    plateCountry: plateData ? plateData.country : ''
+                    plate: plateData.string,
+                    plateRegion: plateData.region,
+                    plateCountry: plateData.country
                 });
                 showNotify('Запрос на спавн отправлен!', 'success');
+            };
+
+            const handleSellCar = (carId, index) => {
+                const car = CARS_DATA.find(c => c.id === carId);
+                if (!car) return;
+                const sellPrice = Math.floor(car.price * 0.5);
+
+                setUser(p => {
+                    const newGarage = [...p.garage];
+                    newGarage.splice(index, 1);
+                    return {
+                        ...p,
+                        balance: p.balance + sellPrice,
+                        garage: newGarage
+                    };
+                });
+                showNotify(`Машина продана за ₽${sellPrice.toLocaleString()}`, 'success');
             };
 
             const handleFinishShift = async (id) => {
@@ -931,7 +955,7 @@
                                     showNotify('Повышение ранга!', 'success');
                                 }
 
-                                showNotify(`Заработано: $${pay} за ${km.toFixed(2)} км`, 'success');
+                                showNotify(`Заработано: ₽${pay} за ${km.toFixed(2)} км`, 'success');
                                 return {
                                     ...p,
                                     balance: p.balance + pay,
@@ -1061,7 +1085,7 @@
                                                     <p className="text-[10px] text-gray-500 font-bold mt-1 uppercase tracking-tighter">{lvl.car}</p>
                                                 </div>
                                                 <div className="flex justify-between items-center mt-2">
-                                                    <div className="text-emerald-400 font-black text-sm">$200/км</div>
+                                                    <div className="text-emerald-400 font-black text-sm">₽200/км</div>
                                                     {isCurrent && <div className="text-[8px] text-gray-500 font-bold">{p.km?.toFixed(1) || 0}/{lvl.req_km} км</div>}
                                                 </div>
                                             </div>
@@ -1105,7 +1129,7 @@
                     <div className="grid grid-cols-2 gap-4">
                         <Card className="text-center bg-white/[0.02] border-white/5 py-4">
                             <div className="text-[10px] text-gray-500 font-black uppercase mb-1">Баланс</div>
-                            <div className="text-lg font-black text-emerald-400">${user.balance.toLocaleString()}</div>
+                            <div className="text-lg font-black text-emerald-400">₽{user.balance.toLocaleString()}</div>
                         </Card>
                         <Card className="text-center bg-white/[0.02] border-white/5 py-4">
                             <div className="text-[10px] text-gray-500 font-black uppercase mb-1">Уровень</div>
@@ -1139,7 +1163,7 @@
                                                 <img src={biz.img} className="w-12 h-12 rounded-lg object-cover" />
                                                 <div className="flex-1">
                                                     <div className="font-black text-xs uppercase">{biz.name}</div>
-                                                    <div className="text-[8px] text-emerald-400 font-bold uppercase tracking-widest">+${biz.income}/ч</div>
+                                                    <div className="text-[8px] text-emerald-400 font-bold uppercase tracking-widest">+₽{biz.income}/ч</div>
                                                 </div>
                                                 <Badge color="green">Доход</Badge>
                                             </Card>
@@ -1161,14 +1185,25 @@
                                 <div className="grid gap-3">
                                     {user.garage.map((carId, i) => {
                                         const car = CARS_DATA.find(c => c.id === carId);
+                                        const plate = user.registeredPlates[carId];
                                         return (
                                             <Card key={i} className="flex items-center gap-4 py-3 bg-white/[0.04] border-white/5">
                                                 <img src={car.img} className="w-12 h-12 rounded-lg object-cover" />
                                                 <div className="flex-1">
                                                     <div className="font-black text-xs uppercase">{car.name}</div>
-                                                    <div className="text-[8px] text-blue-400 font-bold uppercase tracking-widest">{car.type}</div>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        {plate ? (
+                                                            <span className="text-[8px] bg-white text-black px-1 rounded font-black tracking-tighter">{plate.string}</span>
+                                                        ) : (
+                                                            <span className="text-[8px] text-red-500 font-bold uppercase italic">Без номеров</span>
+                                                        )}
+                                                        <span className="text-[8px] text-gray-500 font-bold uppercase tracking-widest opacity-50">• {car.type}</span>
+                                                    </div>
                                                 </div>
-                                                <Button variant="ghost" size="sm" onClick={() => handleSpawnCar(car.car || car.id)} className="text-[10px] uppercase">Спавн</Button>
+                                                <div className="flex gap-2">
+                                                    <Button variant="danger" size="sm" onClick={() => handleSellCar(carId, i)} className="text-[8px] uppercase px-2 py-1 h-8">Продать</Button>
+                                                    <Button variant={plate ? "ghost" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId)} disabled={!plate} className={`text-[8px] uppercase px-3 py-1 h-8 ${!plate ? 'opacity-20' : ''}`}>Спавн</Button>
+                                                </div>
                                             </Card>
                                         );
                                     })}
@@ -1196,8 +1231,8 @@
                                         <div>
                                             <h4 className="font-black text-lg italic uppercase">{car.name}</h4>
                                             <div className="flex items-center gap-2 mt-1">
-                                                <span className={`text-emerald-400 font-black ${discount ? 'text-lg' : ''}`}>${finalPrice.toLocaleString()}</span>
-                                                {discount && <span className="text-xs text-gray-500 line-through">${car.price.toLocaleString()}</span>}
+                                                <span className={`text-emerald-400 font-black ${discount ? 'text-lg' : ''}`}>₽{finalPrice.toLocaleString()}</span>
+                                                {discount && <span className="text-xs text-gray-500 line-through">₽{car.price.toLocaleString()}</span>}
                                             </div>
                                         </div>
                                         <Button size="sm" onClick={() => { if (user.balance >= finalPrice) { setUser(p => ({ ...p, balance: p.balance - finalPrice, garage: [...p.garage, car.id] })); showNotify('Успешная покупка!'); } else showNotify('Недостаточно денег', 'danger'); }} className="uppercase text-[10px] py-3 px-6">Купить</Button>
@@ -1218,7 +1253,7 @@
                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl italic ${idx === 0 ? 'bg-yellow-500 text-black' : 'bg-gray-800 text-white'}`}>{idx + 1}</div>
                                 <div className="flex-1">
                                     <div className="font-black italic uppercase tracking-tight">{item.name}</div>
-                                    <div className="text-xs font-bold text-emerald-400">${item.balance.toLocaleString()}</div>
+                                    <div className="text-xs font-bold text-emerald-400">₽{item.balance.toLocaleString()}</div>
                                 </div>
                                 <div className="text-center">
                                     <div className="text-[8px] text-gray-500 uppercase font-black">Level</div>
@@ -1243,7 +1278,7 @@
                             <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
                             <div className="text-center relative z-10">
                                 <div className="text-[10px] text-emerald-400 font-black uppercase tracking-widest mb-2">Общий баланс</div>
-                                <div className="text-4xl font-black italic tracking-tighter">${user.balance.toLocaleString()}</div>
+                                <div className="text-4xl font-black italic tracking-tighter">₽{user.balance.toLocaleString()}</div>
                             </div>
                         </Card>
 
@@ -1251,7 +1286,7 @@
                             <Card className="flex items-center justify-between py-6">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-red-400/10 flex items-center justify-center text-red-400"><SafeIcon name="CreditCard" /></div>
-                                    <div><div className="font-black text-sm uppercase">Налоги и кредиты</div><div className="text-[10px] text-gray-500 font-bold">$0 к оплате</div></div>
+                                    <div><div className="font-black text-sm uppercase">Налоги и кредиты</div><div className="text-[10px] text-gray-500 font-bold">₽0 к оплате</div></div>
                                 </div>
                                 <Button variant="ghost" size="sm" className="text-[10px] uppercase">Оплатить</Button>
                             </Card>
@@ -1285,10 +1320,10 @@
                                             <h4 className="font-black text-lg italic uppercase">{biz.name}</h4>
                                             <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-relaxed mt-1">{biz.desc}</p>
                                         </div>
-                                        <Badge color="green">+${biz.income}/ч</Badge>
+                                        <Badge color="green">+₽{biz.income}/ч</Badge>
                                     </div>
                                     <div className="flex items-center justify-between pt-2 border-t border-white/5 mt-4">
-                                        <span className="text-emerald-400 font-black text-xl">${biz.price.toLocaleString()}</span>
+                                        <span className="text-emerald-400 font-black text-xl">₽{biz.price.toLocaleString()}</span>
                                         <Button size="sm" onClick={() => { if (user.balance >= biz.price) { setUser(p => ({ ...p, balance: p.balance - biz.price, businesses: [...p.businesses, biz.id] })); showNotify('Бизнес куплен!'); } else showNotify('Недостаточно денег', 'danger'); }} className="uppercase text-[10px] py-3 px-6">Вложиться</Button>
                                     </div>
                                 </div>
@@ -1357,7 +1392,7 @@
                         <Card className="bg-blue-500/10 border-blue-500/30">
                             <h4 className="font-black italic uppercase text-sm mb-4">Быстрые действия</h4>
                             <div className="grid gap-4">
-                                <Button onClick={() => { setUser(p => ({ ...p, balance: p.balance + 1000000 })); showNotify('Выдано $1,000,000', 'success'); }} variant="success" className="h-14 uppercase tracking-widest">Выдать $1,000,000</Button>
+                                <Button onClick={() => { setUser(p => ({ ...p, balance: p.balance + 1000000 })); showNotify('Выдано ₽1,000,000', 'success'); }} variant="success" className="h-14 uppercase tracking-widest">Выдать ₽1,000,000</Button>
                                 <Button onClick={() => { setUser(p => ({ ...p, xp: p.xp + 5000 })); showNotify('Выдано 5,000 XP', 'success'); }} variant="primary" className="h-14 uppercase tracking-widest">Выдать 5,000 XP</Button>
                                 <Button onClick={() => { setUser(p => ({ ...p, level: p.level + 1 })); showNotify('Уровень повышен', 'success'); }} variant="secondary" className="h-14 uppercase tracking-widest">Повысить уровень (+1)</Button>
                             </div>
@@ -1441,7 +1476,7 @@
             return (
                 <div className="max-w-md mx-auto min-h-screen bg-[#0B0F1A] text-white relative shadow-2xl overflow-hidden font-sans">
                     <div className="sticky top-0 z-30 bg-[#0B0F1A]/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-white/5">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold italic"><SafeIcon name="Wallet" size={16} />${user.balance.toLocaleString()}</div>
+                        <div className="flex items-center gap-2 text-emerald-400 font-bold italic"><SafeIcon name="Wallet" size={16} />₽{user.balance.toLocaleString()}</div>
                         <div className="flex items-center gap-4">
                             <Badge color="blue">Level {user.level}</Badge>
                             <button onClick={() => setShowSettings(true)} className="text-gray-400 hover:text-white"><SafeIcon name="Settings" size={20} /></button>
