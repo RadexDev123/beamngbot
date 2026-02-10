@@ -106,11 +106,11 @@
         };
 
         const CARS_DATA = [
-            { id: "c1", name: "Ibishu Pigeon", type: "van", price: 5000, img: "https://images.unsplash.com/photo-1469285994282-454ceb49e63c?q=80&w=400&auto=format" },
-            { id: "c2", name: "Ibishu Covet", type: "sedan", price: 12000, img: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=400&auto=format" },
-            { id: "c3", name: "Gavril D-Series", type: "suv", price: 25000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=400&auto=format" },
-            { id: "c4", name: "Civetta Scintilla", type: "hyper", price: 250000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format" },
-            { id: "c5", name: "ETK 800", type: "sedan", price: 45000, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=400&auto=format" },
+            { id: "c1", name: "Ibishu Pigeon", car: "pigeon", type: "van", price: 5000, img: "https://images.unsplash.com/photo-1469285994282-454ceb49e63c?q=80&w=400&auto=format" },
+            { id: "c2", name: "Ibishu Covet", car: "covet", type: "sedan", price: 12000, img: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=400&auto=format" },
+            { id: "c3", name: "Gavril D-Series", car: "pickup", type: "suv", price: 25000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=400&auto=format" },
+            { id: "c4", name: "Civetta Scintilla", car: "scintilla", type: "hyper", price: 250000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format" },
+            { id: "c5", name: "ETK 800", car: "etk800", type: "sedan", price: 45000, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=400&auto=format" },
         ];
 
         const BUSINESS_DATA = [
@@ -462,6 +462,26 @@
             const [showEditProfile, setShowEditProfile] = useState(false);
             const [showAdminPanel, setShowAdminPanel] = useState(false);
 
+            useEffect(() => {
+                const syncGarage = async () => {
+                    try {
+                        const ownedModels = user.garage.map(id => {
+                            const car = CARS_DATA.find(c => c.id === id);
+                            return car ? car.car : null;
+                        }).filter(c => c !== null);
+
+                        await fetch(`http://${relayIP}:3000/sync_garage`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ user: user.name, vehicles: ownedModels })
+                        });
+                    } catch (e) {
+                        console.error("Garage sync failed", e);
+                    }
+                };
+                if (user.name) syncGarage();
+            }, [user.garage, user.name, relayIP]);
+
             const [discounts] = useState(() => {
                 const count = 2;
                 const shuffled = [...CARS_DATA].sort(() => 0.5 - Math.random());
@@ -491,6 +511,11 @@
                 setWorking(true);
                 sendGameCommand({ type: 'start_shift', carId: lvl.car, user: user.name });
                 showNotify('Смена начата! Машина заспавлена.', 'success');
+            };
+
+            const handleSpawnCar = (carId) => {
+                sendGameCommand({ type: 'spawn_car', carId: carId, user: user.name });
+                showNotify('Запрос на спавн отправлен!', 'success');
             };
 
             const handleFinishShift = async (id) => {
@@ -751,7 +776,7 @@
                                                     <div className="font-black text-xs uppercase">{car.name}</div>
                                                     <div className="text-[8px] text-blue-400 font-bold uppercase tracking-widest">{car.type}</div>
                                                 </div>
-                                                <Badge color="blue">Владелец</Badge>
+                                                <Button variant="ghost" size="sm" onClick={() => handleSpawnCar(car.car || car.id)} className="text-[10px] uppercase">Спавн</Button>
                                             </Card>
                                         );
                                     })}
