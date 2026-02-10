@@ -453,14 +453,17 @@
                 if (localData) {
                     try {
                         const parsed = JSON.parse(localData);
-                        // Если ID совпадает с текущим пользователем Telegram, используем локальные данные
-                        if (parsed.id === (tgUser?.id || 0)) {
-                            return { ...defaultUser, ...parsed };
+                        console.log("Found local storage data:", parsed);
+                        // Если ID совпадает ИЛИ если в локале ID=0 (гость), восстанавливаем
+                        if (parsed.id === (tgUser?.id || 0) || parsed.id === 0) {
+                            console.log("Restoring from local storage...");
+                            return { ...defaultUser, ...parsed, id: tgUser?.id || parsed.id };
                         }
                     } catch (e) {
                         console.error("Local storage parse error", e);
                     }
                 }
+                console.log("Using default user profile");
                 return defaultUser;
             });
 
@@ -479,10 +482,21 @@
             useEffect(() => {
                 const loadUserData = async () => {
                     if (!user.id) return;
+
+                    // Если у нас баланс НЕ дефолтный или есть машины, значит локал уже что-то загрузил
+                    // В этом случае сервер может только "дополнить" или мы его игнорим, если локал новее.
+                    // Для безопасности: если локал есть, серверную загрузку пропускаем (или мержим).
+                    if (user.balance !== 5000 || user.garage.length > 0) {
+                        console.log("Local data present, skipping server load to prevent overwrite");
+                        return;
+                    }
+
+                    console.log("Checking server for user data...");
                     try {
                         const res = await fetch(`http://${relayIP}:3000/get_user?id=${user.id}`);
                         const data = await res.json();
                         if (data && data.status !== 'not_found') {
+                            console.log("Loaded from server:", data);
                             setUser(prev => ({
                                 ...prev,
                                 ...data,
@@ -490,19 +504,19 @@
                             }));
                         }
                     } catch (e) {
-                        console.error("Failed to load user data", e);
+                        console.error("Failed to fetch from server (it is okay if not configured):", e);
                     }
                 };
                 loadUserData();
             }, [user.id, relayIP]);
 
             useEffect(() => {
-                const saveUserData = async () => {
-                    if (!user.id) return;
+                if (!user.id) return;
 
-                    // Сохраняем локально В ЛЮБОМ СЛУЧАЕ
-                    localStorage.setItem('user_data', JSON.stringify(user));
+                // 1. Сохраняем локально НЕМЕДЛЕННО при любом изменении
+                localStorage.setItem('user_data', JSON.stringify(user));
 
+                const saveToServer = async () => {
                     try {
                         const garageModels = user.garage.map(cid => {
                             const car = CARS_DATA.find(c => c.id === cid);
@@ -518,7 +532,8 @@
                         console.error("Auto-save to server failed", e);
                     }
                 };
-                const timer = setTimeout(saveUserData, 2000);
+
+                const timer = setTimeout(saveToServer, 2000);
                 return () => clearTimeout(timer);
             }, [user, relayIP]);
 
