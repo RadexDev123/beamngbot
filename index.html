@@ -124,16 +124,30 @@
         ];
 
         const CASES_DATA = [
-            { id: "case_start", name: "Кейс Новичка", price: 2000, img: "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=400&auto=format", items: [{ id: "m1", type: "money", value: 500, name: "$500", rarity: "common", img: "https://via.placeholder.com/100?text=$500" }, { id: "m2", type: "money", value: 3000, name: "$3,000", rarity: "rare", img: "https://via.placeholder.com/100?text=$3K" }, { id: "x1", type: "xp", value: 100, name: "100 XP", rarity: "common", img: "https://via.placeholder.com/100?text=100XP" }, { id: "c1", type: "car", value: "c1", name: "Ibishu Pigeon", rarity: "legendary", img: "https://via.placeholder.com/100?text=Pigeon" }] },
-            { id: "case_street", name: "Street Racer", price: 15000, img: "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?q=80&w=400&auto=format", items: [{ id: "m3", type: "money", value: 5000, name: "$5,000", rarity: "common", img: "https://via.placeholder.com/100?text=$5K" }, { id: "c2", type: "car", value: "c2", name: "Ibishu Covet", rarity: "epic", img: "https://via.placeholder.com/100?text=Covet" }, { id: "c3", type: "car", value: "c3", name: "Gavril D-Series", rarity: "legendary", img: "https://via.placeholder.com/100?text=D-Series" }] },
-            { id: "case_drift", name: "Мастер Дрифта", price: 45000, img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=400&auto=format", items: [{ id: "m4", type: "money", value: 15000, name: "$15k", rarity: "common", img: "https://via.placeholder.com/100?text=$15K" }, { id: "c5", type: "car", value: "c5", name: "ETK 800", rarity: "legendary", img: "https://via.placeholder.com/100?text=ETK" }, { id: "m5", type: "money", value: 50000, name: "$50k", rarity: "legendary", img: "https://via.placeholder.com/100?text=$50K" }] },
-            { id: "case_hyper", name: "Гипердрайв", price: 120000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format", items: [{ id: "m6", type: "money", value: 100000, name: "$100k", rarity: "rare", img: "https://via.placeholder.com/100?text=$100K" }, { id: "c4", type: "car", value: "c4", name: "Civetta Scintilla", rarity: "legendary", img: "https://via.placeholder.com/100?text=Scintilla" }, { id: "m7", type: "money", value: 250000, name: "$250k", rarity: "legendary", img: "https://via.placeholder.com/100?text=$250K" }] }
+            { id: "case_start", name: "Кейс Новичка", price: 2000, img: "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=400&auto=format", items: [{ id: "m1", type: "money", value: 500, name: "₽500", rarity: "common", img: "https://via.placeholder.com/100?text=500R" }, { id: "m2", type: "money", value: 3000, name: "₽3,000", rarity: "rare", img: "https://via.placeholder.com/100?text=3KR" }, { id: "x1", type: "xp", value: 100, name: "100 XP", rarity: "common", img: "https://via.placeholder.com/100?text=100XP" }, { id: "c1", type: "car", value: "c1", name: "Ibishu Pigeon", rarity: "legendary", img: "https://via.placeholder.com/100?text=Pigeon" }] },
+            { id: "case_street", name: "Street Racer", price: 15000, img: "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?q=80&w=400&auto=format", items: [{ id: "m3", type: "money", value: 5000, name: "₽5,000", rarity: "common", img: "https://via.placeholder.com/100?text=5KR" }, { id: "c2", type: "car", value: "c2", name: "Ibishu Covet", rarity: "epic", img: "https://via.placeholder.com/100?text=Covet" }, { id: "c3", type: "car", value: "c3", name: "Gavril D-Series", rarity: "legendary", img: "https://via.placeholder.com/100?text=D-Series" }] },
+            { id: "case_drift", name: "Мастер Дрифта", price: 45000, img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=400&auto=format", items: [{ id: "m4", type: "money", value: 15000, name: "₽15k", rarity: "common", img: "https://via.placeholder.com/100?text=15KR" }, { id: "c5", type: "car", value: "c5", name: "ETK 800", rarity: "legendary", img: "https://via.placeholder.com/100?text=ETK" }, { id: "m5", type: "money", value: 50000, name: "₽50k", rarity: "legendary", img: "https://via.placeholder.com/100?text=50KR" }] },
+            { id: "case_hyper", name: "Гипердрайв", price: 120000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format", items: [{ id: "m6", type: "money", value: 100000, name: "₽100k", rarity: "rare", img: "https://via.placeholder.com/100?text=100KR" }, { id: "c4", type: "car", value: "c4", name: "Civetta Scintilla", rarity: "legendary", img: "https://via.placeholder.com/100?text=Scintilla" }, { id: "m7", type: "money", value: 250000, name: "₽250k", rarity: "legendary", img: "https://via.placeholder.com/100?text=250KR" }] }
         ];
 
         const RARITY_COLORS = { common: "gray", rare: "blue", epic: "purple", legendary: "yellow" };
         const RARITY_CHANCES = { common: 50, rare: 30, epic: 15, legendary: 5 };
         const ROULETTE_SEGMENTS = [10, 2, 5, 2, 3, 2, 5, 2, 3, 2, 5, 2, 3, 2, 5, 2, 3, 2, 3, 2];
         const SEGMENT_COLORS = { 2: '#f3f4f6', 3: '#ef4444', 5: '#22c55e', 10: '#eab308' };
+
+        // --- GIBDD DATA ---
+        const GIBDD_CONFIG = {
+            registrationPrice: 1000,
+            generationPrice: 500,
+            countries: [
+                { id: 'ru', name: 'Россия', flag: '🇷🇺' },
+                { id: 'by', name: 'Беларусь', flag: '🇧🇾' }
+            ],
+            regions: {
+                ru: ['77', '78', '161', '93', '102', '125', '777', '750'],
+                by: ['1', '2', '3', '4', '5', '6', '7']
+            }
+        };
 
         // --- UI COMPONENTS ---
         const SafeIcon = ({ name, size = 24, className, ...props }) => {
@@ -210,7 +224,7 @@
                     if (selectedMultiplier === winMultiplier) {
                         const win = bet * winMultiplier;
                         setUser(p => ({ ...p, balance: p.balance + win }));
-                        showNotify(`ПОБЕДА! x${winMultiplier} (+$${win.toLocaleString()})`, 'success');
+                        showNotify(`ПОБЕДА! x${winMultiplier} (+₽${win.toLocaleString()})`, 'success');
                     } else showNotify(`Выпало x${winMultiplier}`, 'danger');
                 }, 5000);
             };
@@ -240,7 +254,7 @@
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
                         <button onClick={close} disabled={spinning} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg">Рулетка</div>
-                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />${user.balance.toLocaleString()}</div>
+                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />₽{user.balance.toLocaleString()}</div>
                     </div>
                     <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-44 z-30"><div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[20px] border-t-white"></div></div>
@@ -293,7 +307,7 @@
                 setGameState('cashed');
                 const win = Math.floor(bet * multiplier);
                 setUser(p => ({ ...p, balance: p.balance + win }));
-                showNotify(`Забрал: $${win}`, 'success');
+                showNotify(`Забрал: ₽${win}`, 'success');
             };
 
             return (
@@ -301,7 +315,7 @@
                     <div className="p-6 flex justify-between items-center border-b border-white/5">
                         <button onClick={close} disabled={gameState === 'running'} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" /></button>
                         <div className="font-black italic uppercase tracking-tighter">Краш</div>
-                        <div className="text-emerald-400 font-bold">${user.balance.toLocaleString()}</div>
+                        <div className="text-emerald-400 font-bold">₽{user.balance.toLocaleString()}</div>
                     </div>
                     <div className="flex-1 p-6 flex flex-col justify-center gap-8">
                         <div className="flex-1 glass-card rounded-[3rem] flex flex-col items-center justify-center">
@@ -353,7 +367,7 @@
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
                         <button onClick={close} disabled={status === 'spinning'} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg">{box.name}</div>
-                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />${user.balance.toLocaleString()}</div>
+                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />₽{user.balance.toLocaleString()}</div>
                     </div>
                     <div className="flex-1 relative flex flex-col justify-center overflow-y-auto">
                         <div className="relative h-60 shrink-0 flex flex-col justify-center">
@@ -371,7 +385,7 @@
                         </div>
 
                         <div className="px-6 py-8 space-y-6">
-                            {status === 'idle' && <Button onClick={spin} variant="primary" className="w-full h-16 text-xl uppercase italic tracking-tighter shadow-yellow-500/20">Открыть за ${box.price.toLocaleString()}</Button>}
+                            {status === 'idle' && <Button onClick={spin} variant="primary" className="w-full h-16 text-xl uppercase italic tracking-tighter shadow-yellow-500/20">Открыть за ₽{box.price.toLocaleString()}</Button>}
 
                             <div className="space-y-4">
                                 <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Содержимое кейса</h4>
@@ -412,7 +426,7 @@
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
                         <button onClick={close} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg">Все Кейсы</div>
-                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />${user.balance.toLocaleString()}</div>
+                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />₽{user.balance.toLocaleString()}</div>
                     </div>
                     <div className="flex-1 overflow-y-auto p-6 space-y-4">
                         <div className="grid gap-4">
@@ -421,7 +435,7 @@
                                     <img src={box.img} className="w-24 h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                     <div className="p-4 flex-1">
                                         <div className="font-black italic uppercase text-sm tracking-tight mb-1">{box.name}</div>
-                                        <div className="text-emerald-400 font-black text-xs">${box.price.toLocaleString()}</div>
+                                        <div className="text-emerald-400 font-black text-xs">₽{box.price.toLocaleString()}</div>
                                     </div>
                                     <div className="pr-4"><Button variant="ghost" size="sm" className="uppercase text-[8px] font-black tracking-widest">Открыть</Button></div>
                                 </Card>
@@ -430,6 +444,286 @@
                     </div>
                 </div>
             )
+        };
+
+        const LicensePlate = ({ country = 'ru', region = '77', value = 'А000АА', spinning = false }) => {
+            const isBY = country === 'by';
+
+            // Format for RU: А 123 ВВ 77
+            // Format for BY: 1234 АВ-7
+            // value for RU is "A000AA"
+            // value for BY is "0000 AA"
+
+            const renderValue = () => {
+                if (spinning) {
+                    return (
+                        <div className="flex-1 text-center text-3xl font-black tracking-widest animate-pulse text-gray-300 italic">
+                            {isBY ? '• • • •  • •' : '•  • • •  • •'}
+                        </div>
+                    );
+                }
+
+                if (!value) return (
+                    <div className="flex-1 text-center text-xl font-bold text-gray-200 italic opacity-20">
+                        {isBY ? '0000 XX' : 'X 000 XX'}
+                    </div>
+                );
+
+                if (isBY) {
+                    // 1234 AA
+                    const parts = value.split(' ');
+                    return (
+                        <div className="flex-1 flex items-center justify-center text-4xl font-bold text-[#1a1a1a] tracking-tight">
+                            <span className="mr-2">{parts[0]}</span>
+                            <span>{parts[1] || ''}</span>
+                        </div>
+                    );
+                } else {
+                    // A000AA -> A 000 AA
+                    const l1 = value[0] || ' ';
+                    const num = value.substring(1, 4) || ' ';
+                    const l23 = value.substring(4) || ' ';
+                    return (
+                        <div className="flex-1 flex items-center justify-center text-[2.75rem] font-bold text-[#1a1a1a] tracking-tight translate-y-[-1px]">
+                            <span className="mr-3 scale-y-110">{l1}</span>
+                            <span className="mr-3">{num}</span>
+                            <span className="scale-y-110">{l23}</span>
+                        </div>
+                    );
+                }
+            };
+
+            return (
+                <div className="relative w-80 h-20 bg-[#f8f8f8] rounded-xl border-[3px] border-[#1a1a1a] flex items-center justify-between px-3 shadow-2xl overflow-hidden select-none">
+                    {/* Reflective overlay and texture */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-black/5 pointer-events-none"></div>
+                    <div className="absolute inset-[2.5px] border border-black/10 rounded-lg pointer-events-none"></div>
+
+                    {/* Left screw hole placeholder (aesthetic) */}
+                    <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gray-400/30 border border-black/5"></div>
+
+                    {renderValue()}
+
+                    <div className="w-20 h-full border-l-[3px] border-[#1a1a1a] flex flex-col items-center justify-between py-2 relative bg-white/30 backdrop-blur-[1px]">
+                        <span className="text-3xl font-bold text-[#1a1a1a] leading-tight flex-1 flex items-center">{region}</span>
+                        <div className="flex items-center gap-1.5 px-1 mt-auto">
+                            <span className="text-[10px] font-black text-[#1a1a1a] tracking-tighter leading-none">{isBY ? 'BY' : 'RUS'}</span>
+                            {isBY ? (
+                                <div className="flex flex-col w-5 h-3 border border-black/20 overflow-hidden shadow-sm">
+                                    <div className="bg-red-500 h-1/2 w-full"></div>
+                                    <div className="bg-green-600 h-1/2 w-full"></div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col w-5 h-3 border border-black/20 overflow-hidden shadow-sm">
+                                    <div className="bg-white h-1/3 w-full"></div>
+                                    <div className="bg-blue-600 h-1/3 w-full"></div>
+                                    <div className="bg-red-600 h-1/3 w-full"></div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    {/* Right screw hole placeholder */}
+                    <div className="absolute right-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gray-400/30 border border-black/5"></div>
+                </div>
+            );
+        };
+
+        const GIBDDSection = ({ close, user, setUser, showNotify }) => {
+            const [view, setView] = useState('menu'); // 'menu', 'register', 'generate'
+            const [country, setCountry] = useState('ru');
+            const [region, setRegion] = useState('77');
+            const [spinning, setSpinning] = useState(false);
+            const [generatedPlate, setGeneratedPlate] = useState(null);
+            const [selectedCarId, setSelectedCarId] = useState(null);
+
+            const letters = ['А', 'В', 'Е', 'К', 'М', 'Н', 'О', 'Р', 'С', 'Т', 'У', 'Х'];
+            const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+            const generateRandomPlate = () => {
+                if (user.balance < GIBDD_CONFIG.generationPrice) {
+                    showNotify('Недостаточно денег на балансе!', 'danger');
+                    return;
+                }
+
+                setUser(p => ({ ...p, balance: p.balance - GIBDD_CONFIG.generationPrice }));
+                setSpinning(true);
+                setGeneratedPlate(null);
+
+                setTimeout(() => {
+                    let plateStr = '';
+                    if (country === 'ru') {
+                        // A 000 AA
+                        const l1 = letters[Math.floor(Math.random() * letters.length)];
+                        const d = Array(3).fill(0).map(() => digits[Math.floor(Math.random() * digits.length)]).join('');
+                        const l2 = letters[Math.floor(Math.random() * letters.length)];
+                        const l3 = letters[Math.floor(Math.random() * letters.length)];
+                        plateStr = `${l1}${d}${l2}${l3}`;
+                    } else {
+                        // 1234 AA
+                        const d = Array(4).fill(0).map(() => digits[Math.floor(Math.random() * digits.length)]).join('');
+                        const l1 = letters[Math.floor(Math.random() * letters.length)];
+                        const l2 = letters[Math.floor(Math.random() * letters.length)];
+                        plateStr = `${d} ${l1}${l2}`;
+                    }
+
+                    setGeneratedPlate(plateStr);
+                    setSpinning(false);
+                    showNotify('Номер сгенерирован!', 'success');
+                }, 3000);
+            };
+
+            const handleRegister = (carId) => {
+                if (!generatedPlate) {
+                    showNotify('Сначала получите номер!', 'danger');
+                    return;
+                }
+
+                setUser(p => ({
+                    ...p,
+                    registeredPlates: {
+                        ...p.registeredPlates,
+                        [carId]: { string: generatedPlate, country, region }
+                    }
+                }));
+
+                showNotify('Автомобиль успешно зарегистрирован!', 'success');
+                setGeneratedPlate(null);
+                setView('menu');
+            };
+
+            const renderMenu = () => (
+                <div className="space-y-4 animate-fade-in p-6">
+                    <Card onClick={() => setView('generate')} className="flex items-center gap-4 py-8 bg-blue-600/10 border-blue-500/30">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 shadow-xl"><SafeIcon name="Hash" size={32} /></div>
+                        <div className="flex-1">
+                            <div className="font-black text-xl italic uppercase">Получение номера</div>
+                            <div className="text-xs text-gray-500 font-bold mt-1 uppercase">Стоимость: ₽{GIBDD_CONFIG.generationPrice}</div>
+                        </div>
+                        <SafeIcon name="ChevronRight" size={20} className="text-gray-700" />
+                    </Card>
+                    <Card onClick={() => setView('register')} className="flex items-center gap-4 py-8 bg-emerald-600/10 border-emerald-500/30">
+                        <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-xl"><SafeIcon name="ShieldCheck" size={32} /></div>
+                        <div className="flex-1">
+                            <div className="font-black text-xl italic uppercase">Регистрация авто</div>
+                            <div className="text-xs text-gray-500 font-bold mt-1 uppercase">Привязка номера к машине</div>
+                        </div>
+                        <SafeIcon name="ChevronRight" size={20} className="text-gray-700" />
+                    </Card>
+                </div>
+            );
+
+            const renderGenerate = () => (
+                <div className="p-6 space-y-8 animate-slide-in">
+                    <div className="flex flex-col items-center gap-6 py-10 bg-black/20 rounded-[3rem] border border-white/5 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-blue-600/5 blur-3xl rounded-full"></div>
+                        <LicensePlate country={country} region={region} value={generatedPlate} spinning={spinning} />
+                        <div className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em]">Государственный регистрационный знак</div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Страна</label>
+                            <div className="flex gap-2">
+                                {GIBDD_CONFIG.countries.map(c => (
+                                    <button
+                                        key={c.id}
+                                        onClick={() => { setCountry(c.id); setRegion(GIBDD_CONFIG.regions[c.id][0]); }}
+                                        className={`flex-1 py-3 rounded-xl border transition-all font-black text-xs ${country === c.id ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-white/5 border-white/10 text-gray-500'}`}
+                                    >
+                                        {c.flag} {c.id.toUpperCase()}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Регион</label>
+                            <select
+                                value={region}
+                                onChange={(e) => setRegion(e.target.value)}
+                                className="w-full bg-white/5 p-3 rounded-xl border border-white/10 outline-none font-black text-xs text-center appearance-none"
+                            >
+                                {GIBDD_CONFIG.regions[country].map(r => <option key={r} value={r} className="bg-[#0B0F1A]">{r}</option>)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4 pt-4">
+                        {generatedPlate ? (
+                            <div className="grid grid-cols-2 gap-4">
+                                <Button onClick={() => setView('register')} variant="success" className="h-16 uppercase italic font-black text-lg">Забрать</Button>
+                                <Button onClick={generateRandomPlate} variant="secondary" disabled={spinning} className="h-16 uppercase italic font-black text-lg">Перекрутить</Button>
+                            </div>
+                        ) : (
+                            <Button onClick={generateRandomPlate} disabled={spinning} variant="primary" className="w-full h-16 uppercase italic font-black text-lg">
+                                {spinning ? 'Генерация...' : `Сгенерировать за ₽${GIBDD_CONFIG.generationPrice}`}
+                            </Button>
+                        )}
+                        <p className="text-[10px] text-gray-500 text-center font-bold uppercase italic tracking-widest">Деньги за прокрутку не возвращаются</p>
+                    </div>
+                </div>
+            );
+
+            const renderRegister = () => (
+                <div className="p-6 space-y-6 animate-slide-in">
+                    <h3 className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] px-2">Выберите автомобиль</h3>
+                    <div className="space-y-3">
+                        {user.garage.length === 0 ? (
+                            <div className="p-10 text-center text-gray-500 font-bold uppercase text-xs italic">Нет доступных машин</div>
+                        ) : (
+                            user.garage.map((carId, i) => {
+                                const car = CARS_DATA.find(c => c.id === carId);
+                                const plate = user.registeredPlates[carId];
+                                return (
+                                    <Card key={i} onClick={() => !plate && generatedPlate && handleRegister(carId)} className={`flex items-center gap-4 py-4 ${plate ? 'opacity-60 grayscale' : 'hover:border-blue-500/50'}`}>
+                                        <img src={car.img} className="w-16 h-12 rounded-xl object-cover" />
+                                        <div className="flex-1">
+                                            <div className="font-black text-sm uppercase italic">{car.name}</div>
+                                            {plate ? (
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="text-[10px] bg-white text-black px-1.5 py-0.5 rounded font-black tracking-tighter">{plate.string} | {plate.region}</span>
+                                                    <Badge color="green">Регистрация OK</Badge>
+                                                </div>
+                                            ) : (
+                                                <div className="text-[10px] text-gray-500 font-bold uppercase italic tracking-widest mt-1">Не зарегистрирован</div>
+                                            )}
+                                        </div>
+                                        {!plate && generatedPlate && <SafeIcon name="PlusCircle" size={20} className="text-blue-400" />}
+                                    </Card>
+                                );
+                            })
+                        )}
+                    </div>
+                    {generatedPlate && (
+                        <div className="fixed bottom-24 left-6 right-6">
+                            <Card className="bg-blue-600/20 border-blue-500/50 py-4 flex flex-col items-center gap-2">
+                                <div className="text-[10px] text-blue-400 font-black uppercase tracking-widest">Выбранный номер</div>
+                                <div className="text-xl font-black italic">{generatedPlate} | {region}</div>
+                            </Card>
+                        </div>
+                    )}
+                </div>
+            );
+
+            return (
+                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
+                        <button onClick={() => view === 'menu' ? close() : setView('menu')} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                        <div className="font-black italic uppercase tracking-tighter text-lg">ГИБДД</div>
+                        <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />₽{user.balance.toLocaleString()}</div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto pb-28">
+                        <div className="h-48 relative overflow-hidden mb-6">
+                            <img src="https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A] flex flex-col justify-end p-6">
+                                <h2 className="text-2xl font-black italic uppercase tracking-tighter text-blue-400">Управление ТС</h2>
+                            </div>
+                        </div>
+                        {view === 'menu' && renderMenu()}
+                        {view === 'generate' && renderGenerate()}
+                        {view === 'register' && renderRegister()}
+                    </div>
+                </div>
+            );
         };
 
         // --- MAIN APP ---
@@ -442,12 +736,13 @@
                     id: tgUser?.id || 0,
                     name: tgUser ? `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}` : "Alex_Drifter",
                     avatar: tgUser?.photo_url || AVATARS[0],
-                    balance: 5000,
+                    balance: 1000000,
                     xp: 0,
                     level: 1,
                     garage: [],
                     businesses: [],
-                    jobProgress: {}
+                    jobProgress: {},
+                    registeredPlates: {} // carId -> plateData { string, country, region }
                 };
 
                 if (localData) {
@@ -584,13 +879,30 @@
                 const p = user.jobProgress[id] || { level: 1, km: 0 };
                 const lvl = job.levels[p.level];
 
+                // Для рабочих машин можно использовать дефолтный номер или какой-то уникальный
+                // Но если пользователь хочет, можем попробовать найти машину в гараже с таким же типом
+                // Для простоты пока просто передаем 'WORKPLATE' или пусто
                 setWorking(true);
-                sendGameCommand({ type: 'start_shift', carId: lvl.car, user: user.name });
+                sendGameCommand({
+                    type: 'start_shift',
+                    carId: lvl.car,
+                    user: user.name,
+                    plate: 'SERVICE',
+                    plateCountry: 'ru'
+                });
                 showNotify('Смена начата! Машина заспавлена.', 'success');
             };
 
             const handleSpawnCar = (carId) => {
-                sendGameCommand({ type: 'spawn_car', carId: carId, user: user.name });
+                const plateData = user.registeredPlates[carId];
+                sendGameCommand({
+                    type: 'spawn_car',
+                    carId: carId,
+                    user: user.name,
+                    plate: plateData ? plateData.string : '',
+                    plateRegion: plateData ? plateData.region : '',
+                    plateCountry: plateData ? plateData.country : ''
+                });
                 showNotify('Запрос на спавн отправлен!', 'success');
             };
 
@@ -684,6 +996,10 @@
                         <Card onClick={() => setShowCases(true)} className="aspect-square flex flex-col items-center justify-center gap-4 bg-yellow-500/5 border-yellow-500/20 hover:bg-yellow-500/10 active:scale-95 transition-all">
                             <div className="w-16 h-16 rounded-2xl bg-yellow-400/10 flex items-center justify-center text-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.1)]"><SafeIcon name="Gift" size={32} /></div>
                             <span className="font-black uppercase text-[10px] tracking-widest text-center">Кейсы</span>
+                        </Card>
+                        <Card onClick={() => setActiveTab('gibdd')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-indigo-500/5 border-indigo-500/20 hover:bg-indigo-500/10 active:scale-95 transition-all">
+                            <div className="w-16 h-16 rounded-2xl bg-indigo-400/10 flex items-center justify-center text-indigo-400 shadow-[0_0_20px_rgba(129,140,248,0.1)]"><SafeIcon name="Shield" size={32} /></div>
+                            <span className="font-black uppercase text-[10px] tracking-widest text-center">ГИБДД</span>
                         </Card>
                         <Card onClick={() => setActiveTab('more')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-gray-500/5 border-gray-500/20 hover:bg-gray-500/10 active:scale-95 transition-all">
                             <div className="w-16 h-16 rounded-2xl bg-gray-400/10 flex items-center justify-center text-gray-400"><SafeIcon name="MoreHorizontal" size={32} /></div>
@@ -1088,6 +1404,10 @@
                                     <div className="w-16 h-16 rounded-2xl bg-blue-400/10 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(96,165,250,0.2)]"><SafeIcon name="Zap" size={36} /></div>
                                     <span className="font-black uppercase text-xs tracking-widest text-center">Краш</span>
                                 </Card>
+                                <Card onClick={() => setActiveTab('gibdd')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-blue-600/5 border-blue-500/20 hover:bg-blue-600/10 active:scale-95 transition-all">
+                                    <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(59,130,246,0.2)]"><SafeIcon name="Shield" size={36} /></div>
+                                    <span className="font-black uppercase text-xs tracking-widest text-center">ГИБДД</span>
+                                </Card>
                                 <Card onClick={() => setActiveTab('forbes')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-white/[0.02] border-white/5 hover:bg-white/[0.04] active:scale-95 transition-all text-gray-400">
                                     <div className="w-16 h-16 rounded-2xl bg-gray-400/10 flex items-center justify-center"><SafeIcon name="BarChart3" size={36} /></div>
                                     <span className="font-black uppercase text-xs tracking-widest text-center">Forbes</span>
@@ -1137,6 +1457,7 @@
                         {activeTab === 'business' && renderBusiness()}
                         {activeTab === 'bank' && renderBank()}
                         {activeTab === 'more' && renderMore()}
+                        {activeTab === 'gibdd' && <GIBDDSection close={() => setActiveTab('home')} user={user} setUser={setUser} showNotify={showNotify} />}
                     </div>
 
                     {selectedCaseId && <CaseOpening caseId={selectedCaseId} close={() => setSelectedCaseId(null)} user={user} setUser={setUser} showNotify={showNotify} />}

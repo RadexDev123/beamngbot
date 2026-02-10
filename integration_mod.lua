@@ -9,16 +9,26 @@ local timer = 0
 local config = { serverIP = "127.0.0.1", username = "Player", allowedVehicles = {} }
 local lastSpawnedByBot = ""
 
--- Загрузка конфига
+-- Загрузка или создание конфига
 local function loadConfig()
     local path = "integration_mod_config.json"
     local content = readFile(path)
+    
     if content then
         local ok, data = pcall(jsonDecode, content)
         if ok and data then
             if data.serverIP then config.serverIP = data.serverIP end
             if data.username then config.username = data.username end
+            print("[BOT RP] Конфиг загружен: " .. config.serverIP .. " | " .. config.username)
         end
+    else
+        -- Создаем дефолтный файл, если его нет
+        local defaultConfig = {
+            serverIP = "127.0.0.1",
+            username = "Alex_Drifter"
+        }
+        writeFile(path, jsonEncode(defaultConfig))
+        print("[BOT RP] Создан новый файл конфига: " .. path)
     end
 end
 loadConfig()
@@ -40,11 +50,40 @@ local function httpCall(url, callback)
     end)
 end
 
-local function spawnCar(modelName)
+local function spawnCar(modelName, plateText, plateRegion)
     local model = tostring(modelName or "pigeon"):lower()
-    print("[BOT RP] Команда на спавн: " .. model)
-    -- Используем queueAllObjectLua для надежности в песочнице
-    be:queueAllObjectLua(string.format("if extensions.core_vehicles then extensions.core_vehicles.spawnVehicle('%s', nil, be:getPlayerVehicle(0):getPosition()+vec3(0,5,2), quat(0,0,0,1)) end", model))
+    local plate = tostring(plateText or "")
+    local region = tostring(plateRegion or "")
+    
+    local fullPlate = plate
+    if region ~= "" then fullPlate = plate .. " " .. region end
+
+    print("[BOT RP] Попытка спавна: " .. model .. " | Номер: " .. fullPlate)
+    
+    -- Команда для спавна с проверкой наличия текущей машины для позиции
+    local luaCmd = string.format([[
+        (function()
+            local pos = vec3(0,0,0)
+            local playerVeh = be:getPlayerVehicle(0)
+            if playerVeh then
+                pos = playerVeh:getPosition() + vec3(0, 5, 1)
+            end
+            
+            if extensions.core_vehicles then
+                local vid = extensions.core_vehicles.spawnVehicle('%s', nil, pos, quat(0,0,0,1))
+                if vid and '%s' ~= '' then
+                    -- Ставим текст номера (может сработать не сразу, но setTimeout тут нет)
+                    -- В некоторых версиях работает core_vehicles, в других extensions.core_vehicles
+                    local cv = extensions.core_vehicles
+                    if cv and cv.setLicensePlateText then
+                        cv.setLicensePlateText('%s', vid)
+                    end
+                end
+            end
+        end)()
+    ]], model, plate, fullPlate)
+    
+    be:queueAllObjectLua(luaCmd)
     lastSpawnedByBot = model
 end
 
@@ -79,7 +118,7 @@ local function onUpdate(dt)
                 print("[BOT RP] Найдена команда: " .. tostring(data.type))
                 if data.type == "start_shift" or data.type == "spawn_car" then
                     print("[BOT RP] Запрос на спавн: " .. tostring(data.carId))
-                    spawnCar(data.carId)
+                    spawnCar(data.carId, data.plate, data.plateRegion)
                 end
             end
         end
