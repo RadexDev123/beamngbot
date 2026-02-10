@@ -50,7 +50,7 @@ local function httpCall(url, callback)
     end)
 end
 
-local function spawnCar(modelName, plateText, plateRegion)
+local function spawnCar(modelName, plateText, plateRegion, spawnPos)
     local model = tostring(modelName or "pigeon"):lower()
     local plate = tostring(plateText or "")
     local region = tostring(plateRegion or "")
@@ -60,29 +60,53 @@ local function spawnCar(modelName, plateText, plateRegion)
 
     print("[BOT RP] Попытка спавна: " .. model .. " | Номер: " .. fullPlate)
     
-    -- Команда для спавна с проверкой наличия текущей машины для позиции
+    local posStr = "nil"
+    if spawnPos and spawnPos.x then
+        posStr = string.format("vec3(%f, %f, %f)", spawnPos.x, spawnPos.y, spawnPos.z)
+    end
+
     local luaCmd = string.format([[
         (function()
-            local pos = vec3(0,0,0)
+            local pos = %s
             local playerVeh = be:getPlayerVehicle(0)
-            if playerVeh then
+            if not pos and playerVeh then
                 pos = playerVeh:getPosition() + vec3(0, 5, 1)
+            elseif not pos then
+                pos = vec3(0,0,0)
             end
             
             if extensions.core_vehicles then
                 local vid = extensions.core_vehicles.spawnVehicle('%s', nil, pos, quat(0,0,0,1))
                 if vid and '%s' ~= '' then
                     local pText = string.upper('%s')
-                    -- Даем немного времени через простую задержку (в коде это сложно, но core_vehicles.setLicensePlateText обычно ставит отложенно)
                     extensions.core_vehicles.setLicensePlateText(pText, vid)
                     extensions.core_vehicles.setLicensePlateDesign('htnv_russian_regular', vid)
                 end
             end
         end)()
-    ]], model, plate, plate)
+    ]], posStr, model, plate, plate)
     
     be:queueAllObjectLua(luaCmd)
     lastSpawnedByBot = model
+end
+
+local function teleportPlayer(targetPos)
+    if not targetPos or not targetPos.x then return end
+    local posStr = string.format("vec3(%f, %f, %f)", targetPos.x, targetPos.y, targetPos.z)
+    
+    local luaCmd = string.format([[
+        (function()
+            local playerVeh = be:getPlayerVehicle(0)
+            if playerVeh then
+                playerVeh:setPosition(%s)
+            else
+                be:setFreeCameraPos(%s)
+            end
+        end)()
+    ]], posStr, posStr)
+    
+    be:queueAllObjectLua(luaCmd)
+    print("[BOT RP] Телепортация: " .. posStr)
 end
 
 -- Команды для проверки в консоли (~)
@@ -116,7 +140,9 @@ local function onUpdate(dt)
                 print("[BOT RP] Найдена команда: " .. tostring(data.type))
                 if data.type == "start_shift" or data.type == "spawn_car" then
                     print("[BOT RP] Запрос на спавн: " .. tostring(data.carId))
-                    spawnCar(data.carId, data.plate, data.plateRegion)
+                    spawnCar(data.carId, data.plate, data.plateRegion, data.pos)
+                elseif data.type == "teleport" then
+                    teleportPlayer(data.pos)
                 end
             end
         end

@@ -4,7 +4,7 @@
       "id": 6422329319,
       "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 4962227,
+      "balance": 2917227,
       "xp": 10053,
       "level": 7,
       "garage": [
@@ -37,6 +37,16 @@
           "region": "77"
         }
       },
+      "realEstate": [
+        "h2"
+      ],
+      "houseUpgrades": {
+        "h2": {
+          "garage": 3,
+          "workshop": false
+        }
+      },
+      "garageSlots": 1,
       "garageModels": [
         "covet"
       ]
