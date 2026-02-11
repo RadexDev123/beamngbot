@@ -112,11 +112,11 @@
         };
 
         const CARS_DATA = [
-            { id: "c1", name: "Ibishu Pigeon", car: "pigeon", type: "van", price: 5000, img: "https://images.unsplash.com/photo-1469285994282-454ceb49e63c?q=80&w=400&auto=format" },
-            { id: "c2", name: "Ibishu Covet", car: "covet", type: "sedan", price: 12000, img: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=400&auto=format" },
-            { id: "c3", name: "Gavril D-Series", car: "pickup", type: "suv", price: 25000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=400&auto=format" },
-            { id: "c4", name: "Civetta Scintilla", car: "scintilla", type: "hyper", price: 250000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format" },
-            { id: "c5", name: "ETK 800", car: "etk800", type: "sedan", price: 45000, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=400&auto=format" },
+            { id: "c1", name: "Ibishu Pigeon", car: "pigeon", type: "van", price: 5000, img: "https://images.unsplash.com/photo-1469285994282-454ceb49e63c?q=80&w=400&auto=format", configs: ["base", "600", "stabilizer"] },
+            { id: "c2", name: "Ibishu Covet", car: "covet", type: "sedan", price: 12000, img: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=400&auto=format", configs: ["base", "DX", "LXi", "ZXi", "sport", "rally"] },
+            { id: "c3", name: "Gavril D-Series", car: "pickup", type: "suv", price: 25000, img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=400&auto=format", configs: ["base", "d15_v8_4wd", "d15_offroad", "kentucky_derby"] },
+            { id: "c4", name: "Civetta Scintilla", car: "scintilla", type: "hyper", price: 250000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format", configs: ["base", "gt", "gt_spyder", "race", "offroad"] },
+            { id: "c5", name: "ETK 800", car: "etk800", type: "sedan", price: 45000, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=400&auto=format", configs: ["base", "854tc", "856tc", "856ttsport", "police"] },
         ];
 
         const BUSINESS_DATA = [
@@ -680,6 +680,7 @@
             const [dealerFilter, setDealerFilter] = useState({ sort: 'price_asc', type: 'all' });
             const [spawnedVehicles, setSpawnedVehicles] = useState([]); // Array of carIds
             const [selectedSpawnId, setSelectedSpawnId] = useState('spawn');
+            const [garageConfigs, setGarageConfigs] = useState({}); // carIndex -> configName
 
             const fetchLeaderboard = async () => {
                 const url = getRelayUrl('/get_leaderboard');
@@ -853,7 +854,7 @@
                 }
             };
 
-            const handleSpawnCar = (id) => {
+            const handleSpawnCar = (id, index) => {
                 const plateData = user.registeredPlates[id];
                 if (!plateData) {
                     showNotify('Машина не зарегистрирована в ГИБДД!', 'danger');
@@ -861,6 +862,7 @@
                 }
                 const car = CARS_DATA.find(c => c.id === id);
                 const model = car ? car.car : 'pigeon';
+                const config = garageConfigs[index] || 'base';
 
                 setSpawnedVehicles(prev => [...prev, model]);
                 // Для htnv мода номер должен быть слитным (A000AA000)
@@ -872,6 +874,7 @@
                 sendGameCommand({
                     type: 'spawn_car',
                     carId: model,
+                    config: config,
                     plate: fullPlateText,
                     pos: spawnPoint.pos,
                     plateDesign: 'htnv_russian_regular'
@@ -1289,9 +1292,18 @@
                                                     {spawnedVehicles.includes(car.car) ? (
                                                         <Button variant="secondary" size="sm" onClick={() => { if (confirm(`Убрать ${car.name} из игры?`)) handleDespawnCar(car.car); }} className="text-[10px] uppercase font-black py-2 h-10 bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white transition-all">Убрать</Button>
                                                     ) : (
-                                                        <Button variant={plate ? "primary" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId)} disabled={!plate} className={`text-[10px] uppercase font-black py-2 h-10 ${!plate ? 'opacity-20' : 'bg-blue-600/20 border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white shadow-lg active:scale-95 transition-all'}`}>
-                                                            {plate ? 'Спавн' : 'ГИБДД...'}
-                                                        </Button>
+                                                        <div className="flex flex-col gap-1">
+                                                            <select
+                                                                className="bg-white/5 border border-white/10 rounded-lg text-[8px] px-2 py-1 outline-none font-bold uppercase"
+                                                                value={garageConfigs[i] || 'base'}
+                                                                onChange={(e) => setGarageConfigs(p => ({ ...p, [i]: e.target.value }))}
+                                                            >
+                                                                {(car.configs || ['base']).map(cfg => <option key={cfg} value={cfg} className="bg-[#0B0F1A]">{cfg}</option>)}
+                                                            </select>
+                                                            <Button variant={plate ? "primary" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId, i)} disabled={!plate} className={`text-[10px] uppercase font-black py-2 h-10 ${!plate ? 'opacity-20' : 'bg-blue-600/20 border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white shadow-lg active:scale-95 transition-all'}`}>
+                                                                {plate ? 'Спавн' : 'ГИБДД...'}
+                                                            </Button>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </Card>

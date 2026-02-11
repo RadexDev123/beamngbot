@@ -50,15 +50,16 @@ local function httpCall(url, callback)
     end)
 end
 
-local function spawnCar(modelName, plateText, plateRegion, spawnPos)
+local function spawnCar(modelName, configName, plateText, plateRegion, spawnPos)
     local model = tostring(modelName or "pigeon"):lower()
+    local config = tostring(configName or "")
     local plate = tostring(plateText or "")
     local region = tostring(plateRegion or "")
     
     local fullPlate = plate
     if region ~= "" then fullPlate = plate .. " " .. region end
 
-    print("[BOT RP] Попытка спавна: " .. model .. " | Номер: " .. fullPlate)
+    print("[BOT RP] Попытка спавна: " .. model .. (config ~= "" and " | Конфиг: " .. config or "") .. " | Номер: " .. fullPlate)
     
     local posStr = "nil"
     if spawnPos and spawnPos.x then
@@ -76,7 +77,9 @@ local function spawnCar(modelName, plateText, plateRegion, spawnPos)
             end
             
             if extensions.core_vehicles then
-                local vid = extensions.core_vehicles.spawnVehicle('%s', nil, pos, quat(0,0,0,1))
+                local configName = '%s'
+                if configName == '' then configName = nil end
+                local vid = extensions.core_vehicles.spawnVehicle('%s', configName, pos, quat(0,0,0,1))
                 if vid and '%s' ~= '' then
                     local pText = string.upper('%s')
                     extensions.core_vehicles.setLicensePlateText(pText, vid)
@@ -84,7 +87,7 @@ local function spawnCar(modelName, plateText, plateRegion, spawnPos)
                 end
             end
         end)()
-    ]], posStr, model, plate, plate)
+    ]], posStr, config, model, plate, plate)
     
     be:queueAllObjectLua(luaCmd)
     lastSpawnedByBot = model
@@ -140,7 +143,7 @@ local function onUpdate(dt)
                 print("[BOT RP] Найдена команда: " .. tostring(data.type))
                 if data.type == "start_shift" or data.type == "spawn_car" then
                     print("[BOT RP] Запрос на спавн: " .. tostring(data.carId))
-                    spawnCar(data.carId, data.plate, data.plateRegion, data.pos)
+                    spawnCar(data.carId, data.config or data.livery, data.plate, data.plateRegion, data.pos)
                 elseif data.type == "teleport" then
                     teleportPlayer(data.pos)
                 end
