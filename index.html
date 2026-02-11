@@ -118,13 +118,22 @@
             { id: "c4", name: "Civetta Scintilla", car: "scintilla", type: "hyper", price: 250000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format", configs: ["base", "gt", "gt_spyder", "race", "offroad"] },
             { id: "c5", name: "ETK 800", car: "etk800", type: "sedan", price: 45000, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=400&auto=format", configs: ["base", "854tc", "856tc", "856ttsport", "police"] },
             {
-                id: "c6", // Уникальный ID
-                name: "Porsche 911", // Красивое название для бота
-                car: "Porsche 911 992 TwiXeR", // Внутреннее имя папки мода
-                type: "sedan", // Тип (sedan, suv, sport и т.д.)
-                price: 1500000, // Цена в боте
-                img: "https://imgur.com/a/HHY4coB", // Ссылка на картинку
-                configs: ["992 Turbo (A)"] // Ливреи/конфиги (имена .pc файлов)
+                id: "c6",
+                name: "Porsche 911 (992)",
+                car: "porsche_911_992",
+                type: "sport",
+                price: 1500000,
+                img: "https://i.imgur.com/uFpXJv2.png",
+                configs: ["992_turbo_s", "992_gt3_rs", "base"]
+            },
+            {
+                id: "c7",
+                name: "BMW M5 F90",
+                car: "bmw_m5_f90",
+                type: "sedan",
+                price: 1200000,
+                img: "https://i.imgur.com/8QG3yS0.png",
+                configs: ["competition", "cs", "base"]
             },
         ];
 
@@ -139,11 +148,7 @@
             { id: "h3", name: "Современный коттедж", price: 5000000, dailyTax: 5000, baseSlots: 8, garageUpgradePrice: 1000000, img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400&auto=format", pos: { x: 890.1, y: -123.4, z: 45.8 } },
         ];
 
-        const PUBLIC_SPAWNS = [
-            { id: 'spawn', name: 'Автовокзал', pos: { x: 0, y: 0, z: 0 } },
-            { id: 'gibdd', name: 'ГИБДД', pos: { x: 150, y: 200, z: 0 } },
-            { id: 'dealer', name: 'Автосалон', pos: { x: -50, y: -100, z: 0 } },
-        ];
+
 
         const FORBES_DATA = [
             { id: 1, name: "Admin_God", balance: 999999999, level: 100 },
@@ -688,7 +693,6 @@
             const [leaderboard, setLeaderboard] = useState([]);
             const [dealerFilter, setDealerFilter] = useState({ sort: 'price_asc', type: 'all' });
             const [spawnedVehicles, setSpawnedVehicles] = useState([]); // Array of carIds
-            const [selectedSpawnId, setSelectedSpawnId] = useState('spawn');
             const [garageConfigs, setGarageConfigs] = useState({}); // carIndex -> configName
 
             const fetchLeaderboard = async () => {
@@ -877,18 +881,14 @@
                 // Для htnv мода номер должен быть слитным (A000AA000)
                 const fullPlateText = (plateData.string + plateData.region).replace(/\s/g, '').toUpperCase();
 
-                // Находим координаты точки спавна
-                const spawnPoint = [...PUBLIC_SPAWNS, ...user.realEstate.map(hid => REAL_ESTATE_DATA.find(h => h.id === hid))].find(s => s.id === selectedSpawnId) || PUBLIC_SPAWNS[0];
-
                 sendGameCommand({
                     type: 'spawn_car',
                     carId: model,
                     config: config,
                     plate: fullPlateText,
-                    pos: spawnPoint.pos,
                     plateDesign: 'htnv_russian_regular'
                 });
-                showNotify(`Запрос отправлен! Спавн: ${spawnPoint.name}`, 'success');
+                showNotify(`Запрос отправлен! Машина появится рядом`, 'success');
             };
 
             const handleTeleport = (pos, name) => {
@@ -1138,29 +1138,6 @@
                         <div className="text-center">
                             <h2 className="text-3xl font-black italic tracking-tight uppercase">{user.name}</h2>
                             <p className="text-xs text-gray-500 font-bold uppercase mt-1 tracking-widest">ID: {user.id || 'Unknown'}</p>
-                        </div>
-                        <div className="w-full space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Место появления авто</label>
-                            <div className="relative">
-                                <select
-                                    value={selectedSpawnId}
-                                    onChange={(e) => setSelectedSpawnId(e.target.value)}
-                                    className="w-full h-12 bg-white/5 border border-white/10 rounded-xl px-4 text-xs font-bold appearance-none outline-none focus:border-blue-500/50"
-                                >
-                                    <optgroup label="Общественные" className="bg-[#0B0F1A]">
-                                        {PUBLIC_SPAWNS.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                    </optgroup>
-                                    {user.realEstate.length > 0 && (
-                                        <optgroup label="Моя недвижимость" className="bg-[#0B0F1A]">
-                                            {user.realEstate.map(hid => {
-                                                const h = REAL_ESTATE_DATA.find(x => x.id === hid);
-                                                return <option key={h.id} value={h.id}>{h.name}</option>;
-                                            })}
-                                        </optgroup>
-                                    )}
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"><SafeIcon name="ChevronDown" size={14} /></div>
-                            </div>
                         </div>
                         <Button onClick={() => setShowEditProfile(true)} variant="secondary" size="sm" className="w-fit">Редактировать профиль</Button>
                     </div>
