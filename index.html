@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 
 <head>
@@ -8,7 +8,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=Roboto+Condensed:wght@700&display=swap"
         rel="stylesheet">
     <!-- React & Babel -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -23,7 +23,7 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: { sans: ['Manrope', 'sans-serif'], display: ['Sora', 'sans-serif'] },
                     boxShadow: { 'premium': '0 20px 50px rgba(0,0,0,0.3)', 'inner-glow': 'inset 0 0 20px rgba(255,255,255,0.05)' },
                     animation: {
                         'pulse-glow': 'pulse-glow 3s infinite',
@@ -44,20 +44,210 @@
 
     <style>
         body {
-            background-color: #0B0F1A;
+            background:
+                radial-gradient(circle at 10% 12%, rgba(56, 189, 248, 0.18), transparent 32%),
+                radial-gradient(circle at 90% 0%, rgba(37, 99, 235, 0.2), transparent 34%),
+                linear-gradient(145deg, #060a14 0%, #0a1120 45%, #080d1a 100%);
             -webkit-tap-highlight-color: transparent;
+            color: #f8fafc;
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
+            background: linear-gradient(150deg, rgba(148, 163, 184, 0.12), rgba(15, 23, 42, 0.45));
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            box-shadow: 0 16px 38px rgba(2, 6, 23, 0.38);
         }
 
         .glass-card-bright {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(140deg, rgba(59, 130, 246, 0.2), rgba(15, 23, 42, 0.55));
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(147, 197, 253, 0.22);
+        }
+
+        .app-shell {
+            background:
+                radial-gradient(circle at 100% 0%, rgba(56, 189, 248, 0.14), transparent 35%),
+                radial-gradient(circle at 0% 100%, rgba(30, 64, 175, 0.2), transparent 45%),
+                linear-gradient(175deg, rgba(7, 12, 24, 0.94), rgba(8, 15, 30, 0.98));
+            background-size: 160% 160%;
+            animation: shellDrift 16s ease-in-out infinite;
+        }
+
+        .app-shell::before,
+        .app-shell::after {
+            content: "";
+            position: absolute;
+            z-index: 0;
+            border-radius: 9999px;
+            filter: blur(70px);
+            pointer-events: none;
+        }
+
+        .app-shell::before {
+            width: 16rem;
+            height: 16rem;
+            right: -5rem;
+            top: -4rem;
+            background: rgba(34, 211, 238, 0.2);
+            animation: blobFloatA 14s ease-in-out infinite;
+        }
+
+        .app-shell::after {
+            width: 14rem;
+            height: 14rem;
+            left: -4rem;
+            bottom: 4rem;
+            background: rgba(59, 130, 246, 0.2);
+            animation: blobFloatB 18s ease-in-out infinite;
+        }
+
+        .premium-noise {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.12;
+            mix-blend-mode: soft-light;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.35) 0.7px, transparent 0.7px);
+            background-size: 3px 3px;
+        }
+
+        .premium-sheen {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-sheen::after {
+            content: "";
+            position: absolute;
+            inset: -120% auto -120% -40%;
+            width: 45%;
+            transform: rotate(18deg);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+            animation: sheenSweep 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .tab-stage {
+            transform-origin: 50% 0%;
+            will-change: transform, opacity, filter;
+        }
+
+        .tab-stage-right {
+            animation: tabSlideRight 340ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-stage-left {
+            animation: tabSlideLeft 340ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes shellDrift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes blobFloatA {
+            0%,
+            100% {
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate3d(-20px, 14px, 0) scale(1.12);
+            }
+        }
+
+        @keyframes blobFloatB {
+            0%,
+            100% {
+                transform: translate3d(0, 0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate3d(22px, -12px, 0) scale(1.08);
+            }
+        }
+
+        @keyframes sheenSweep {
+            0% {
+                transform: translateX(-180%) rotate(18deg);
+            }
+
+            45% {
+                transform: translateX(240%) rotate(18deg);
+            }
+
+            100% {
+                transform: translateX(240%) rotate(18deg);
+            }
+        }
+
+        @keyframes tabReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(12px) scale(0.992);
+                filter: blur(2px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes tabSlideRight {
+            0% {
+                opacity: 0;
+                transform: translateX(18px) scale(0.995);
+                filter: blur(2px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes tabSlideLeft {
+            0% {
+                opacity: 0;
+                transform: translateX(-18px) scale(0.995);
+                filter: blur(2px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .app-shell,
+            .app-shell::before,
+            .app-shell::after,
+            .premium-sheen::after,
+            .tab-stage,
+            .plate-char.spin {
+                animation: none !important;
+            }
+
+            .tab-stage {
+                transform: none !important;
+                filter: none !important;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -73,6 +263,83 @@
 
         .cubic-bezier {
             transition-timing-function: cubic-bezier(0.15, 0, 0.1, 1);
+        }
+
+        .number-plate {
+            width: min(420px, 100%);
+            aspect-ratio: 520 / 112;
+            background: linear-gradient(180deg, #fbfcf8 0%, #f3f4ef 100%);
+            border: 3px solid #111827;
+            border-radius: 12px;
+            box-shadow:
+                0 14px 30px rgba(2, 6, 23, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .number-plate::before {
+            content: "";
+            position: absolute;
+            inset: 2px;
+            border: 1px solid rgba(17, 24, 39, 0.16);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .plate-main {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-family: "Roboto Condensed", "Sora", sans-serif;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            padding-left: 14px;
+            gap: 10px;
+        }
+
+        .plate-region {
+            width: 82px;
+            height: 100%;
+            border-left: 3px solid #111827;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 6px 6px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.2));
+            color: #111827;
+        }
+
+        .plate-char {
+            display: inline-block;
+            transform-origin: 50% 62%;
+            will-change: transform, opacity;
+        }
+
+        .plate-char.spin {
+            animation: plateCharRoll 0.34s linear infinite;
+        }
+
+        @keyframes plateCharRoll {
+            0% {
+                transform: translateY(-6px) rotateX(0deg);
+                opacity: 0.35;
+            }
+
+            45% {
+                transform: translateY(0px) rotateX(180deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(6px) rotateX(360deg);
+                opacity: 0.35;
+            }
         }
     </style>
 </head>
@@ -93,10 +360,10 @@
         }
 
         const AVATARS = [
-            "https://via.placeholder.com/150/1d4ed8/ffffff?text=User1",
-            "https://via.placeholder.com/150/7e22ce/ffffff?text=User2",
-            "https://via.placeholder.com/150/047857/ffffff?text=User3",
-            "https://via.placeholder.com/150/be123c/ffffff?text=User4",
+            "https://images.unsplash.com/photo-1527980965255-d3b416303d12?q=80&w=400&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=400&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?q=80&w=400&auto=format&fit=crop",
         ];
 
         const JOBS_DATA = {
@@ -137,6 +404,34 @@
             },
         ];
 
+        const prettyCarName = (code) => (code || '').replace(/_/g, ' ').replace(/(^|\s)\S/g, s => s.toUpperCase());
+
+        const FALLBACK_JOB_IMAGES = [
+            "https://images.unsplash.com/photo-1493238792000-8113da705763?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1494976688153-ca738665f66f?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1502877338535-766e1452684a?q=80&w=1200&auto=format&fit=crop"
+        ];
+
+        const FALLBACK_DEALER_IMAGES = [
+            "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1200&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1200&auto=format&fit=crop"
+        ];
+
+        const TAB_ORDER = ['home', 'jobs', 'dealer', 'profile', 'more', 'forbes', 'realestate', 'myrealestate', 'business', 'bank', 'gibdd'];
+
+        // Добавляй свои фото в поле gallery: ["url1", "url2", "url3"] у машин и уровней работ.
+        const buildGallery = (gallery, mainImage, placeholders = []) => {
+            const fromGallery = Array.isArray(gallery) ? gallery.filter(Boolean) : [];
+            if (fromGallery.length > 0) return fromGallery;
+            const base = mainImage ? [mainImage] : [];
+            return [...base, ...placeholders].filter(Boolean).slice(0, 6);
+        };
+
+        const getLevelGallery = (levelData) => buildGallery(levelData?.gallery, levelData?.img, FALLBACK_JOB_IMAGES);
+        const getCarGallery = (carData) => buildGallery(carData?.gallery, carData?.img, FALLBACK_DEALER_IMAGES);
+
+
         const BUSINESS_DATA = [
             { id: "b1", name: "Бургерная", price: 50000, income: 500, desc: "Ларёк на пляже", img: "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=400&auto=format" },
             { id: "b2", name: "Заправка", price: 200000, income: 2500, desc: "В центре города", img: "https://images.unsplash.com/photo-1542382156909-9ae37b3f56fd?q=80&w=400&auto=format" },
@@ -156,16 +451,17 @@
         ];
 
         const CASES_DATA = [
-            { id: "case_start", name: "Кейс Новичка", price: 2000, img: "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=400&auto=format", items: [{ id: "m1", type: "money", value: 500, name: "₽500", rarity: "common", img: "https://via.placeholder.com/100?text=500R" }, { id: "m2", type: "money", value: 3000, name: "₽3,000", rarity: "rare", img: "https://via.placeholder.com/100?text=3KR" }, { id: "x1", type: "xp", value: 100, name: "100 XP", rarity: "common", img: "https://via.placeholder.com/100?text=100XP" }, { id: "c1", type: "car", value: "c1", name: "Ibishu Pigeon", rarity: "legendary", img: "https://via.placeholder.com/100?text=Pigeon" }] },
-            { id: "case_street", name: "Street Racer", price: 15000, img: "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?q=80&w=400&auto=format", items: [{ id: "m3", type: "money", value: 5000, name: "₽5,000", rarity: "common", img: "https://via.placeholder.com/100?text=5KR" }, { id: "c2", type: "car", value: "c2", name: "Ibishu Covet", rarity: "epic", img: "https://via.placeholder.com/100?text=Covet" }, { id: "c3", type: "car", value: "c3", name: "Gavril D-Series", rarity: "legendary", img: "https://via.placeholder.com/100?text=D-Series" }] },
-            { id: "case_drift", name: "Мастер Дрифта", price: 45000, img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=400&auto=format", items: [{ id: "m4", type: "money", value: 15000, name: "₽15k", rarity: "common", img: "https://via.placeholder.com/100?text=15KR" }, { id: "c5", type: "car", value: "c5", name: "ETK 800", rarity: "legendary", img: "https://via.placeholder.com/100?text=ETK" }, { id: "m5", type: "money", value: 50000, name: "₽50k", rarity: "legendary", img: "https://via.placeholder.com/100?text=50KR" }] },
-            { id: "case_hyper", name: "Гипердрайв", price: 120000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format", items: [{ id: "m6", type: "money", value: 100000, name: "₽100k", rarity: "rare", img: "https://via.placeholder.com/100?text=100KR" }, { id: "c4", type: "car", value: "c4", name: "Civetta Scintilla", rarity: "legendary", img: "https://via.placeholder.com/100?text=Scintilla" }, { id: "m7", type: "money", value: 250000, name: "₽250k", rarity: "legendary", img: "https://via.placeholder.com/100?text=250KR" }] }
+            { id: "case_start", name: "Кейс Новичка", price: 2000, img: "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=400&auto=format", items: [{ id: "m1", type: "money", value: 500, name: "₽500", rarity: "common", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=400&auto=format&fit=crop" }, { id: "m2", type: "money", value: 3000, name: "₽3,000", rarity: "rare", img: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=400&auto=format&fit=crop" }, { id: "x1", type: "xp", value: 100, name: "100 XP", rarity: "common", img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=400&auto=format&fit=crop" }, { id: "c1", type: "car", value: "c1", name: "Ibishu Pigeon", rarity: "legendary", img: "https://images.unsplash.com/photo-1469285994282-454ceb49e63c?q=80&w=400&auto=format" }] },
+            { id: "case_street", name: "Street Racer", price: 15000, img: "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?q=80&w=400&auto=format", items: [{ id: "m3", type: "money", value: 5000, name: "₽5,000", rarity: "common", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=400&auto=format&fit=crop" }, { id: "c2", type: "car", value: "c2", name: "Ibishu Covet", rarity: "epic", img: "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=400&auto=format" }, { id: "c3", type: "car", value: "c3", name: "Gavril D-Series", rarity: "legendary", img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=400&auto=format" }] },
+            { id: "case_drift", name: "Мастер Дрифта", price: 45000, img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=400&auto=format", items: [{ id: "m4", type: "money", value: 15000, name: "₽15k", rarity: "common", img: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=400&auto=format&fit=crop" }, { id: "c5", type: "car", value: "c5", name: "ETK 800", rarity: "legendary", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=400&auto=format" }, { id: "m5", type: "money", value: 50000, name: "₽50k", rarity: "legendary", img: "https://images.unsplash.com/photo-1633158829516-966f1338fbe2?q=80&w=400&auto=format&fit=crop" }] },
+            { id: "case_hyper", name: "Гипердрайв", price: 120000, img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format", items: [{ id: "m6", type: "money", value: 100000, name: "₽100k", rarity: "rare", img: "https://images.unsplash.com/photo-1633158829516-966f1338fbe2?q=80&w=400&auto=format&fit=crop" }, { id: "c4", type: "car", value: "c4", name: "Civetta Scintilla", rarity: "legendary", img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0ad?q=80&w=400&auto=format" }, { id: "m7", type: "money", value: 250000, name: "₽250k", rarity: "legendary", img: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=400&auto=format&fit=crop" }] }
         ];
 
         const RARITY_COLORS = { common: "gray", rare: "blue", epic: "purple", legendary: "yellow" };
         const RARITY_CHANCES = { common: 50, rare: 30, epic: 15, legendary: 5 };
         const ROULETTE_SEGMENTS = [10, 2, 5, 2, 3, 2, 5, 2, 3, 2, 5, 2, 3, 2, 5, 2, 3, 2, 3, 2];
         const SEGMENT_COLORS = { 2: '#f3f4f6', 3: '#ef4444', 5: '#22c55e', 10: '#eab308' };
+        const DAILY_REWARD_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
         // --- GIBDD DATA ---
         const GIBDD_CONFIG = {
@@ -221,10 +517,66 @@
         };
 
         const NavButton = ({ icon, label, active, onClick }) => (
-            <button onClick={onClick} className={`flex flex-col items-center justify-center w-14 h-full transition-all ${active ? 'text-blue-500 scale-105' : 'text-gray-600 hover:text-gray-400'}`}>
-                <SafeIcon name={icon} size={22} /><span className="text-[10px] mt-1 font-medium">{label}</span>
+            <button onClick={onClick} className={`flex flex-col items-center justify-center w-[62px] h-full transition-all duration-300 ${active ? 'text-white scale-105' : 'text-slate-400 hover:text-white/80'}`}>
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 ${active ? 'bg-gradient-to-br from-blue-500 to-cyan-400 shadow-[0_10px_24px_rgba(56,189,248,0.4)]' : 'bg-white/5 border border-white/5'}`}>
+                    <SafeIcon name={icon} size={20} />
+                </div>
+                <span className={`text-[10px] mt-1 font-bold uppercase tracking-wide ${active ? 'text-blue-100' : ''}`}>{label}</span>
             </button>
         );
+
+        const ImageCarousel = ({ images = [], title = "", heightClass = "h-52", roundedClass = "rounded-3xl", overlay = true }) => {
+            const slides = (images && images.length ? images : FALLBACK_DEALER_IMAGES).filter(Boolean);
+            const [activeIndex, setActiveIndex] = useState(0);
+
+            useEffect(() => {
+                if (activeIndex >= slides.length) setActiveIndex(0);
+            }, [activeIndex, slides.length]);
+
+            const next = (e) => {
+                e?.stopPropagation?.();
+                setActiveIndex((prev) => (prev + 1) % slides.length);
+            };
+
+            const prev = (e) => {
+                e?.stopPropagation?.();
+                setActiveIndex((prev) => (prev - 1 + slides.length) % slides.length);
+            };
+
+            return (
+                <div className={`relative overflow-hidden ${roundedClass} ${heightClass}`}>
+                    <img src={slides[activeIndex]} alt={title || "slide"} className="w-full h-full object-cover" />
+                    {overlay && <div className="absolute inset-0 bg-gradient-to-t from-[#030712]/75 via-transparent to-transparent"></div>}
+                    {slides.length > 1 && (
+                        <>
+                            <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 border border-white/20 backdrop-blur-md text-white flex items-center justify-center">
+                                <SafeIcon name="ChevronLeft" size={18} />
+                            </button>
+                            <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 border border-white/20 backdrop-blur-md text-white flex items-center justify-center">
+                                <SafeIcon name="ChevronRight" size={18} />
+                            </button>
+                            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+                                {slides.map((_, i) => (
+                                    <span key={i} className={`h-1.5 rounded-full transition-all ${activeIndex === i ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`}></span>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+        };
+
+        const CaseItemImage = ({ src, alt = "item", className = "w-16 h-16 object-contain", fallbackIcon = "ImageOff" }) => {
+            const [failed, setFailed] = useState(false);
+            if (src && !failed) {
+                return <img src={src} alt={alt} className={className} onError={() => setFailed(true)} />;
+            }
+            return (
+                <div className={`${className} flex items-center justify-center text-white/30`}>
+                    <SafeIcon name={fallbackIcon} size={18} />
+                </div>
+            );
+        };
 
         // --- GAMES ---
 
@@ -260,21 +612,21 @@
             };
 
             return (
-                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                <div className="absolute inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
                         <button onClick={close} disabled={status === 'spinning'} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg">{box.name}</div>
                         <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />₽{user.balance.toLocaleString()}</div>
                     </div>
-                    <div className="flex-1 relative flex flex-col justify-center overflow-y-auto">
-                        <div className="relative h-60 shrink-0 flex flex-col justify-center">
+                    <div className="flex-1 relative flex flex-col overflow-y-auto pt-4">
+                        <div className="relative h-60 shrink-0 flex flex-col justify-start">
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-44 w-0.5 bg-yellow-500 z-20 shadow-[0_0_20px_#eab308]"></div>
                             <div className="relative h-44 w-full overflow-hidden">
                                 <div className="flex absolute top-0 h-full left-0 pl-[50vw] transition-transform duration-[5500ms] cubic-bezier" style={{ transform: `translateX(-${offset}px)`, gap: '10px' }}>
                                     {itemsTape.map((it, i) => (
                                         <div key={i} className={`w-[130px] h-full glass-card border-b-4 shrink-0 flex flex-col items-center justify-center p-4 border-${RARITY_COLORS[it.rarity]}-500/50`}>
-                                            <img src={it.img} className="w-16 h-16 object-contain" />
-                                            <div className="text-[10px] font-black mt-2 uppercase">{it.name}</div>
+                                            <CaseItemImage src={it.img} alt={it.name} className="w-16 h-16 object-contain" fallbackIcon={it.type === 'money' ? 'Wallet' : 'ImageOff'} />
+                                            <div className={`text-[10px] font-black mt-2 uppercase ${it.type === 'money' ? 'text-emerald-400' : ''}`}>{it.name}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -289,9 +641,9 @@
                                 <div className="grid grid-cols-2 gap-3">
                                     {box.items.map((it, i) => (
                                         <Card key={i} className={`flex items-center gap-3 py-3 bg-white/[0.04] border-${RARITY_COLORS[it.rarity]}-500/20`}>
-                                            <div className="w-10 h-10 rounded-lg bg-gray-900/50 flex items-center justify-center border border-white/5"><img src={it.img} className="w-8 h-8 object-contain" /></div>
+                                            <div className="w-10 h-10 rounded-lg bg-gray-900/50 flex items-center justify-center border border-white/5"><CaseItemImage src={it.img} alt={it.name} className="w-8 h-8 object-contain" fallbackIcon={it.type === 'money' ? 'Wallet' : 'ImageOff'} /></div>
                                             <div className="flex-1 min-w-0">
-                                                <div className="font-bold text-[9px] uppercase truncate">{it.name}</div>
+                                                <div className={`font-bold text-[9px] uppercase truncate ${it.type === 'money' ? 'text-emerald-400' : ''}`}>{it.name}</div>
                                                 <div className={`text-[7px] font-black uppercase tracking-widest text-${RARITY_COLORS[it.rarity]}-400`}>{it.rarity}</div>
                                             </div>
                                         </Card>
@@ -306,9 +658,9 @@
                                 <div className="text-yellow-500 font-black uppercase text-[10px] mb-8 tracking-[0.2em]">Выигрыш</div>
                                 <div className="relative mb-8">
                                     <div className="absolute inset-0 bg-yellow-500/20 blur-3xl rounded-full"></div>
-                                    <img src={wonItem.img} className="w-32 h-32 mx-auto relative z-10 drop-shadow-2xl" />
+                                    <CaseItemImage src={wonItem?.img} alt={wonItem?.name || "won"} className="w-32 h-32 mx-auto relative z-10 drop-shadow-2xl object-contain" fallbackIcon={wonItem?.type === 'money' ? 'Wallet' : 'ImageOff'} />
                                 </div>
-                                <div className="text-2xl font-black mb-10 italic uppercase tracking-tighter">{wonItem.name}</div>
+                                <div className={`text-2xl font-black mb-10 italic uppercase tracking-tighter ${wonItem?.type === 'money' ? 'text-emerald-400' : ''}`}>{wonItem.name}</div>
                                 <Button onClick={take} variant="success" className="w-full h-14 uppercase font-black tracking-widest">Забрать</Button>
                             </Card>
                         </div>
@@ -319,7 +671,7 @@
 
         const CasesList = ({ close, selectCase, user }) => {
             return (
-                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                <div className="absolute inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
                         <button onClick={close} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg">Все Кейсы</div>
@@ -343,84 +695,80 @@
             )
         };
 
+        const PLATE_LETTERS = ['A', 'B', 'E', 'K', 'M', 'H', 'O', 'P', 'C', 'T', 'Y', 'X'];
+        const PLATE_DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+        const generatePlateByCountry = (country = 'ru') => {
+            const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            if (country === 'ru') {
+                const l1 = rand(PLATE_LETTERS);
+                const d = `${rand(PLATE_DIGITS)}${rand(PLATE_DIGITS)}${rand(PLATE_DIGITS)}`;
+                const l2 = rand(PLATE_LETTERS);
+                const l3 = rand(PLATE_LETTERS);
+                return `${l1}${d}${l2}${l3}`;
+            }
+            const d = `${rand(PLATE_DIGITS)}${rand(PLATE_DIGITS)}${rand(PLATE_DIGITS)}${rand(PLATE_DIGITS)}`;
+            const l1 = rand(PLATE_LETTERS);
+            const l2 = rand(PLATE_LETTERS);
+            return `${d} ${l1}${l2}`;
+        };
+
         const LicensePlate = ({ country = 'ru', region = '77', value = 'A000AA', spinning = false }) => {
             const isBY = country === 'by';
+            const cleaned = String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const safeRegion = String(region || (isBY ? '7' : '77'));
 
-            // Format for RU: А 123 ВВ 77
-            // Format for BY: 1234 АВ-7
-            // value for RU is "A000AA"
-            // value for BY is "0000 AA"
+            const ruRaw = (cleaned || 'X000XX').padEnd(6, 'X').slice(0, 6);
+            const byRaw = (cleaned || '0000XX').padEnd(6, 'X').slice(0, 6);
 
-            const renderValue = () => {
-                if (spinning) {
-                    return (
-                        <div className="flex-1 text-center text-3xl font-black tracking-widest animate-pulse text-gray-300 italic">
-                            {isBY ? '• • • •  • •' : '•  • • •  • •'}
-                        </div>
-                    );
-                }
+            const ruL1 = ruRaw[0];
+            const ruDigits = ruRaw.slice(1, 4);
+            const ruTail = ruRaw.slice(4, 6);
 
-                if (!value) return (
-                    <div className="flex-1 text-center text-xl font-bold text-gray-200 italic opacity-20">
-                        {isBY ? '0000 XX' : 'X 000 XX'}
-                    </div>
-                );
-
-                if (isBY) {
-                    // 1234 AA
-                    const parts = value.split(' ');
-                    return (
-                        <div className="flex-1 flex items-center justify-center text-4xl font-bold text-[#1a1a1a] tracking-tight">
-                            <span className="mr-2">{parts[0]}</span>
-                            <span>{parts[1] || ''}</span>
-                        </div>
-                    );
-                } else {
-                    // A000AA -> A 000 AA
-                    const l1 = value[0] || ' ';
-                    const num = value.substring(1, 4) || ' ';
-                    const l23 = value.substring(4) || ' ';
-                    return (
-                        <div className="flex-1 flex items-center justify-center text-[2.75rem] font-bold text-[#1a1a1a] tracking-tight translate-y-[-1px]">
-                            <span className="mr-3 scale-y-110">{l1}</span>
-                            <span className="mr-3">{num}</span>
-                            <span className="scale-y-110">{l23}</span>
-                        </div>
-                    );
-                }
-            };
+            const byDigits = byRaw.slice(0, 4);
+            const byTail = byRaw.slice(4, 6);
 
             return (
-                <div className="relative w-80 h-20 bg-[#f8f8f8] rounded-xl border-[3px] border-[#1a1a1a] flex items-center justify-between px-3 shadow-2xl overflow-hidden select-none">
-                    {/* Reflective overlay and texture */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-black/5 pointer-events-none"></div>
-                    <div className="absolute inset-[2.5px] border border-black/10 rounded-lg pointer-events-none"></div>
+                <div className="number-plate mx-auto select-none">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/20 via-transparent to-black/10 pointer-events-none"></div>
+                    <div className="absolute left-[8px] top-1/2 -translate-y-1/2 w-[4px] h-[4px] rounded-full bg-black/30 border border-black/20 pointer-events-none"></div>
+                    <div className="absolute right-[8px] top-1/2 -translate-y-1/2 w-[4px] h-[4px] rounded-full bg-black/30 border border-black/20 pointer-events-none"></div>
 
-                    {/* Left screw hole placeholder (aesthetic) */}
-                    <div className="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gray-400/30 border border-black/5"></div>
-
-                    {renderValue()}
-
-                    <div className="w-20 h-full border-l-[3px] border-[#1a1a1a] flex flex-col items-center justify-between py-2 relative bg-white/30 backdrop-blur-[1px]">
-                        <span className="text-3xl font-bold text-[#1a1a1a] leading-tight flex-1 flex items-center">{region}</span>
-                        <div className="flex items-center gap-1.5 px-1 mt-auto">
-                            <span className="text-[10px] font-black text-[#1a1a1a] tracking-tighter leading-none">{isBY ? 'BY' : 'RUS'}</span>
+                    <div className="relative z-[1] h-full flex items-stretch">
+                        <div className="plate-main">
                             {isBY ? (
-                                <div className="flex flex-col w-5 h-3 border border-black/20 overflow-hidden shadow-sm">
-                                    <div className="bg-red-500 h-1/2 w-full"></div>
-                                    <div className="bg-green-600 h-1/2 w-full"></div>
+                                <div className="flex items-end leading-none translate-y-[1px]">
+                                    <span className={`plate-char ${spinning ? 'spin' : ''} text-[2.5rem] tracking-[0.06em] w-[150px] text-center`} style={spinning ? { animationDelay: '0ms' } : undefined}>{byDigits}</span>
+                                    <span className={`plate-char ${spinning ? 'spin' : ''} text-[2.28rem] tracking-[0.08em] w-[88px] text-center`} style={spinning ? { animationDelay: '80ms' } : undefined}>{byTail}</span>
                                 </div>
                             ) : (
-                                <div className="flex flex-col w-5 h-3 border border-black/20 overflow-hidden shadow-sm">
-                                    <div className="bg-white h-1/3 w-full"></div>
-                                    <div className="bg-blue-600 h-1/3 w-full"></div>
-                                    <div className="bg-red-600 h-1/3 w-full"></div>
+                                <div className="flex items-end leading-none translate-y-[1px]">
+                                    <span className={`plate-char ${spinning ? 'spin' : ''} text-[2.35rem] w-[38px] text-center`} style={spinning ? { animationDelay: '0ms' } : undefined}>{ruL1}</span>
+                                    <span className={`plate-char ${spinning ? 'spin' : ''} text-[2.6rem] tracking-[0.08em] w-[128px] text-center`} style={spinning ? { animationDelay: '70ms' } : undefined}>{ruDigits}</span>
+                                    <span className={`plate-char ${spinning ? 'spin' : ''} text-[2.35rem] tracking-[0.08em] w-[84px] text-center`} style={spinning ? { animationDelay: '140ms' } : undefined}>{ruTail}</span>
                                 </div>
                             )}
                         </div>
+
+                        <div className="plate-region">
+                            <div className={`font-black leading-none tracking-tight ${isBY ? 'text-[1.7rem]' : 'text-[2.05rem]'}`}>{safeRegion}</div>
+                            <div className="flex items-center gap-1.5 mt-auto">
+                                <span className="text-[9px] font-black leading-none tracking-tight">{isBY ? 'BY' : 'RUS'}</span>
+                                {isBY ? (
+                                    <div className="flex flex-col w-5 h-3 border border-black/20 overflow-hidden shadow-sm rounded-[1px]">
+                                        <div className="bg-red-500 h-1/2 w-full"></div>
+                                        <div className="bg-green-600 h-1/2 w-full"></div>
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col w-5 h-3 border border-black/20 overflow-hidden shadow-sm rounded-[1px]">
+                                        <div className="bg-white h-1/3 w-full"></div>
+                                        <div className="bg-blue-600 h-1/3 w-full"></div>
+                                        <div className="bg-red-600 h-1/3 w-full"></div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    {/* Right screw hole placeholder */}
-                    <div className="absolute right-1 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-gray-400/30 border border-black/5"></div>
                 </div>
             );
         };
@@ -431,11 +779,21 @@
             const [region, setRegion] = useState('77');
             const [spinning, setSpinning] = useState(false);
             const [generatedPlate, setGeneratedPlate] = useState(null);
-            const [selectedCarId, setSelectedCarId] = useState(null);
+            const [rollingPlate, setRollingPlate] = useState('A000AA');
 
-            const letters = ['A', 'B', 'E', 'K', 'M', 'N', 'O', 'P', 'C', 'T', 'Y', 'X'];
-            const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-            const [manualPlate, setManualPlate] = useState('');
+            useEffect(() => {
+                if (spinning) return;
+                setRollingPlate(country === 'ru' ? 'A000AA' : '0000 AA');
+            }, [country, spinning]);
+
+            useEffect(() => {
+                if (!spinning) return;
+                setRollingPlate(generatePlateByCountry(country));
+                const timer = setInterval(() => {
+                    setRollingPlate(generatePlateByCountry(country));
+                }, 95);
+                return () => clearInterval(timer);
+            }, [spinning, country]);
 
             const generateRandomPlate = () => {
                 if (user.balance < GIBDD_CONFIG.generationPrice) {
@@ -443,28 +801,15 @@
                     return;
                 }
 
+                const targetCountry = country;
                 setUser(p => ({ ...p, balance: p.balance - GIBDD_CONFIG.generationPrice }));
                 setSpinning(true);
                 setGeneratedPlate(null);
 
                 setTimeout(() => {
-                    let plateStr = '';
-                    if (country === 'ru') {
-                        // A 000 AA
-                        const l1 = letters[Math.floor(Math.random() * letters.length)];
-                        const d = Array(3).fill(0).map(() => digits[Math.floor(Math.random() * digits.length)]).join('');
-                        const l2 = letters[Math.floor(Math.random() * letters.length)];
-                        const l3 = letters[Math.floor(Math.random() * letters.length)];
-                        plateStr = `${l1}${d}${l2}${l3}`;
-                    } else {
-                        // 1234 AA
-                        const d = Array(4).fill(0).map(() => digits[Math.floor(Math.random() * digits.length)]).join('');
-                        const l1 = letters[Math.floor(Math.random() * letters.length)];
-                        const l2 = letters[Math.floor(Math.random() * letters.length)];
-                        plateStr = `${d} ${l1}${l2}`;
-                    }
-
+                    const plateStr = generatePlateByCountry(targetCountry);
                     setGeneratedPlate(plateStr);
+                    setRollingPlate(plateStr);
                     setSpinning(false);
                     showNotify('Номер сгенерирован!', 'success');
                 }, 3000);
@@ -512,10 +857,14 @@
 
             const renderGenerate = () => (
                 <div className="p-6 space-y-8 animate-slide-in">
-                    <div className="flex flex-col items-center gap-6 py-10 bg-black/20 rounded-[3rem] border border-white/5 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-blue-600/5 blur-3xl rounded-full"></div>
-                        <LicensePlate country={country} region={region} value={generatedPlate} spinning={spinning} />
-                        <div className="text-[10px] text-gray-500 font-black uppercase tracking-[0.3em]">Государственный регистрационный знак</div>
+                    <div className="flex flex-col items-center gap-6 py-8 px-4 bg-gradient-to-b from-[#0f1b34]/70 to-[#0a1326]/85 rounded-[2.4rem] border border-white/10 relative overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_50px_rgba(2,6,23,0.45)]">
+                        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-500/10 blur-3xl rounded-full"></div>
+                        <div className="relative z-[1] w-full flex justify-center">
+                            <LicensePlate country={country} region={region} value={spinning ? rollingPlate : generatedPlate} spinning={spinning} />
+                        </div>
+                        <div className="text-[10px] text-blue-200/70 font-black uppercase tracking-[0.28em] text-center">
+                            {spinning ? 'Прокрутка символов: буква • цифры • буквы' : 'Государственный регистрационный знак'}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -525,8 +874,9 @@
                                 {GIBDD_CONFIG.countries.map(c => (
                                     <button
                                         key={c.id}
+                                        disabled={spinning}
                                         onClick={() => { setCountry(c.id); setRegion(GIBDD_CONFIG.regions[c.id][0]); }}
-                                        className={`flex-1 py-3 rounded-xl border transition-all font-black text-xs ${country === c.id ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-white/5 border-white/10 text-gray-500'}`}
+                                        className={`flex-1 py-3 rounded-xl border transition-all font-black text-xs ${country === c.id ? 'bg-blue-600 border-blue-500 text-white shadow-lg' : 'bg-white/5 border-white/10 text-gray-500'} ${spinning ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         {c.flag} {c.id.toUpperCase()}
                                     </button>
@@ -537,8 +887,9 @@
                             <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Регион</label>
                             <select
                                 value={region}
+                                disabled={spinning}
                                 onChange={(e) => setRegion(e.target.value)}
-                                className="w-full bg-white/5 p-3 rounded-xl border border-white/10 outline-none font-black text-xs text-center appearance-none"
+                                className={`w-full bg-white/5 p-3 rounded-xl border border-white/10 outline-none font-black text-xs text-center appearance-none ${spinning ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {GIBDD_CONFIG.regions[country].map(r => <option key={r} value={r} className="bg-[#0B0F1A]">{r}</option>)}
                             </select>
@@ -546,32 +897,17 @@
                     </div>
 
                     <div className="space-y-4 pt-4">
-                        <div className="space-y-2">
-                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Ручной ввод (латиница)</label>
-                            <input
-                                type="text"
-                                value={manualPlate}
-                                onChange={(e) => {
-                                    const val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                                    setManualPlate(val);
-                                    if (val.length >= 4) setGeneratedPlate(val);
-                                }}
-                                placeholder="A000AA"
-                                className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none font-mono font-black text-center text-xl tracking-[0.2em] placeholder:text-gray-700"
-                            />
-                        </div>
-
                         {generatedPlate ? (
                             <div className="grid grid-cols-2 gap-4">
                                 <Button onClick={() => setView('register')} variant="success" className="h-16 uppercase italic font-black text-lg">Забрать</Button>
-                                <Button onClick={() => { setGeneratedPlate(null); setManualPlate(''); }} variant="secondary" className="h-16 uppercase italic font-black text-lg">Сбросить</Button>
+                                <Button onClick={() => { setGeneratedPlate(null); }} variant="secondary" className="h-16 uppercase italic font-black text-lg">Сбросить</Button>
                             </div>
                         ) : (
                             <Button onClick={generateRandomPlate} disabled={spinning} variant="primary" className="w-full h-16 uppercase italic font-black text-lg">
                                 {spinning ? 'Генерация...' : `Случайный за ₽${GIBDD_CONFIG.generationPrice}`}
                             </Button>
                         )}
-                        <p className="text-[10px] text-gray-500 text-center font-bold uppercase italic tracking-widest">Используйте только английские буквы и цифры</p>
+                        <p className="text-[10px] text-gray-500 text-center font-bold uppercase italic tracking-widest">Номер выдаётся автоматически</p>
                     </div>
                 </div>
             );
@@ -607,7 +943,7 @@
                         )}
                     </div>
                     {generatedPlate && (
-                        <div className="fixed bottom-24 left-6 right-6">
+                        <div className="sticky bottom-24 z-10">
                             <Card className="bg-blue-600/20 border-blue-500/50 py-4 flex flex-col items-center gap-2">
                                 <div className="text-[10px] text-blue-400 font-black uppercase tracking-widest">Выбранный номер</div>
                                 <div className="text-xl font-black italic">{generatedPlate} | {region}</div>
@@ -618,13 +954,13 @@
             );
 
             return (
-                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
-                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
+                <div className="p-0 pb-28 animate-fade-in">
+                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl sticky top-0 z-20">
                         <button onClick={() => view === 'menu' ? close() : setView('menu')} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg">ГИБДД</div>
                         <div className="text-emerald-400 font-bold flex items-center gap-2"><SafeIcon name="Wallet" size={14} />₽{user.balance.toLocaleString()}</div>
                     </div>
-                    <div className="flex-1 overflow-y-auto pb-28">
+                    <div className="pb-2">
                         <div className="h-48 relative overflow-hidden mb-6">
                             <img src="https://images.unsplash.com/photo-1513323039704-59bb2562f02d?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A] flex flex-col justify-end p-6">
@@ -658,7 +994,9 @@
                     registeredPlates: {}, // carId -> plateData { string, country, region }
                     realEstate: [], // Array of house IDs
                     houseUpgrades: {}, // houseId -> { garage: 0-3, workshop: bool }
-                    garageSlots: 1
+                    garageSlots: 2,
+                    dailyStreak: 0,
+                    dailyRewardNextAt: 0
                 };
 
                 const defaultDataCheck = (d) => d.balance === 1000000 && d.garage.length === 0;
@@ -692,9 +1030,12 @@
             const [showAdminPanel, setShowAdminPanel] = useState(false);
             const [leaderboard, setLeaderboard] = useState([]);
             const [dealerFilter, setDealerFilter] = useState({ sort: 'price_asc', type: 'all' });
+            const [selectedDealerCarId, setSelectedDealerCarId] = useState(null);
             const [spawnedVehicles, setSpawnedVehicles] = useState([]); // Array of carIds
-            const [garageConfigs, setGarageConfigs] = useState({}); // carIndex -> configName
-
+            const avatarFileInputRef = useRef(null);
+            const [nowTs, setNowTs] = useState(Date.now());
+            const previousTabRef = useRef(activeTab);
+            const [tabDirection, setTabDirection] = useState(1);
             const fetchLeaderboard = async () => {
                 const url = getRelayUrl('/get_leaderboard');
                 if (!url) return;
@@ -708,8 +1049,38 @@
             };
 
             useEffect(() => {
+                const timer = setInterval(() => setNowTs(Date.now()), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            useEffect(() => {
+                const resetScroll = () => {
+                    window.scrollTo(0, 0);
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
+                };
+                const frameId = requestAnimationFrame(resetScroll);
+                return () => cancelAnimationFrame(frameId);
+            }, [activeTab, selectedJobId, selectedDealerCarId]);
+
+            useEffect(() => {
                 if (activeTab === 'forbes') fetchLeaderboard();
             }, [activeTab, relayIP]);
+
+            useEffect(() => {
+                const prevIndex = TAB_ORDER.indexOf(previousTabRef.current);
+                const nextIndex = TAB_ORDER.indexOf(activeTab);
+                if (prevIndex !== -1 && nextIndex !== -1) {
+                    setTabDirection(nextIndex >= prevIndex ? 1 : -1);
+                } else {
+                    setTabDirection(1);
+                }
+                previousTabRef.current = activeTab;
+            }, [activeTab]);
+
+            useEffect(() => {
+                if (activeTab !== 'dealer' && selectedDealerCarId) setSelectedDealerCarId(null);
+            }, [activeTab, selectedDealerCarId]);
 
             useEffect(() => {
                 const loadUserData = async () => {
@@ -798,6 +1169,37 @@
                 return shuffled.slice(0, count).map(c => ({ id: c.id, off: Math.floor(Math.random() * 20) + 5 }));
             });
 
+            const getCarDiscount = (carId) => discounts.find(d => d.id === carId);
+            const getDealerPrice = (car) => {
+                const discount = getCarDiscount(car.id);
+                return discount ? Math.floor(car.price * (1 - discount.off / 100)) : car.price;
+            };
+
+            const getTotalGarageSlots = () => (
+                2 + user.realEstate.reduce((acc, id) => {
+                    const house = REAL_ESTATE_DATA.find(x => x.id === id);
+                    const upg = user.houseUpgrades[id] || { garage: 0 };
+                    return house ? acc + house.baseSlots + (upg.garage * 2) : acc;
+                }, 0)
+            );
+
+            const handleDealerPurchase = (car, price) => {
+                const finalPrice = price ?? getDealerPrice(car);
+                const totalSlots = getTotalGarageSlots();
+                if (user.garage.length >= totalSlots) {
+                    showNotify(`Нет места! Лимит: ${totalSlots}`, 'danger');
+                    return;
+                }
+                if (user.balance < finalPrice) {
+                    showNotify('Недостаточно денег', 'danger');
+                    return;
+                }
+                if (confirm(`Купить ${car.name} за ₽${finalPrice.toLocaleString()}?`)) {
+                    setUser(p => ({ ...p, balance: p.balance - finalPrice, garage: [...p.garage, car.id] }));
+                    showNotify('Успешная покупка!', 'success');
+                }
+            };
+
             const getRelayUrl = (path) => {
                 let base = relayIP.trim();
                 if (!base) return '';
@@ -812,6 +1214,82 @@
             };
 
             const showNotify = (text, type = 'success') => { setNotification({ text, type }); setTimeout(() => setNotification(null), 3000); };
+
+            const formatTimeLeft = (ms) => {
+                const total = Math.max(0, Math.floor(ms / 1000));
+                const h = Math.floor(total / 3600);
+                const m = Math.floor((total % 3600) / 60);
+                const s = total % 60;
+                return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            };
+
+            const handleClaimDailyReward = () => {
+                const nextAt = Number(user.dailyRewardNextAt || 0);
+                if (Date.now() < nextAt) {
+                    showNotify('Ежедневная награда ещё недоступна', 'danger');
+                    return;
+                }
+                const streak = Number(user.dailyStreak || 0) + 1;
+                const moneyReward = 5000 + Math.min(streak, 14) * 750;
+                const xpReward = 120 + Math.min(streak, 14) * 25;
+                setUser(prev => ({
+                    ...prev,
+                    balance: prev.balance + moneyReward,
+                    xp: prev.xp + xpReward,
+                    dailyStreak: streak,
+                    dailyRewardNextAt: Date.now() + DAILY_REWARD_INTERVAL_MS
+                }));
+                showNotify(`Награда получена: ₽${moneyReward.toLocaleString()} + ${xpReward} XP`, 'success');
+            };
+
+            const handleAvatarFile = (file) => {
+                if (!file) return;
+                if (!file.type || !file.type.startsWith('image/')) {
+                    showNotify('Нужен файл изображения', 'danger');
+                    return;
+                }
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    showNotify('Файл слишком большой (макс. 5 МБ)', 'danger');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const result = String(reader.result || '');
+                    if (!result) {
+                        showNotify('Не удалось загрузить изображение', 'danger');
+                        return;
+                    }
+                    setUser(prev => ({ ...prev, avatar: result }));
+                    showNotify('Аватар обновлён', 'success');
+                };
+                reader.onerror = () => showNotify('Ошибка чтения файла', 'danger');
+                reader.readAsDataURL(file);
+            };
+
+            const handleAvatarInputChange = (e) => {
+                const file = e.target.files?.[0];
+                if (file) handleAvatarFile(file);
+                e.target.value = '';
+            };
+
+            const handleAvatarPaste = (e) => {
+                const items = Array.from(e.clipboardData?.items || []);
+                const imageItem = items.find(item => item.type && item.type.startsWith('image/'));
+                if (!imageItem) return;
+                const file = imageItem.getAsFile();
+                if (file) {
+                    e.preventDefault();
+                    handleAvatarFile(file);
+                }
+            };
+
+            useEffect(() => {
+                if (!showEditProfile) return;
+                const onPaste = (e) => handleAvatarPaste(e);
+                window.addEventListener('paste', onPaste);
+                return () => window.removeEventListener('paste', onPaste);
+            }, [showEditProfile]);
 
             const sendGameCommand = async (command) => {
                 const url = getRelayUrl('/command');
@@ -832,6 +1310,18 @@
                 const job = JOBS_DATA[id];
                 const p = user.jobProgress[id] || { level: 1, km: 0 };
                 const lvl = job.levels[p.level];
+                const liveryByJob = {
+                    taxi: 'taxi',
+                    police: 'police',
+                    ambulance: 'ambulance',
+                    courier: 'delivery',
+                    bus: 'bus',
+                    marshrutka: 'bus',
+                    trucker: 'cargo',
+                    government: 'executive',
+                    mafia: 'street'
+                };
+                const livery = lvl?.livery || liveryByJob[id] || '';
 
                 let mafiaData = {};
                 if (id === 'mafia') {
@@ -856,7 +1346,7 @@
                     user: user.name,
                     plate: id === 'police' ? 'POLICE' : id === 'ambulance' ? 'MEDIC' : 'SERVICE',
                     plateCountry: 'ru',
-                    livery: lvl.livery, // Новое поле для раскраски
+                    livery,
                     ...mafiaData
                 });
 
@@ -875,7 +1365,6 @@
                 }
                 const car = CARS_DATA.find(c => c.id === id);
                 const model = car ? car.car : 'pigeon';
-                const config = garageConfigs[index] || 'base';
 
                 setSpawnedVehicles(prev => [...prev, model]);
                 // Для htnv мода номер должен быть слитным (A000AA000)
@@ -884,7 +1373,6 @@
                 sendGameCommand({
                     type: 'spawn_car',
                     carId: model,
-                    config: config,
                     plate: fullPlateText,
                     plateDesign: 'htnv_russian_regular'
                 });
@@ -971,65 +1459,204 @@
                 }, 2000);
             };
 
-            const renderHome = () => (
-                <div className="space-y-6 animate-fade-in pb-28">
-                    <div className="relative h-72 rounded-b-[3rem] overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1000&auto=format&fit=crop" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A] flex flex-col justify-end p-8">
-                            <Badge color="yellow" className="w-fit mb-3">Spring 2026</Badge>
-                            <h1 className="text-5xl font-black italic tracking-tighter uppercase">Beamng<span className="text-blue-500 font-light not-italic ml-2">RP</span></h1>
+            const renderHome = () => {
+                const totalSlots = getTotalGarageSlots();
+                const freeSlots = Math.max(totalSlots - user.garage.length, 0);
+                const xpProgress = (user.xp % 1000) / 10;
+                const dailyNextAt = Number(user.dailyRewardNextAt || 0);
+                const dailyCanClaim = nowTs >= dailyNextAt;
+                const dailyTimeLeft = dailyCanClaim ? "00:00:00" : formatTimeLeft(dailyNextAt - nowTs);
+                const dailyStreak = Number(user.dailyStreak || 0);
+                const featuredDiscounts = discounts
+                    .map(d => {
+                        const car = CARS_DATA.find(c => c.id === d.id);
+                        if (!car) return null;
+                        const newPrice = getDealerPrice(car);
+                        return { car, off: d.off, newPrice };
+                    })
+                    .filter(Boolean);
+
+                const jobFocus = Object.values(JOBS_DATA)
+                    .map(job => {
+                        const progress = user.jobProgress[job.id] || { level: 1, km: 0 };
+                        const lvl = job.levels[progress.level];
+                        const req = lvl?.req_km || 0;
+                        const percent = req > 0 ? Math.min(100, (progress.km / req) * 100) : 100;
+                        return { job, level: progress.level, km: progress.km || 0, req, percent };
+                    })
+                    .sort((a, b) => (b.level - a.level) || (b.percent - a.percent))
+                    .slice(0, 3);
+
+                return (
+                    <div className="space-y-6 animate-fade-in pb-32">
+                        <div className="px-6 pt-5">
+                            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-premium">
+                                <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1400&auto=format&fit=crop" className="w-full h-64 object-cover" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-[#030712]/95 via-[#0b1224]/70 to-[#0f172a]/40"></div>
+                                <div className="relative p-6 space-y-5">
+                                    <div className="flex items-center justify-between">
+                                        <Badge color="blue">Season 2026</Badge>
+                                        <span className="text-[10px] text-cyan-200/80 font-black uppercase tracking-[0.2em]">Mini App</span>
+                                    </div>
+                                    <div>
+                                        <h1 className="text-4xl font-display font-black uppercase tracking-tight">BeamNG RP</h1>
+                                        <p className="text-sm text-slate-300 mt-2 max-w-[16rem]">Город, карьера и автосалон в одном стильном центре управления.</p>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div className="rounded-2xl bg-white/10 border border-white/10 p-3">
+                                            <div className="text-[9px] text-slate-300 uppercase font-black tracking-widest">Баланс</div>
+                                            <div className="text-sm font-black text-emerald-300 mt-1">₽{user.balance.toLocaleString()}</div>
+                                        </div>
+                                        <div className="rounded-2xl bg-white/10 border border-white/10 p-3">
+                                            <div className="text-[9px] text-slate-300 uppercase font-black tracking-widest">Уровень</div>
+                                            <div className="text-sm font-black text-cyan-200 mt-1">{user.level}</div>
+                                        </div>
+                                        <div className="rounded-2xl bg-white/10 border border-white/10 p-3">
+                                            <div className="text-[9px] text-slate-300 uppercase font-black tracking-widest">Гараж</div>
+                                            <div className="text-sm font-black text-white mt-1">{user.garage.length}/{totalSlots}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="px-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <Card onClick={() => setActiveTab('jobs')} className="p-4 bg-gradient-to-br from-sky-500/15 to-blue-700/10 border-sky-300/20">
+                                    <div className="w-11 h-11 rounded-2xl bg-sky-400/20 border border-sky-300/20 flex items-center justify-center text-sky-200"><SafeIcon name="Briefcase" size={22} /></div>
+                                    <div className="mt-3">
+                                        <div className="font-black uppercase text-xs tracking-widest">Карьера</div>
+                                        <div className="text-[11px] text-slate-300 mt-1">Работы и ранги</div>
+                                    </div>
+                                </Card>
+                                <Card onClick={() => setActiveTab('dealer')} className="p-4 bg-gradient-to-br from-cyan-500/15 to-slate-700/20 border-cyan-300/20">
+                                    <div className="w-11 h-11 rounded-2xl bg-cyan-400/20 border border-cyan-300/20 flex items-center justify-center text-cyan-100"><SafeIcon name="Car" size={22} /></div>
+                                    <div className="mt-3">
+                                        <div className="font-black uppercase text-xs tracking-widest">Автосалон</div>
+                                        <div className="text-[11px] text-slate-300 mt-1">Подбор и покупка</div>
+                                    </div>
+                                </Card>
+                                <Card onClick={() => setActiveTab('gibdd')} className="p-4 bg-gradient-to-br from-indigo-500/15 to-slate-700/20 border-indigo-300/20">
+                                    <div className="w-11 h-11 rounded-2xl bg-indigo-400/20 border border-indigo-300/20 flex items-center justify-center text-indigo-100"><SafeIcon name="Shield" size={22} /></div>
+                                    <div className="mt-3">
+                                        <div className="font-black uppercase text-xs tracking-widest">ГИБДД</div>
+                                        <div className="text-[11px] text-slate-300 mt-1">Номера и учёт</div>
+                                    </div>
+                                </Card>
+                                <Card onClick={() => setShowCases(true)} className="p-4 bg-gradient-to-br from-amber-500/15 to-orange-700/10 border-amber-300/20">
+                                    <div className="w-11 h-11 rounded-2xl bg-amber-400/20 border border-amber-300/20 flex items-center justify-center text-amber-100"><SafeIcon name="Gift" size={22} /></div>
+                                    <div className="mt-3">
+                                        <div className="font-black uppercase text-xs tracking-widest">Кейсы</div>
+                                        <div className="text-[11px] text-slate-300 mt-1">Лут и награды</div>
+                                    </div>
+                                </Card>
+                            </div>
+                        </div>
+
+                        <div className="px-6">
+                            <Card className="border-white/10 bg-white/[0.03]">
+                                <div className="flex justify-between items-center mb-3">
+                                    <div className="text-xs font-black uppercase tracking-widest text-slate-300">Статус сессии</div>
+                                    {working ? <Badge color="green">Смена активна</Badge> : <Badge color="blue">Готов к старту</Badge>}
+                                </div>
+                                <div className="space-y-3">
+                                    <div>
+                                        <div className="flex justify-between text-xs font-bold mb-1">
+                                            <span className="text-slate-300 uppercase tracking-wide">XP до уровня</span>
+                                            <span className="text-cyan-300">{user.xp % 1000}/1000</span>
+                                        </div>
+                                        <div className="h-2 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full" style={{ width: `${xpProgress}%` }}></div></div>
+                                    </div>
+                                    <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+                                        <div>
+                                            <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Свободные места</div>
+                                            <div className="text-sm font-black mt-1">{freeSlots} из {totalSlots}</div>
+                                        </div>
+                                        <Button size="sm" variant="secondary" onClick={() => setActiveTab('myrealestate')} className="h-9 px-4">Гаражи</Button>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+
+                        <div className="px-6">
+                            <Card className="border-amber-300/25 bg-gradient-to-br from-amber-500/12 to-orange-700/12">
+                                <div className="flex justify-between items-center mb-3">
+                                    <div>
+                                        <div className="text-[10px] text-amber-200/80 font-black uppercase tracking-[0.2em]">Daily RP</div>
+                                        <h3 className="text-lg font-black uppercase mt-1">Ежедневная награда</h3>
+                                    </div>
+                                    <Badge color={dailyCanClaim ? 'green' : 'yellow'}>{dailyCanClaim ? 'Готово' : 'Ожидание'}</Badge>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
+                                        <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Серия дней</div>
+                                        <div className="text-xl font-black text-amber-200 mt-1">{dailyStreak}</div>
+                                    </div>
+                                    <div className="rounded-2xl border border-white/10 bg-black/20 p-3">
+                                        <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest">До выдачи</div>
+                                        <div className="text-xl font-black text-cyan-200 mt-1">{dailyTimeLeft}</div>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={handleClaimDailyReward}
+                                    disabled={!dailyCanClaim}
+                                    variant={dailyCanClaim ? 'success' : 'secondary'}
+                                    className="w-full mt-4 h-11 uppercase text-[11px]"
+                                >
+                                    {dailyCanClaim ? 'Забрать награду' : 'Награда недоступна'}
+                                </Button>
+                            </Card>
+                        </div>
+
+                        <div className="px-6">
+                            <Card className="border-cyan-300/20 bg-gradient-to-br from-cyan-500/10 to-blue-700/10">
+                                <div className="flex justify-between items-center mb-4">
+                                    <div>
+                                        <div className="text-[10px] text-cyan-200/80 font-black uppercase tracking-[0.2em]">Предложение дня</div>
+                                        <h3 className="text-lg font-black uppercase mt-1">Горячие скидки</h3>
+                                    </div>
+                                    <Button size="sm" variant="ghost" onClick={() => setActiveTab('dealer')} className="h-8">В салон</Button>
+                                </div>
+                                <div className="flex gap-3 overflow-x-auto pb-1">
+                                    {featuredDiscounts.map(item => (
+                                        <div key={item.car.id} className="min-w-[190px] rounded-2xl border border-white/10 bg-[#070f1f]/70 overflow-hidden">
+                                            <img src={item.car.img} className="w-full h-24 object-cover" />
+                                            <div className="p-3 space-y-1">
+                                                <div className="text-xs font-black uppercase truncate">{item.car.name}</div>
+                                                <div className="text-[11px] text-slate-400 line-through">₽{item.car.price.toLocaleString()}</div>
+                                                <div className="text-sm font-black text-emerald-300">₽{item.newPrice.toLocaleString()} <span className="text-cyan-200 text-xs">(-{item.off}%)</span></div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
+                        </div>
+
+                        <div className="px-6">
+                            <Card className="border-white/10 bg-white/[0.02]">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-300">Радар карьеры</h3>
+                                    <Button size="sm" variant="ghost" onClick={() => setActiveTab('jobs')} className="h-8">Открыть</Button>
+                                </div>
+                                <div className="space-y-3">
+                                    {jobFocus.map(item => (
+                                        <div key={item.job.id} className="rounded-2xl border border-white/10 bg-[#090f1e]/80 p-3">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <div>
+                                                    <div className="text-xs font-black uppercase">{item.job.title}</div>
+                                                    <div className="text-[10px] text-slate-400 uppercase tracking-widest">Ранг {item.level}</div>
+                                                </div>
+                                                <div className="text-xs text-cyan-200 font-black">{item.req > 0 ? `${item.km.toFixed(1)}/${item.req} км` : 'MAX'}</div>
+                                            </div>
+                                            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-gradient-to-r from-blue-500 to-cyan-300 rounded-full" style={{ width: `${item.percent}%` }}></div></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
                         </div>
                     </div>
-
-                    <div className="px-6">
-                        <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border-blue-500/30">
-                            <div className="flex justify-between items-center mb-4">
-                                <Badge color="blue">Новости</Badge>
-                                <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Сегодня</span>
-                            </div>
-                            <h3 className="text-xl font-black mb-2 italic uppercase">Скидки в салоне!</h3>
-                            <p className="text-sm text-gray-400 mb-4 leading-relaxed">Только сегодня вы можете приобрести автомобили с выгодой до 25%!</p>
-                            <div className="space-y-3">
-                                {discounts.map(d => {
-                                    const car = CARS_DATA.find(c => c.id === d.id);
-                                    return (
-                                        <div key={d.id} className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center"><SafeIcon name="Car" size={18} className="text-blue-400" /></div>
-                                                <div className="text-xs font-bold">{car.name}</div>
-                                            </div>
-                                            <div className="text-emerald-400 font-black">-{d.off}%</div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </Card>
-                    </div>
-
-                    <div className="px-6 grid grid-cols-2 gap-4">
-                        <Card onClick={() => setActiveTab('jobs')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-blue-500/5 border-blue-500/20 hover:bg-blue-500/10 active:scale-95 transition-all">
-                            <div className="w-16 h-16 rounded-2xl bg-blue-400/10 flex items-center justify-center text-blue-400 shadow-[0_0_20px_rgba(96,165,250,0.1)]"><SafeIcon name="Briefcase" size={32} /></div>
-                            <span className="font-black uppercase text-[10px] tracking-widest text-center">Карьера</span>
-                        </Card>
-                        <Card onClick={() => setActiveTab('dealer')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-purple-500/5 border-purple-500/20 hover:bg-purple-500/10 active:scale-95 transition-all">
-                            <div className="w-16 h-16 rounded-2xl bg-purple-400/10 flex items-center justify-center text-purple-400 shadow-[0_0_20px_rgba(192,132,252,0.1)]"><SafeIcon name="Car" size={32} /></div>
-                            <span className="font-black uppercase text-[10px] tracking-widest text-center">Автосалон</span>
-                        </Card>
-                        <Card onClick={() => setShowCases(true)} className="aspect-square flex flex-col items-center justify-center gap-4 bg-yellow-500/5 border-yellow-500/20 hover:bg-yellow-500/10 active:scale-95 transition-all">
-                            <div className="w-16 h-16 rounded-2xl bg-yellow-400/10 flex items-center justify-center text-yellow-400 shadow-[0_0_20px_rgba(234,179,8,0.1)]"><SafeIcon name="Gift" size={32} /></div>
-                            <span className="font-black uppercase text-[10px] tracking-widest text-center">Кейсы</span>
-                        </Card>
-                        <Card onClick={() => setActiveTab('gibdd')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-indigo-500/5 border-indigo-500/20 hover:bg-indigo-500/10 active:scale-95 transition-all">
-                            <div className="w-16 h-16 rounded-2xl bg-indigo-400/10 flex items-center justify-center text-indigo-400 shadow-[0_0_20px_rgba(129,140,248,0.1)]"><SafeIcon name="Shield" size={32} /></div>
-                            <span className="font-black uppercase text-[10px] tracking-widest text-center">ГИБДД</span>
-                        </Card>
-                        <Card onClick={() => setActiveTab('more')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-gray-500/5 border-gray-500/20 hover:bg-gray-500/10 active:scale-95 transition-all">
-                            <div className="w-16 h-16 rounded-2xl bg-gray-400/10 flex items-center justify-center text-gray-400"><SafeIcon name="MoreHorizontal" size={32} /></div>
-                            <span className="font-black uppercase text-[10px] tracking-widest text-center">Ещё</span>
-                        </Card>
-                    </div>
-                </div>
-            );
+                );
+            };
 
             const renderJobs = () => (
                 <div className="p-6 space-y-8 pb-28 animate-fade-in">
@@ -1044,15 +1671,20 @@
                             <div className="space-y-3">
                                 {Object.values(JOBS_DATA).filter(j => j.tier === tier).map(j => {
                                     const p = user.jobProgress[j.id] || { level: 1, km: 0 };
+                                    const lvl = j.levels[p.level];
                                     return (
                                         <Card key={j.id} onClick={() => setSelectedJobId(j.id)} className="flex items-center gap-4 py-5 group bg-white/[0.02] border-white/5">
                                             <div className={`w-14 h-14 rounded-2xl bg-${j.color}-500/10 flex items-center justify-center text-${j.color}-400 group-hover:scale-110 transition-transform`}><SafeIcon name={j.iconName} size={28} /></div>
                                             <div className="flex-1">
                                                 <div className="font-black text-base italic uppercase">{j.title}</div>
+                                                <div className="text-[10px] text-gray-500 font-bold uppercase tracking-tight mt-0.5">{prettyCarName(lvl?.car)}</div>
                                                 <div className="flex items-center gap-2 mt-1">
                                                     <Badge color={user.level >= j.req_user_lvl ? 'green' : 'red'}>{user.level >= j.req_user_lvl ? 'Доступно' : `Ур. ${j.req_user_lvl}`}</Badge>
                                                     <span className="text-[8px] text-gray-500 font-bold uppercase tracking-widest">Ранг {p.level}/3</span>
                                                 </div>
+                                            </div>
+                                            <div className="w-16 h-16 rounded-2xl overflow-hidden border border-white/5 bg-white/[0.02] shrink-0">
+                                                {lvl?.img ? <img src={lvl.img} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-white/20"><SafeIcon name="Image" size={18} /></div>}
                                             </div>
                                             <SafeIcon name="ChevronRight" size={16} className="text-gray-700" />
                                         </Card>
@@ -1127,6 +1759,124 @@
                 )
             };
 
+            const renderJobsV2 = () => (
+                <div className="p-6 space-y-8 pb-28 animate-fade-in">
+                    <div className="space-y-2">
+                        <h2 className="text-3xl font-display font-black italic uppercase">Карьера</h2>
+                        <p className="text-sm text-gray-400">Выбери направление, смотри машины по рангу и выходи на смену.</p>
+                    </div>
+                    {[1, 2, 3, 4].map(tier => (
+                        <div key={tier} className="space-y-4">
+                            <h3 className="text-[10px] text-gray-400 font-black uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                                <div className="h-px flex-1 bg-white/10"></div>
+                                Уровень {tier}
+                                <div className="h-px flex-1 bg-white/10"></div>
+                            </h3>
+                            <div className="grid gap-4">
+                                {Object.values(JOBS_DATA).filter(j => j.tier === tier).map(j => {
+                                    const p = user.jobProgress[j.id] || { level: 1, km: 0 };
+                                    const lvl = j.levels[p.level];
+                                    return (
+                                        <Card key={j.id} onClick={() => setSelectedJobId(j.id)} className="overflow-hidden p-0 border-white/10 bg-gradient-to-br from-[#10213f]/70 to-[#0a1328]/85">
+                                            <div className="px-5 pt-5 pb-4 flex items-start justify-between gap-3">
+                                                <div>
+                                                    <div className="text-[10px] text-blue-200/80 font-black uppercase tracking-[0.2em]">Направление</div>
+                                                    <h4 className="font-display font-black text-xl italic uppercase mt-1">{j.title}</h4>
+                                                    <div className="text-blue-300 text-sm font-bold mt-2">{prettyCarName(lvl?.car)}</div>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-2">
+                                                    <Badge color={user.level >= j.req_user_lvl ? 'green' : 'red'}>{user.level >= j.req_user_lvl ? 'Доступно' : `Ур. ${j.req_user_lvl}`}</Badge>
+                                                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Ранг {p.level}/3</span>
+                                                </div>
+                                            </div>
+                                            <div className="px-5 pb-5 space-y-3">
+                                                <ImageCarousel images={getLevelGallery(lvl)} title={`${j.title} ${lvl?.name || ''}`} heightClass="h-44" roundedClass="rounded-2xl" />
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-xs text-gray-300 font-bold uppercase tracking-wide">{lvl?.name}</span>
+                                                    <span className="text-sm text-emerald-400 font-black">₽{(lvl?.salary || 200).toLocaleString()}/км</span>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+
+            const renderJobDetailV2 = () => {
+                const j = JOBS_DATA[selectedJobId];
+                const p = user.jobProgress[selectedJobId] || { level: 1, mins: 0 };
+                return (
+                    <div className="p-6 animate-slide-in pb-28 space-y-8">
+                        <div className="flex items-center gap-4">
+                            <button onClick={() => setSelectedJobId(null)} className="w-10 h-10 glass-card rounded-xl flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                            <div>
+                                <h2 className="text-2xl font-display font-black italic uppercase">{j.title}</h2>
+                                <p className="text-xs text-gray-400 uppercase tracking-wider mt-1">Машины и ранги</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-5">
+                            {[1, 2, 3].map(l => {
+                                const lvl = j.levels[l];
+                                const isCurrent = p.level === l;
+                                const isLocked = p.level < l;
+                                const kmText = lvl.req_km > 0
+                                    ? (isCurrent ? `${p.km?.toFixed(1) || 0}/${lvl.req_km} км` : `Нужно ${lvl.req_km} км`)
+                                    : 'Элитный уровень';
+
+                                return (
+                                    <Card key={l} className={`relative overflow-hidden p-0 border-white/10 bg-[#0d1a32]/70 ${isCurrent ? 'ring-2 ring-blue-500/60' : ''} ${isLocked ? 'opacity-60 grayscale' : ''}`}>
+                                        <div className="p-4 space-y-4">
+                                            <ImageCarousel images={getLevelGallery(lvl)} title={`${j.title} ${lvl.name}`} heightClass="h-52" roundedClass="rounded-2xl" />
+                                            <div className="flex justify-between items-start gap-3">
+                                                <div>
+                                                    <h4 className="font-black text-sm italic uppercase">{lvl.name}</h4>
+                                                    <p className="text-sm text-blue-300 font-bold mt-1">{prettyCarName(lvl.car)}</p>
+                                                </div>
+                                                {isCurrent && <Badge color="blue">Ваш ранг</Badge>}
+                                            </div>
+                                            <div className="flex justify-between items-center gap-3">
+                                                <div className="text-emerald-400 font-black">₽{(lvl.salary || 200).toLocaleString()}/км</div>
+                                                <div className="text-xs text-gray-400 font-bold">{kmText}</div>
+                                            </div>
+                                        </div>
+                                        {isLocked && (
+                                            <div className="absolute inset-0 bg-[#020617]/70 flex items-center justify-center">
+                                                <span className="px-4 py-2 rounded-xl border border-white/15 bg-black/30 text-[11px] font-black uppercase tracking-widest text-white/80">Закрыто</span>
+                                            </div>
+                                        )}
+                                    </Card>
+                                );
+                            })}
+                        </div>
+
+                        <div className="pt-4">
+                            {working ? (
+                                <div className="space-y-4">
+                                    {selectedJobId === 'mafia' && mafiaTarget && (
+                                        <Card className="bg-red-900/20 border-red-500/30 p-4 border-2 animate-pulse">
+                                            <div className="text-[10px] text-red-400 font-black uppercase tracking-widest mb-1">Текущая цель</div>
+                                            <div className="text-lg font-black italic uppercase">{mafiaTarget.name}</div>
+                                            <div className="text-xs text-gray-400 uppercase font-bold">{mafiaTarget.color}</div>
+                                        </Card>
+                                    )}
+                                    <Button onClick={() => { handleFinishShift(j.id); setSpawnedVehicles([]); setMafiaTarget(null); }} variant="danger" className="w-full h-16 uppercase text-lg italic tracking-tighter">
+                                        Завершить смену
+                                    </Button>
+                                </div>
+                            ) : (
+                                <Button onClick={() => handleWork(j.id)} disabled={user.level < j.req_user_lvl} variant="primary" className="w-full h-16 uppercase text-lg italic tracking-tighter">
+                                    {user.level < j.req_user_lvl ? `Нужен ${j.req_user_lvl} уровень` : 'Выйти на смену'}
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
+
             const renderProfile = () => (
                 <div className="p-8 space-y-8 animate-fade-in pb-28">
                     <div className="flex flex-col items-center gap-6">
@@ -1185,27 +1935,20 @@
                                                     </div>
                                                     <Badge color="red">₽{house.dailyTax}/д</Badge>
                                                 </div>
-                                                <div className="p-4 grid grid-cols-2 gap-3">
-                                                    <div className="space-y-1">
-                                                        <Button onClick={() => handleTeleport(house.pos, house.name)} variant="primary" className="w-full text-[8px] h-8 p-0 mb-1">ТП к дому</Button>
-                                                        <div className="text-[8px] text-gray-500 font-black uppercase">Гараж ({upg.garage}/3)</div>
-                                                        <Button size="sm" variant="secondary" disabled={upg.garage >= 3} onClick={() => handleUpgradeHouse(houseId, 'garage')} className="w-full text-[8px] h-8 p-0">
-                                                            {upg.garage >= 3 ? "Макс" : `+2 ГМ (₽${(house.garageUpgradePrice * (upg.garage + 1)).toLocaleString()})`}
-                                                        </Button>
+                                                <div className="p-4 space-y-3">
+                                                    <div className="text-[9px] text-gray-500 font-black uppercase tracking-wider">
+                                                        Прокачка гаража: в разделе "Ещё → Моя недвижимость"
                                                     </div>
-                                                    <div className="space-y-1">
-                                                        <div className="text-[8px] text-gray-500 font-black uppercase">Продажа (₽{(house.price * 0.7).toLocaleString()})</div>
-                                                        <Button size="sm" variant="danger" onClick={() => {
-                                                            if (confirm(`Продать ${house.name} за ₽${(house.price * 0.7).toLocaleString()}? Все машины в гараже останутся, но лимит мест уменьшится.`)) {
-                                                                setUser(prev => ({
-                                                                    ...prev,
-                                                                    balance: prev.balance + (house.price * 0.7),
-                                                                    realEstate: prev.realEstate.filter(id => id !== houseId)
-                                                                }));
-                                                                showNotify('Недвижимость продана!');
-                                                            }
-                                                        }} className="w-full text-[8px] h-8 p-0">Продать</Button>
-                                                    </div>
+                                                    <Button size="sm" variant="danger" onClick={() => {
+                                                        if (confirm(`Продать ${house.name} за ₽${(house.price * 0.7).toLocaleString()}? Все машины в гараже останутся, но лимит мест уменьшится.`)) {
+                                                            setUser(prev => ({
+                                                                ...prev,
+                                                                balance: prev.balance + (house.price * 0.7),
+                                                                realEstate: prev.realEstate.filter(id => id !== houseId)
+                                                            }));
+                                                            showNotify('Недвижимость продана!');
+                                                        }
+                                                    }} className="w-full text-[10px] h-9 p-0">Продать</Button>
                                                 </div>
                                             </Card>
                                         );
@@ -1278,18 +2021,9 @@
                                                     {spawnedVehicles.includes(car.car) ? (
                                                         <Button variant="secondary" size="sm" onClick={() => { if (confirm(`Убрать ${car.name} из игры?`)) handleDespawnCar(car.car); }} className="text-[10px] uppercase font-black py-2 h-10 bg-yellow-500/10 border-yellow-500/20 text-yellow-500 hover:bg-yellow-500 hover:text-white transition-all">Убрать</Button>
                                                     ) : (
-                                                        <div className="flex flex-col gap-1">
-                                                            <select
-                                                                className="bg-white/5 border border-white/10 rounded-lg text-[8px] px-2 py-1 outline-none font-bold uppercase"
-                                                                value={garageConfigs[i] || 'base'}
-                                                                onChange={(e) => setGarageConfigs(p => ({ ...p, [i]: e.target.value }))}
-                                                            >
-                                                                {(car.configs || ['base']).map(cfg => <option key={cfg} value={cfg} className="bg-[#0B0F1A]">{cfg}</option>)}
-                                                            </select>
-                                                            <Button variant={plate ? "primary" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId, i)} disabled={!plate} className={`text-[10px] uppercase font-black py-2 h-10 ${!plate ? 'opacity-20' : 'bg-blue-600/20 border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white shadow-lg active:scale-95 transition-all'}`}>
-                                                                {plate ? 'Спавн' : 'ГИБДД...'}
-                                                            </Button>
-                                                        </div>
+                                                        <Button variant={plate ? "primary" : "secondary"} size="sm" onClick={() => handleSpawnCar(carId, i)} disabled={!plate} className={`text-[10px] uppercase font-black py-2 h-10 ${!plate ? 'opacity-20' : 'bg-blue-600/20 border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white shadow-lg active:scale-95 transition-all'}`}>
+                                                            {plate ? 'Спавн' : 'ГИБДД...'}
+                                                        </Button>
                                                     )}
                                                 </div>
                                             </Card>
@@ -1343,10 +2077,28 @@
                                 const finalPrice = discount ? Math.floor(car.price * (1 - discount.off / 100)) : car.price;
                                 return (
                                     <Card key={car.id} className="overflow-hidden p-0 border-white/5">
-                                        <div className="relative h-48">
-                                            <img src={car.img} className="w-full h-full object-cover" />
-                                            {discount && <div className="absolute top-4 right-4 bg-red-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-xl">-{discount.off}%</div>}
-                                            <div className="absolute bottom-4 left-4"><Badge color="blue">{car.type}</Badge></div>
+                                        <div className="relative p-2">
+                                            <div className="grid grid-cols-3 gap-2">
+                                                <div className="col-span-2 relative h-44 rounded-3xl overflow-hidden border border-white/5">
+                                                    <img src={car.img} className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F1A]/85 via-transparent to-transparent"></div>
+                                                    {discount && <div className="absolute top-3 right-3 bg-red-500 text-white font-black text-xs px-3 py-1.5 rounded-full shadow-xl">-{discount.off}%</div>}
+                                                    <div className="absolute bottom-3 left-3"><Badge color="blue">{car.type}</Badge></div>
+                                                </div>
+                                                <div className="flex flex-col gap-2">
+                                                    {[car.gallery?.[1], car.gallery?.[2], car.gallery?.[3]].map((src, i) => (
+                                                        <div key={i} className="relative h-[56px] rounded-3xl overflow-hidden border border-white/5 bg-white/[0.02]">
+                                                            {src ? (
+                                                                <img src={src} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-white/20">
+                                                                    <SafeIcon name="Image" size={18} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="p-5 flex justify-between items-center">
                                             <div>
@@ -1357,7 +2109,7 @@
                                                 </div>
                                             </div>
                                             <Button size="sm" onClick={() => {
-                                                const totalSlots = 1 + user.realEstate.reduce((acc, id) => {
+                                                const totalSlots = 2 + user.realEstate.reduce((acc, id) => {
                                                     const h = REAL_ESTATE_DATA.find(x => x.id === id);
                                                     const upg = user.houseUpgrades[id] || { garage: 0 };
                                                     return acc + h.baseSlots + (upg.garage * 2);
@@ -1376,6 +2128,139 @@
                                         </div>
                                     </Card>
                                 )
+                            })}
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderDealerDetailV2 = (car) => {
+                const discount = getCarDiscount(car.id);
+                const finalPrice = getDealerPrice(car);
+
+                return (
+                    <div className="p-0 pb-28 animate-slide-in">
+                        <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/10 bg-[#0B0F1A]/80 backdrop-blur-xl sticky top-0 z-20">
+                            <button onClick={() => setSelectedDealerCarId(null)} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                            <div className="font-display font-black italic uppercase tracking-tight text-lg">Подробнее</div>
+                            <Badge color="blue">{car.type}</Badge>
+                        </div>
+                        <div className="px-6 py-6 space-y-6">
+                            <ImageCarousel images={getCarGallery(car)} title={car.name} heightClass="h-64" roundedClass="rounded-[2rem]" />
+
+                            <div className="space-y-2">
+                                <h3 className="font-display text-3xl font-black italic uppercase leading-tight">{car.name}</h3>
+                                <p className="text-sm text-gray-400">Модель в игре: <span className="text-blue-300 font-semibold">{prettyCarName(car.car)}</span></p>
+                            </div>
+
+                            <Card className="bg-white/[0.02] border-white/10">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <div className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Категория</div>
+                                        <div className="text-sm font-bold mt-1 uppercase">{car.type}</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Комплектации</div>
+                                        <div className="text-sm font-bold mt-1">{car.configs?.length || 0}</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Цена</div>
+                                        <div className="text-xl text-emerald-400 font-black mt-1">₽{finalPrice.toLocaleString()}</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Скидка</div>
+                                        <div className="text-sm mt-1 font-black">{discount ? `-${discount.off}%` : 'Нет'}</div>
+                                    </div>
+                                </div>
+                            </Card>
+
+                            <Card className="bg-white/[0.02] border-white/10 space-y-3">
+                                <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Комплектации</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {(car.configs || []).map(cfg => (
+                                        <span key={cfg} className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/10 border border-blue-400/20 text-blue-300">{prettyCarName(cfg)}</span>
+                                    ))}
+                                </div>
+                            </Card>
+
+                            <Card className="bg-white/[0.02] border-white/10">
+                                <h4 className="text-[10px] text-gray-500 font-black uppercase tracking-widest mb-2">Описание</h4>
+                                <p className="text-sm text-gray-300 leading-relaxed">
+                                    {car.description || `${car.name} подходит для ежедневной езды и коллекции в гараже. Добавь свои фото в поле gallery у этой машины, чтобы сделать карточку уникальной.`}
+                                </p>
+                            </Card>
+
+                            <Button onClick={() => handleDealerPurchase(car, finalPrice)} className="w-full h-14 uppercase font-black tracking-widest text-base">
+                                Купить за ₽{finalPrice.toLocaleString()}
+                            </Button>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderDealerV2 = () => {
+                const selectedCar = CARS_DATA.find(c => c.id === selectedDealerCarId);
+                if (selectedDealerCarId && selectedCar) return renderDealerDetailV2(selectedCar);
+
+                const types = ['all', ...new Set(CARS_DATA.map(c => c.type))];
+                let filtered = [...CARS_DATA];
+                if (dealerFilter.type !== 'all') filtered = filtered.filter(c => c.type === dealerFilter.type);
+
+                filtered.sort((a, b) => {
+                    if (dealerFilter.sort === 'price_asc') return a.price - b.price;
+                    if (dealerFilter.sort === 'price_desc') return b.price - a.price;
+                    if (dealerFilter.sort === 'name') return a.name.localeCompare(b.name);
+                    return 0;
+                });
+
+                return (
+                    <div className="p-6 space-y-6 pb-28 animate-fade-in">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-3xl font-display font-black italic uppercase">Автосалон</h2>
+                            <div className="flex gap-2">
+                                <select
+                                    value={dealerFilter.type}
+                                    onChange={(e) => setDealerFilter(p => ({ ...p, type: e.target.value }))}
+                                    className="bg-white/5 border border-white/10 rounded-lg text-[10px] px-2 py-1 outline-none font-bold uppercase"
+                                >
+                                    {types.map(t => <option key={t} value={t} className="bg-[#0B0F1A]">{t}</option>)}
+                                </select>
+                                <select
+                                    value={dealerFilter.sort}
+                                    onChange={(e) => setDealerFilter(p => ({ ...p, sort: e.target.value }))}
+                                    className="bg-white/5 border border-white/10 rounded-lg text-[10px] px-2 py-1 outline-none font-bold uppercase"
+                                >
+                                    <option value="price_asc" className="bg-[#0B0F1A]">Цена ↑</option>
+                                    <option value="price_desc" className="bg-[#0B0F1A]">Цена ↓</option>
+                                    <option value="name" className="bg-[#0B0F1A]">А-Я</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-6">
+                            {filtered.map(car => {
+                                const discount = getCarDiscount(car.id);
+                                const finalPrice = getDealerPrice(car);
+                                return (
+                                    <Card key={car.id} onClick={() => setSelectedDealerCarId(car.id)} className="overflow-hidden p-0 border-white/10 bg-gradient-to-br from-[#111f3a]/75 to-[#081325]/85">
+                                        <div className="p-4">
+                                            <ImageCarousel images={getCarGallery(car)} title={car.name} heightClass="h-52" roundedClass="rounded-[1.75rem]" />
+                                        </div>
+                                        <div className="px-5 pb-5 flex justify-between items-end gap-4">
+                                            <div>
+                                                <h4 className="font-display text-xl font-black italic uppercase leading-tight">{car.name}</h4>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <span className={`text-emerald-400 font-black ${discount ? 'text-lg' : 'text-base'}`}>₽{finalPrice.toLocaleString()}</span>
+                                                    {discount && <span className="text-xs text-gray-500 line-through">₽{car.price.toLocaleString()}</span>}
+                                                </div>
+                                                <div className="text-[11px] text-gray-400 mt-1 uppercase tracking-wider">{car.type} • {car.configs?.length || 0} конфигураций</div>
+                                            </div>
+                                            <Button size="sm" variant="secondary" className="uppercase text-[10px] px-5" onClick={(e) => { e.stopPropagation(); setSelectedDealerCarId(car.id); }}>
+                                                Подробнее
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                );
                             })}
                         </div>
                     </div>
@@ -1495,8 +2380,37 @@
                 </div>
             );
 
+            const renderOtherProfile = () => (
+                <div className="absolute inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
+                        <button onClick={() => setViewingUser(null)} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                        <div className="font-black italic uppercase tracking-tighter text-lg">Профиль игрока</div>
+                        <div className="w-10"></div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-8 space-y-6 pb-28">
+                        <div className="flex flex-col items-center gap-4">
+                            <img src={viewingUser?.avatar || AVATARS[0]} className="w-24 h-24 rounded-full border-4 border-white/10 object-cover" />
+                            <div className="text-center">
+                                <h3 className="text-2xl font-black uppercase italic">{viewingUser?.name || 'Unknown'}</h3>
+                                <p className="text-xs text-gray-400 font-bold mt-1 uppercase">Уровень {viewingUser?.level || 1}</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <Card className="text-center py-4">
+                                <div className="text-[10px] text-gray-500 uppercase font-black">Баланс</div>
+                                <div className="text-emerald-400 text-lg font-black mt-1">₽{(viewingUser?.balance || 0).toLocaleString()}</div>
+                            </Card>
+                            <Card className="text-center py-4">
+                                <div className="text-[10px] text-gray-500 uppercase font-black">Гараж</div>
+                                <div className="text-blue-300 text-lg font-black mt-1">{viewingUser?.garage?.length || 0}</div>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            );
+
             const renderEditProfile = () => (
-                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                <div className="absolute inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
                         <button onClick={() => setShowEditProfile(false)} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg">Настройка профиля</div>
@@ -1514,19 +2428,35 @@
                             />
                         </div>
                         <div className="space-y-4">
-                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Выберите Аватар</label>
-                            <div className="grid grid-cols-4 gap-4">
-                                {AVATARS.map((url, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => setUser(prev => ({ ...prev, avatar: url }))}
-                                        className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all ${user.avatar === url ? 'border-blue-500 scale-105 shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'border-white/5 grayscale opacity-50'}`}
+                            <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Загрузка иконки</label>
+                            <Card className="space-y-4 p-4" onPaste={handleAvatarPaste}>
+                                <div className="text-xs text-gray-300 font-semibold">Вставьте изображение через `Ctrl+V` или выберите файл</div>
+                                <div className="flex gap-3">
+                                    <Button
+                                        size="sm"
+                                        variant="secondary"
+                                        onClick={() => avatarFileInputRef.current?.click()}
+                                        className="uppercase text-[10px]"
                                     >
-                                        <img src={url} className="w-full h-full object-cover" />
-                                        {user.avatar === url && <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center"><SafeIcon name="Check" size={20} className="text-white" /></div>}
-                                    </button>
-                                ))}
-                            </div>
+                                        Выбрать файл
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => showNotify('Нажмите Ctrl+V после копирования картинки', 'success')}
+                                        className="uppercase text-[10px]"
+                                    >
+                                        Вставить Ctrl+V
+                                    </Button>
+                                </div>
+                                <input
+                                    ref={avatarFileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarInputChange}
+                                    className="hidden"
+                                />
+                            </Card>
                         </div>
                         <div className="space-y-4">
                             <label className="text-[10px] text-gray-500 font-black uppercase tracking-widest px-2">Или укажите свою ссылку</label>
@@ -1642,9 +2572,63 @@
                 </div>
             );
 
+            const renderMyRealEstate = () => (
+                <div className="p-0 pb-28 animate-fade-in">
+                    <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl sticky top-0 z-20">
+                        <button onClick={() => setActiveTab('more')} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
+                        <div className="font-black italic uppercase tracking-tighter text-lg">Моя Недвижимость</div>
+                        <div className="w-10"></div>
+                    </div>
+
+                    <div className="px-6 py-6 space-y-6">
+                        <Card className="bg-blue-500/10 border-blue-500/25">
+                            <div className="text-[10px] text-blue-300 font-black uppercase tracking-widest">Гаражные места</div>
+                            <div className="mt-2 text-3xl font-black">#{getTotalGarageSlots()}</div>
+                            <div className="text-xs text-gray-400 mt-2">Базово: 2 ГМ, дальше увеличение только через дома и их прокачку.</div>
+                        </Card>
+
+                        {user.realEstate.length === 0 ? (
+                            <Card className="py-8 text-center space-y-4">
+                                <div className="text-sm text-gray-400 font-bold">У вас нет купленных домов</div>
+                                <Button onClick={() => setActiveTab('realestate')} className="mx-auto uppercase text-[10px]">Открыть рынок недвижимости</Button>
+                            </Card>
+                        ) : (
+                            user.realEstate.map(houseId => {
+                                const house = REAL_ESTATE_DATA.find(h => h.id === houseId);
+                                const upg = user.houseUpgrades[houseId] || { garage: 0, workshop: false };
+                                const upgradePrice = house.garageUpgradePrice * (upg.garage + 1);
+                                return (
+                                    <Card key={houseId} className="p-0 overflow-hidden border-white/10">
+                                        <img src={house.img} className="w-full h-36 object-cover" />
+                                        <div className="p-5 space-y-4">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div>
+                                                    <h4 className="font-black text-sm italic uppercase">{house.name}</h4>
+                                                    <p className="text-[10px] text-gray-500 font-black uppercase mt-1">Уровень гаража: {upg.garage}/3</p>
+                                                </div>
+                                                <Badge color="blue">+{house.baseSlots + (upg.garage * 2)} ГМ</Badge>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                variant="secondary"
+                                                disabled={upg.garage >= 3}
+                                                onClick={() => handleUpgradeHouse(houseId, 'garage')}
+                                                className="w-full text-[10px] h-11 uppercase font-black"
+                                            >
+                                                {upg.garage >= 3 ? "Максимум" : `Прокачать +2 ГМ за ₽${upgradePrice.toLocaleString()}`}
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                );
+                            })
+                        )}
+                    </div>
+                </div>
+            );
+
 
             const renderAdminPanel = () => (
-                <div className="fixed inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
+                <div className="absolute inset-0 z-50 bg-[#0B0F1A] flex flex-col animate-fade-in overflow-hidden">
                     <div className="shrink-0 p-6 flex justify-between items-center border-b border-white/5 bg-[#0B0F1A]/80 backdrop-blur-xl">
                         <button onClick={() => setShowAdminPanel(false)} className="w-10 h-10 glass-card rounded-full flex items-center justify-center active:scale-95 transition-all"><SafeIcon name="ArrowLeft" size={20} /></button>
                         <div className="font-black italic uppercase tracking-tighter text-lg text-blue-400">Панель Администратора</div>
@@ -1713,7 +2697,11 @@
                                 </Card>
                                 <Card onClick={() => setActiveTab('realestate')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-orange-500/5 border-orange-500/20 hover:bg-orange-500/10 active:scale-95 transition-all text-orange-400">
                                     <div className="w-16 h-16 rounded-2xl bg-orange-400/10 flex items-center justify-center text-orange-400"><SafeIcon name="Home" size={36} /></div>
-                                    <span className="font-black uppercase text-xs tracking-widest text-center">Недвижимость</span>
+                                    <span className="font-black uppercase text-xs tracking-widest text-center">Рынок домов</span>
+                                </Card>
+                                <Card onClick={() => setActiveTab('myrealestate')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-cyan-500/5 border-cyan-500/20 hover:bg-cyan-500/10 active:scale-95 transition-all text-cyan-300">
+                                    <div className="w-16 h-16 rounded-2xl bg-cyan-400/10 flex items-center justify-center text-cyan-300"><SafeIcon name="Warehouse" size={36} /></div>
+                                    <span className="font-black uppercase text-xs tracking-widest text-center">Моя недвижимость</span>
                                 </Card>
                                 <Card onClick={() => setActiveTab('bank')} className="aspect-square flex flex-col items-center justify-center gap-4 bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/10 active:scale-95 transition-all text-emerald-400">
                                     <div className="w-16 h-16 rounded-2xl bg-emerald-400/10 flex items-center justify-center text-emerald-400"><SafeIcon name="Building2" size={36} /></div>
@@ -1731,82 +2719,123 @@
                 </div>
             );
 
+            const tabThemes = {
+                home: { a: 'rgba(34,211,238,0.28)', b: 'rgba(59,130,246,0.24)' },
+                jobs: { a: 'rgba(56,189,248,0.28)', b: 'rgba(29,78,216,0.24)' },
+                dealer: { a: 'rgba(16,185,129,0.26)', b: 'rgba(45,212,191,0.22)' },
+                profile: { a: 'rgba(14,165,233,0.25)', b: 'rgba(59,130,246,0.2)' },
+                forbes: { a: 'rgba(234,179,8,0.22)', b: 'rgba(249,115,22,0.2)' },
+                realestate: { a: 'rgba(249,115,22,0.24)', b: 'rgba(234,88,12,0.2)' },
+                myrealestate: { a: 'rgba(6,182,212,0.24)', b: 'rgba(14,116,144,0.22)' },
+                business: { a: 'rgba(168,85,247,0.24)', b: 'rgba(79,70,229,0.18)' },
+                bank: { a: 'rgba(16,185,129,0.24)', b: 'rgba(5,150,105,0.18)' },
+                more: { a: 'rgba(100,116,139,0.22)', b: 'rgba(37,99,235,0.16)' },
+                gibdd: { a: 'rgba(37,99,235,0.24)', b: 'rgba(15,23,42,0.24)' },
+            };
+            const activeTheme = tabThemes[activeTab] || tabThemes.home;
+            const contentMotionKey = activeTab;
+
 
             return (
-                <div className="max-w-md mx-auto min-h-screen bg-[#0B0F1A] text-white relative shadow-2xl overflow-hidden font-sans">
-                    <div className="sticky top-0 z-30 bg-[#0B0F1A]/80 backdrop-blur-xl px-6 py-4 flex justify-between items-center border-b border-white/5">
-                        <div className="flex items-center gap-2 text-emerald-400 font-bold italic"><SafeIcon name="Wallet" size={16} />₽{user.balance.toLocaleString()}</div>
-                        <div className="flex items-center gap-4">
-                            <Badge color="blue">Level {user.level}</Badge>
-                            <button onClick={() => setShowSettings(true)} className="text-gray-400 hover:text-white"><SafeIcon name="Settings" size={20} /></button>
+                <div className="max-w-md mx-auto min-h-screen app-shell text-white relative shadow-[0_30px_90px_rgba(2,6,23,0.65)] overflow-hidden font-sans border-x border-white/5">
+                    <div className="premium-noise"></div>
+                    <div className="absolute -top-20 -right-16 w-72 h-72 rounded-full blur-[92px] transition-all duration-700 pointer-events-none z-0" style={{ background: activeTheme.a }}></div>
+                    <div className="absolute bottom-20 -left-16 w-72 h-72 rounded-full blur-[98px] transition-all duration-700 pointer-events-none z-0" style={{ background: activeTheme.b }}></div>
+
+                    <div className="relative z-10">
+                        <div className="sticky top-0 z-30 px-6 py-4 border-b border-white/10 bg-[#071020]/70 backdrop-blur-2xl premium-sheen">
+                        <div className="flex justify-between items-center gap-4">
+                            <div className="flex items-center gap-3 min-w-0">
+                                <img src={user.avatar} className="w-10 h-10 rounded-2xl border border-white/20 object-cover shadow-lg" />
+                                <div className="min-w-0">
+                                    <div className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">В игре</div>
+                                    <div className="text-sm font-black truncate">{user.name}</div>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="px-3 py-2 rounded-xl border border-emerald-300/20 bg-emerald-500/10 text-emerald-300 font-bold text-xs flex items-center gap-2">
+                                    <SafeIcon name="Wallet" size={14} /> ₽{user.balance.toLocaleString()}
+                                </div>
+                                <Badge color="blue">LVL {user.level}</Badge>
+                                <button onClick={() => setShowSettings(true)} className="w-9 h-9 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white flex items-center justify-center">
+                                    <SafeIcon name="Settings" size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="min-h-screen">
+                    <div key={contentMotionKey} className={`min-h-screen tab-stage ${tabDirection >= 0 ? 'tab-stage-right' : 'tab-stage-left'}`}>
                         {activeTab === 'home' && renderHome()}
-                        {activeTab === 'jobs' && (selectedJobId ? renderJobDetail() : renderJobs())}
+                        {activeTab === 'jobs' && (selectedJobId ? renderJobDetailV2() : renderJobsV2())}
                         {activeTab === 'profile' && renderProfile()}
-                        {activeTab === 'dealer' && renderDealer()}
+                        {activeTab === 'dealer' && renderDealerV2()}
                         {activeTab === 'forbes' && renderForbes()}
                         {activeTab === 'realestate' && renderRealEstate()}
+                        {activeTab === 'myrealestate' && renderMyRealEstate()}
                         {activeTab === 'business' && renderBusiness()}
                         {activeTab === 'bank' && renderBank()}
                         {activeTab === 'more' && renderMore()}
                         {activeTab === 'gibdd' && <GIBDDSection close={() => setActiveTab('home')} user={user} setUser={setUser} showNotify={showNotify} />}
                     </div>
 
-                    {selectedCaseId && <CaseOpening caseId={selectedCaseId} close={() => setSelectedCaseId(null)} user={user} setUser={setUser} showNotify={showNotify} />}
-                    {showCases && <CasesList close={() => setShowCases(false)} selectCase={setSelectedCaseId} user={user} />}
-                    {showEditProfile && renderEditProfile()}
-                    {showAdminPanel && isAdmin && renderAdminPanel()}
-                    {viewingUser && renderOtherProfile()}
+                        {selectedCaseId && <CaseOpening caseId={selectedCaseId} close={() => setSelectedCaseId(null)} user={user} setUser={setUser} showNotify={showNotify} />}
+                        {showCases && <CasesList close={() => setShowCases(false)} selectCase={setSelectedCaseId} user={user} />}
+                        {showEditProfile && renderEditProfile()}
+                        {showAdminPanel && isAdmin && renderAdminPanel()}
+                        {viewingUser && renderOtherProfile()}
 
-                    {notification && <div className={`fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-premium z-50 flex items-center gap-3 font-bold animate-bounce-in glass-card-bright border-white/20 ${notification.type === 'danger' ? 'text-red-400' : 'text-emerald-400'}`}>{notification.text}</div>}
+                        {notification && <div className={`fixed top-20 left-1/2 -translate-x-1/2 px-6 py-3 rounded-2xl shadow-premium z-50 flex items-center gap-3 font-bold animate-bounce-in glass-card-bright border-white/20 ${notification.type === 'danger' ? 'text-red-400' : 'text-emerald-400'}`}>{notification.text}</div>}
 
-                    {showSettings && (
-                        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-8 animate-fade-in">
-                            <Card className="w-full max-w-xs bg-[#0B0F1A] border-white/10 p-8">
-                                <h3 className="text-xl font-black mb-6 uppercase italic">Настройки связи</h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="text-[10px] text-gray-500 font-black uppercase mb-2 block">IP Relay Сервера</label>
-                                        <input
-                                            type="text"
-                                            value={relayIP}
-                                            onChange={(e) => {
-                                                setRelayIP(e.target.value);
-                                                localStorage.setItem('relayIP', e.target.value);
-                                            }}
-                                            className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none font-bold"
-                                            placeholder="например: localhost"
-                                        />
+                        {showSettings && (
+                            <div className="absolute inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-8 animate-fade-in">
+                                <Card className="w-full max-w-xs bg-[#0B0F1A] border-white/10 p-8">
+                                    <h3 className="text-xl font-black mb-6 uppercase italic">Настройки связи</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="text-[10px] text-gray-500 font-black uppercase mb-2 block">IP Relay Сервера</label>
+                                            <input
+                                                type="text"
+                                                value={relayIP}
+                                                onChange={(e) => {
+                                                    setRelayIP(e.target.value);
+                                                    localStorage.setItem('relayIP', e.target.value);
+                                                }}
+                                                className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none font-bold"
+                                                placeholder="например: localhost"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] text-gray-500 font-black uppercase mb-2 block">Ваш Ник (Name)</label>
+                                            <input
+                                                type="text"
+                                                value={user.name}
+                                                onChange={(e) => {
+                                                    setUser(prev => ({ ...prev, name: e.target.value }));
+                                                }}
+                                                className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none font-bold"
+                                                placeholder="Введите ваш ник"
+                                            />
+                                        </div>
+                                        <p className="text-[10px] text-gray-500 leading-relaxed italic">Ник должен в точности совпадать с тем, что вы написали в игре в файле integration_mod_config.json.</p>
+                                        <Button onClick={() => setShowSettings(false)} className="w-full h-12 uppercase italic font-black mt-4">Закрыть</Button>
                                     </div>
-                                    <div>
-                                        <label className="text-[10px] text-gray-500 font-black uppercase mb-2 block">Ваш Ник (Name)</label>
-                                        <input
-                                            type="text"
-                                            value={user.name}
-                                            onChange={(e) => {
-                                                setUser(prev => ({ ...prev, name: e.target.value }));
-                                            }}
-                                            className="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none font-bold"
-                                            placeholder="Введите ваш ник"
-                                        />
-                                    </div>
-                                    <p className="text-[10px] text-gray-500 leading-relaxed italic">Ник должен в точности совпадать с тем, что вы написали в игре в файле integration_mod_config.json.</p>
-                                    <Button onClick={() => setShowSettings(false)} className="w-full h-12 uppercase italic font-black mt-4">Закрыть</Button>
-                                </div>
-                            </Card>
-                        </div>
-                    )}
+                                </Card>
+                            </div>
+                        )}
 
-                    <div className="fixed bottom-0 left-0 right-0 p-4 z-40 bg-gradient-to-t from-[#0B0F1A] to-transparent">
-                        <div className="max-w-md mx-auto glass-card-bright rounded-[2.5rem] px-2 py-2 flex justify-between items-center shadow-2xl border-white/10">
-                            <NavButton icon="Home" label="Главная" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
-                            <NavButton icon="Briefcase" label="Карьера" active={activeTab === 'jobs'} onClick={() => setActiveTab('jobs')} />
-                            <div className="relative -mt-12" onClick={() => setActiveTab('dealer')}><div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-40 animate-pulse"></div><div className={`w-16 h-16 rounded-full flex items-center justify-center border-4 border-[#0B0F1A] shadow-2xl relative z-10 transition-all ${activeTab === 'dealer' ? 'bg-blue-600 scale-110' : 'bg-gray-800'}`}><SafeIcon name="Car" size={28} /></div></div>
-                            <NavButton icon="User" label="Профиль" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
-                            <NavButton icon="MoreHorizontal" label="Ещё" active={activeTab === 'more'} onClick={() => setActiveTab('more')} />
+                        <div className="fixed bottom-0 left-0 right-0 p-4 z-40 bg-gradient-to-t from-[#050a14] via-[#050a14]/70 to-transparent">
+                            <div className="max-w-md mx-auto rounded-[2rem] px-3 py-2 flex justify-between items-end border border-white/10 bg-[#071021]/85 backdrop-blur-2xl shadow-[0_18px_60px_rgba(2,6,23,0.7)] premium-sheen">
+                                <NavButton icon="Home" label="Главная" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+                                <NavButton icon="Briefcase" label="Карьера" active={activeTab === 'jobs'} onClick={() => setActiveTab('jobs')} />
+                                <button onClick={() => setActiveTab('dealer')} className="relative -mt-9">
+                                    <div className="absolute inset-0 rounded-full blur-xl bg-cyan-400/40"></div>
+                                    <div className={`w-16 h-16 rounded-full flex items-center justify-center border-4 border-[#071021] shadow-2xl relative z-10 transition-all ${activeTab === 'dealer' ? 'bg-gradient-to-br from-cyan-400 to-blue-600 scale-110 text-white' : 'bg-slate-800 text-slate-300'}`}>
+                                        <SafeIcon name="Car" size={26} />
+                                    </div>
+                                </button>
+                                <NavButton icon="User" label="Профиль" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
+                                <NavButton icon="MoreHorizontal" label="Ещё" active={activeTab === 'more'} onClick={() => setActiveTab('more')} />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -4,12 +4,12 @@
       "id": 6422329319,
       "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 2917227,
+      "balance": 1514227,
       "xp": 10053,
       "level": 7,
       "garage": [
         "c2",
-        "c5"
+        "c6"
       ],
       "businesses": [],
       "jobProgress": {
@@ -36,6 +36,11 @@
           "string": "Т829ВК",
           "country": "ru",
           "region": "77"
+        },
+        "c6": {
+          "string": "A261YY",
+          "country": "ru",
+          "region": "77"
         }
       },
       "realEstate": [
@@ -50,7 +55,7 @@
       "garageSlots": 1,
       "garageModels": [
         "covet",
-        "etk800"
+        "porsche_911_992"
       ]
     }
   }

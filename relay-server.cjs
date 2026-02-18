@@ -11,6 +11,13 @@ if (fs.existsSync(DB_PATH)) {
     try {
         db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
         console.log('[DB] База данных загружена. Пользователей:', Object.keys(db.users).length);
+
+        // Восстановление кэша гаражей для моста
+        Object.values(db.users).forEach(u => {
+            if (u.name && u.garageModels) {
+                userVehicles[u.name] = u.garageModels;
+            }
+        });
     } catch (e) {
         console.error('[DB] Ошибка парсинга БД!', e);
     }

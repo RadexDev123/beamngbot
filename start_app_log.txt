@@ -1,0 +1,11 @@
+===== START 17.02.2026 22:09:38,65 ===== 
+Folder: C:\Bott bimka\Bimka
+
+--- WHERE node/npm --- 
+C:\Program Files\nodejs\node.exe
+C:\Program Files\nodejs\npm
+C:\Program Files\nodejs\npm.cmd
+
+--- VERSIONS --- 
+v24.13.1
+11.8.0

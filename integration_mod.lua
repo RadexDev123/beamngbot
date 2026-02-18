@@ -50,66 +50,94 @@ local function httpCall(url, callback)
     end)
 end
 
-local function spawnCar(modelName, configName, plateText, plateRegion, spawnPos)
-    local model = tostring(modelName or "pigeon"):lower()
-    local config = tostring(configName or "")
-    local plate = tostring(plateText or "")
-    local region = tostring(plateRegion or "")
-    
-    local fullPlate = plate
-    if region ~= "" then fullPlate = plate .. " " .. region end
+local LIVERY_KEYWORDS = {
+    taxi = {"taxi", "cab"},
+    police = {"police", "sheriff"},
+    ambulance = {"ambulance", "medic", "ems"},
+    bus = {"bus"},
+    delivery = {"delivery", "courier", "van"},
+    cargo = {"cargo", "truck", "haul"},
+    executive = {"executive", "gov", "official"},
+    street = {"street", "gang", "black"}
+}
 
-    print("[BOT RP] Попытка спавна: " .. model .. (config ~= "" and " | Конфиг: " .. config or "") .. " | Номер: " .. fullPlate)
+local function pickConfigByLivery(model, liveryHint)
+    if not liveryHint or liveryHint == "" then return nil end
+    if not extensions.core_vehicles or not extensions.core_vehicles.getModel then return nil end
+
+    local token = tostring(liveryHint):lower()
+    local keywords = LIVERY_KEYWORDS[token] or {token}
+    local ok, modelData = pcall(extensions.core_vehicles.getModel, model)
+    if not ok or not modelData or not modelData.configs then return nil end
+
+    for cfgKey, cfgData in pairs(modelData.configs) do
+        local haystack = (
+            tostring(cfgKey) .. " " ..
+            tostring(cfgData and cfgData.name or "") .. " " ..
+            tostring(cfgData and cfgData.description or "")
+        ):lower()
+        for _, kw in ipairs(keywords) do
+            if string.find(haystack, kw, 1, true) then
+                return cfgKey
+            end
+        end
+    end
+    return nil
+end
+
+local function spawnCar(modelName, plateText, plateRegion, spawnPos, liveryHint)
+    local model = tostring(modelName or "pigeon"):lower()
+    local plate = tostring(plateText or "")
     
-    local posStr = "nil"
+    print("[BOT RP] === СИСТЕМА СПАВНА ===")
+    print("[BOT RP] Модель: " .. model)
+    print("[BOT RP] Номер: " .. plate)
+
+    local pos = nil
     if spawnPos and spawnPos.x then
-        posStr = string.format("vec3(%f, %f, %f)", spawnPos.x, spawnPos.y, spawnPos.z)
+        pos = vec3(spawnPos.x, spawnPos.y, spawnPos.z)
     end
 
-    local luaCmd = string.format([[
-        (function()
-            local pos = %s
-            local playerVeh = be:getPlayerVehicle(0)
-            if not pos and playerVeh then
-                pos = playerVeh:getPosition() + vec3(0, 5, 1)
-            elseif not pos then
-                pos = vec3(0,0,0)
-            end
-            
-            if extensions.core_vehicles then
-                local configName = '%s'
-                if configName == '' then configName = nil end
-                local vid = extensions.core_vehicles.spawnVehicle('%s', configName, pos, quat(0,0,0,1))
-                if vid and '%s' ~= '' then
-                    local pText = string.upper('%s')
-                    extensions.core_vehicles.setLicensePlateText(pText, vid)
-                    extensions.core_vehicles.setLicensePlateDesign('htnv_russian_regular', vid)
-                end
-            end
-        end)()
-    ]], posStr, config, model, plate, plate)
+    if not pos then
+        local playerVeh = be:getPlayerVehicle(0)
+        if playerVeh then
+            pos = playerVeh:getPosition() + playerVeh:getDirectionVector() * 6 + vec3(0,0,1)
+        else
+            pos = vec3(0,0,0)
+        end
+    end
     
-    be:queueAllObjectLua(luaCmd)
-    lastSpawnedByBot = model
+    if extensions.core_vehicles then
+        local configKey = pickConfigByLivery(model, liveryHint)
+        local vid = extensions.core_vehicles.spawnVehicle(model, configKey, pos, quat(0,0,0,1))
+        if not vid and configKey ~= nil then
+            vid = extensions.core_vehicles.spawnVehicle(model, nil, pos, quat(0,0,0,1))
+        end
+        
+        if vid then
+            if plate ~= "" then
+                extensions.core_vehicles.setLicensePlateText(string.upper(plate), vid)
+                extensions.core_vehicles.setLicensePlateDesign('htnv_russian_regular', vid)
+            end
+            lastSpawnedByBot = model
+            print("[BOT RP] УСПЕХ: " .. model .. " (ID: " .. tostring(vid) .. ")")
+        else
+            print("[BOT RP] ОШИБКА: Машина не заспавнилась.")
+        end
+    end
 end
 
 local function teleportPlayer(targetPos)
     if not targetPos or not targetPos.x then return end
-    local posStr = string.format("vec3(%f, %f, %f)", targetPos.x, targetPos.y, targetPos.z)
+    local pos = vec3(targetPos.x, targetPos.y, targetPos.z)
     
-    local luaCmd = string.format([[
-        (function()
-            local playerVeh = be:getPlayerVehicle(0)
-            if playerVeh then
-                playerVeh:setPosition(%s)
-            else
-                be:setFreeCameraPos(%s)
-            end
-        end)()
-    ]], posStr, posStr)
-    
-    be:queueAllObjectLua(luaCmd)
-    print("[BOT RP] Телепортация: " .. posStr)
+    local playerVeh = be:getPlayerVehicle(0)
+    if playerVeh then
+        playerVeh:setPosition(pos)
+    else
+        be:setFreeCameraPos(pos)
+    end
+    print("[BOT RP] Телепортация: " .. tostring(pos))
 end
 
 -- Команды для проверки в консоли (~)
@@ -132,6 +160,7 @@ local function onUpdate(dt)
     timer = 0
 
     httpCall(RELAY_URL, function(body)
+        -- print("[BOT RP] Ответ сервера: " .. tostring(body)) -- Раскомментируйте для полной отладки
         local ok, data = pcall(jsonDecode, body)
         if ok and data then
             -- Синхронизируем список разрешенных машин
@@ -140,10 +169,9 @@ local function onUpdate(dt)
             end
 
             if data.type ~= "none" then
-                print("[BOT RP] Найдена команда: " .. tostring(data.type))
+                print("[BOT RP] >>> ПОЛУЧЕНА КОМАНДА: " .. tostring(data.type))
                 if data.type == "start_shift" or data.type == "spawn_car" then
-                    print("[BOT RP] Запрос на спавн: " .. tostring(data.carId))
-                    spawnCar(data.carId, data.config or data.livery, data.plate, data.plateRegion, data.pos)
+                    spawnCar(data.carId, data.plate, data.plateRegion, data.pos, data.livery)
                 elseif data.type == "teleport" then
                     teleportPlayer(data.pos)
                 end
