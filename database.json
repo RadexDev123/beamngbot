@@ -4,8 +4,8 @@
       "id": 6422329319,
       "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 1514227,
-      "xp": 10053,
+      "balance": 1519977,
+      "xp": 10198,
       "level": 7,
       "garage": [
         "c2",
@@ -53,8 +53,8 @@
         }
       },
       "garageSlots": 1,
-      "dailyStreak": 0,
-      "dailyRewardNextAt": 0,
+      "dailyStreak": 1,
+      "dailyRewardNextAt": 1771588100874,
       "garageModels": [
         "covet",
         "porsche_911_992"

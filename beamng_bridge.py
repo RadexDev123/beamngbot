@@ -28,6 +28,12 @@ TAXI_MAP_PROFILES = {
     },
 }
 
+PLAYER_STATE_CACHE = {
+    'pos': None,
+    'dir': (1.0, 0.0, 0.0),
+}
+PLAYER_STATE_FILE = None
+
 
 def load_config(path='beamng_config.json'):
     if not os.path.exists(path):
@@ -95,6 +101,128 @@ def _get_player_state_from_lua(bng):
     return None, None
 
 
+def _get_player_state_from_api(bng):
+    try:
+        vehicles = bng.vehicles.get_current() or {}
+        if not vehicles:
+            return None, None
+
+        # 1) Try player vehicle id when API supports it.
+        candidate_list = []
+        try:
+            player_vid = bng.get_player_vehicle_id(0)
+            if player_vid in vehicles:
+                candidate_list.append(vehicles[player_vid])
+            elif str(player_vid) in vehicles:
+                candidate_list.append(vehicles[str(player_vid)])
+            else:
+                for k, v in vehicles.items():
+                    if str(k) == str(player_vid):
+                        candidate_list.append(v)
+                        break
+        except Exception:
+            pass
+
+        # 2) Fallback: any active vehicle (common for tcom sessions with one controlled car).
+        for _, v in vehicles.items():
+            if v not in candidate_list:
+                candidate_list.append(v)
+
+        for vehicle in candidate_list:
+            try:
+                vehicle.connect(bng)
+            except Exception:
+                pass
+            try:
+                vehicle.update_vehicle()
+            except Exception:
+                pass
+
+            state = getattr(vehicle, 'state', {}) or {}
+            pos = state.get('pos')
+            vel = state.get('vel')
+            direction = state.get('dir')
+            if pos is None:
+                continue
+
+            px, py, pz = float(pos[0]), float(pos[1]), float(pos[2])
+            if direction is not None:
+                dx, dy, dz = float(direction[0]), float(direction[1]), float(direction[2])
+            elif vel is not None:
+                dx, dy, dz = float(vel[0]), float(vel[1]), float(vel[2])
+            else:
+                dx, dy, dz = 1.0, 0.0, 0.0
+
+            dlen = max(1e-4, math.sqrt(dx * dx + dy * dy + dz * dz))
+            dx, dy, dz = dx / dlen, dy / dlen, dz / dlen
+            return (px, py, pz), (dx, dy, dz)
+
+        return None, None
+    except Exception:
+        return None, None
+
+
+def _get_player_state_via_file_bridge(bng):
+    if not PLAYER_STATE_FILE:
+        return None, None
+    lua = """
+    (function()
+      local out = ''
+      local v = be:getPlayerVehicle(0)
+      if v then
+        local p = v:getPosition()
+        local d = v:getDirectionVector()
+        out = string.format('%.6f|%.6f|%.6f|%.6f|%.6f|%.6f', p.x, p.y, p.z, d.x, d.y, d.z)
+      end
+      pcall(function() writeFile('bridge_player_state.txt', out) end)
+    end)()
+    """
+    try:
+        bng.queue_lua_command(lua)
+        # Give BeamNG a tiny window to flush writeFile.
+        time.sleep(0.03)
+        with open(PLAYER_STATE_FILE, 'r', encoding='utf-8') as f:
+            text = (f.read() or '').strip()
+        if not text:
+            return None, None
+        parts = text.split('|')
+        if len(parts) != 6:
+            return None, None
+        px, py, pz, dx, dy, dz = [float(x) for x in parts]
+        dlen = max(1e-4, math.sqrt(dx * dx + dy * dy + dz * dz))
+        dx, dy, dz = dx / dlen, dy / dlen, dz / dlen
+        return (px, py, pz), (dx, dy, dz)
+    except Exception:
+        return None, None
+
+
+def _get_player_state(bng):
+    pos, direction = _get_player_state_from_lua(bng)
+    if _valid_world_pos(pos) and direction:
+        PLAYER_STATE_CACHE['pos'] = pos
+        PLAYER_STATE_CACHE['dir'] = direction
+        return pos, direction
+
+    pos, direction = _get_player_state_from_api(bng)
+    if _valid_world_pos(pos) and direction:
+        PLAYER_STATE_CACHE['pos'] = pos
+        PLAYER_STATE_CACHE['dir'] = direction
+        return pos, direction
+
+    pos, direction = _get_player_state_via_file_bridge(bng)
+    if _valid_world_pos(pos) and direction:
+        PLAYER_STATE_CACHE['pos'] = pos
+        PLAYER_STATE_CACHE['dir'] = direction
+        return pos, direction
+
+    cached_pos = PLAYER_STATE_CACHE.get('pos')
+    cached_dir = PLAYER_STATE_CACHE.get('dir') or (1.0, 0.0, 0.0)
+    if _valid_world_pos(cached_pos):
+        return cached_pos, cached_dir
+
+    return None, None
+
+
 def _valid_world_pos(pos):
     if not pos:
         return False
@@ -105,7 +233,7 @@ def _valid_world_pos(pos):
 
 
 def _get_spawn_pos_near_player(bng):
-    pos, direction = _get_player_state_from_lua(bng)
+    pos, direction = _get_player_state(bng)
     if (not _valid_world_pos(pos)) or (not direction):
         return None
     px, py, pz = pos
@@ -120,7 +248,7 @@ def _get_spawn_pos_near_player(bng):
 
 
 def _get_player_pos_from_lua(bng):
-    pos, _ = _get_player_state_from_lua(bng)
+    pos, _ = _get_player_state(bng)
     if _valid_world_pos(pos):
         return pos
     return None
@@ -391,9 +519,9 @@ def spawn_vehicle_via_py(bng, car_id):
 
 
 def create_taxi_mission(bng, map_id='unknown'):
-    pos, direction = _get_player_state_from_lua(bng)
+    pos, direction = _get_player_state(bng)
     if (not _valid_world_pos(pos)) or (not direction):
-        _show_game_message(bng, 'Taxi mission paused: cannot read player position yet.', 'warning')
+        print('[TAXI] Waiting for valid player position...')
         return None
     px, py, pz = pos
     dx, dy, dz = direction
@@ -496,14 +624,8 @@ def update_taxi_mission(bng, mission):
     return None
 
 
-def push_order_status(report_order_url, payload):
-    try:
-        requests.post(report_order_url, json=payload, timeout=1.2)
-    except Exception:
-        pass
-
-
 def main():
+    global PLAYER_STATE_FILE
     config = load_config()
     if not config:
         print('[BRIDGE] ERROR: beamng_config.json not found')
@@ -516,7 +638,7 @@ def main():
     relay_base = f"http://{relay_host}:{relay_port}"
     poll_url = f"{relay_base}/poll?user={username}"
     report_url = f"{relay_base}/report_shift"
-    report_order_url = f"{relay_base}/report_order"
+    PLAYER_STATE_FILE = os.path.join(config['beamng_user'], 'bridge_player_state.txt')
 
     print('[BRIDGE] Starting bridge')
     print(f'[BRIDGE] Relay: {relay_base}')
@@ -534,12 +656,7 @@ def main():
     total_distance = 0.0
     last_pos = None
     shift_job = ''
-    taxi_mission = None
-    taxi_trips = 0
-    taxi_earned = 0
-    taxi_completed_seq = 0
     map_id = 'unknown'
-    marker_errors = 0
     work_vehicle_ids = set()
     player_state_errors = 0
 
@@ -548,6 +665,9 @@ def main():
         bng.open(launch=False)
         print('[BRIDGE] Connected to BeamNG')
         map_id = _get_map_id_from_lua(bng)
+        if map_id == 'unknown':
+            map_id = 'west_coast_usa'
+            print('[BRIDGE] Map fallback applied: west_coast_usa')
         print(f'[BRIDGE] Map detected: {map_id}')
 
         while True:
@@ -571,10 +691,12 @@ def main():
                         plate_design = data.get('plateDesign', 'htnv_russian_regular')
                         livery = data.get('livery', '')
                         print(f'[BRIDGE] Spawn request: car={car_id} plate={plate}')
-                        result = spawn_vehicle_via_py(bng, car_id)
-                        if ('new_ids_final=[]' in result and 'seen_new_ids=[]' in result) or result.startswith('py_failed:'):
-                            lua_result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery)
-                            result = f'{result} | lua_fallback={lua_result}'
+                        # In some BeamNG tech/tcom sessions Python state read is unavailable.
+                        # Use Lua spawn as primary path so vehicle appears near current player vehicle.
+                        result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery)
+                        if result.startswith('ERR:no_core_vehicles'):
+                            py_result = spawn_vehicle_via_py(bng, car_id)
+                            result = f'{result} | py_fallback={py_result}'
                         print(f'[BRIDGE] Spawn result: {result}')
                         spawned_ids = _extract_spawned_ids(result)
                         if spawned_ids:
@@ -589,22 +711,6 @@ def main():
                             total_distance = 0.0
                             last_pos = None
                             shift_job = str(data.get('jobId') or data.get('job') or 'shift').lower()
-                            taxi_trips = 0
-                            taxi_earned = 0
-                            taxi_mission = create_taxi_mission(bng, map_id=map_id)
-                            if taxi_mission:
-                                tx, ty, tz = taxi_mission['pickup']
-                                cur = _get_player_pos_from_lua(bng)
-                                dist_left = calc_distance(cur, (tx, ty, tz)) if _valid_world_pos(cur) else 0.0
-                                push_order_status(report_order_url, {
-                                    'user': username,
-                                    'type': 'order',
-                                    'active': True,
-                                    'phase': taxi_mission.get('phase'),
-                                    'distanceLeft': dist_left,
-                                    'price': int(taxi_mission.get('base_fare', 0)),
-                                    'completedSeq': taxi_completed_seq
-                                })
 
                     elif cmd_type == 'end_shift':
                         if shift_active:
@@ -612,9 +718,7 @@ def main():
                                 'user': username,
                                 'distance': total_distance / 1000.0,
                                 'type': 'shift_done',
-                                'job': shift_job,
-                                'taxiTrips': taxi_trips,
-                                'taxiEarned': taxi_earned
+                                'job': shift_job
                             }
                             requests.post(report_url, json=report, timeout=2)
                         if work_vehicle_ids:
@@ -624,19 +728,7 @@ def main():
                         total_distance = 0.0
                         last_pos = None
                         shift_job = ''
-                        taxi_mission = None
-                        taxi_trips = 0
-                        taxi_earned = 0
                         work_vehicle_ids.clear()
-                        push_order_status(report_order_url, {
-                            'user': username,
-                            'type': 'order',
-                            'active': False,
-                            'phase': 'idle',
-                            'distanceLeft': 0,
-                            'price': 0,
-                            'completedSeq': taxi_completed_seq
-                        })
 
                     elif cmd_type == 'despawn_all':
                         bng.queue_lua_command("extensions.core_vehicles and extensions.core_vehicles.removeAllVehicles and extensions.core_vehicles.removeAllVehicles()")
@@ -647,16 +739,6 @@ def main():
                         total_distance = 0.0
                         last_pos = None
                         shift_job = ''
-                        taxi_mission = None
-                        push_order_status(report_order_url, {
-                            'user': username,
-                            'type': 'order',
-                            'active': False,
-                            'phase': 'idle',
-                            'distanceLeft': 0,
-                            'price': 0,
-                            'completedSeq': taxi_completed_seq
-                        })
 
                 if shift_active:
                     try:
@@ -670,58 +752,6 @@ def main():
                         if last_pos is not None:
                             total_distance += calc_distance(cur_pos, last_pos)
                         last_pos = cur_pos
-
-                        if taxi_mission is None or not taxi_mission.get('active'):
-                            taxi_mission = create_taxi_mission(bng, map_id=map_id)
-                            if taxi_mission:
-                                tx, ty, tz = taxi_mission['pickup']
-                                dist_left = calc_distance(cur_pos, (tx, ty, tz))
-                                push_order_status(report_order_url, {
-                                    'user': username,
-                                    'type': 'order',
-                                    'active': True,
-                                    'phase': taxi_mission.get('phase'),
-                                    'distanceLeft': dist_left,
-                                    'price': int(taxi_mission.get('base_fare', 0)),
-                                    'completedSeq': taxi_completed_seq
-                                })
-                        else:
-                            target = taxi_mission.get('pickup') if taxi_mission.get('phase') == 'to_pickup' else taxi_mission.get('dropoff')
-                            if target:
-                                dist_left = calc_distance(cur_pos, target)
-                                push_order_status(report_order_url, {
-                                    'user': username,
-                                    'type': 'order',
-                                    'active': True,
-                                    'phase': taxi_mission.get('phase'),
-                                    'distanceLeft': dist_left,
-                                    'price': int(taxi_mission.get('base_fare', 0)),
-                                    'completedSeq': taxi_completed_seq
-                                })
-                            taxi_done = update_taxi_mission(bng, taxi_mission)
-                            if taxi_done:
-                                taxi_trips += 1
-                                taxi_earned += int(taxi_done.get('earned', 0))
-                                taxi_completed_seq += 1
-                                push_order_status(report_order_url, {
-                                    'user': username,
-                                    'type': 'order',
-                                    'active': False,
-                                    'phase': 'completed',
-                                    'distanceLeft': 0,
-                                    'price': 0,
-                                    'completedSeq': taxi_completed_seq,
-                                    'rewardMoney': int(taxi_done.get('earned', 0)),
-                                    'rewardXp': max(15, int(taxi_done.get('earned', 0) / 25))
-                                })
-                                taxi_mission = None
-
-                        # Draw visual mission marker in-world every loop.
-                        marker_state = _draw_taxi_mission_markers(bng, taxi_mission)
-                        if isinstance(marker_state, str) and marker_state.startswith('err:'):
-                            marker_errors += 1
-                            if marker_errors == 1:
-                                print(f'[TAXI] Marker draw error: {marker_state}')
                     except Exception:
                         pass
 
