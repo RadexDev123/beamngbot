@@ -70,16 +70,18 @@ def _get_player_state_from_lua(bng):
       if not v then return '' end
       local p = v:getPosition()
       local d = v:getDirectionVector()
-      return string.format('%.3f|%.3f|%.3f|%.4f|%.4f|%.4f', p.x, p.y, p.z, d.x, d.y, d.z)
+      return {p.x, p.y, p.z, d.x, d.y, d.z}
     end)()
     """
     try:
         raw = bng.queue_lua_command(lua)
-        # beamngpy may return either a string or an array-like payload
+        # beamngpy may return either an array-like payload or a string
         if isinstance(raw, (list, tuple)) and len(raw) >= 6:
             px, py, pz, dx, dy, dz = [float(x) for x in raw[:6]]
         else:
             text = str(raw or '')
+            if text.startswith('{') and text.endswith('}'):
+                text = text.strip('{}').replace(' ', '')
             parts = text.split('|')
             if len(parts) != 6:
                 raise ValueError(f"Unexpected player state payload: {text}")
@@ -90,12 +92,38 @@ def _get_player_state_from_lua(bng):
         return (px, py, pz), (dx, dy, dz)
     except Exception:
         pass
-    return (0.0, 0.0, 0.0), (1.0, 0.0, 0.0)
+    return None, None
+
+
+def _valid_world_pos(pos):
+    if not pos:
+        return False
+    x, y, z = pos
+    if abs(x) < 0.001 and abs(y) < 0.001 and abs(z) < 0.001:
+        return False
+    return True
+
+
+def _get_spawn_pos_near_player(bng):
+    pos, direction = _get_player_state_from_lua(bng)
+    if (not _valid_world_pos(pos)) or (not direction):
+        return None
+    px, py, pz = pos
+    dx, dy, dz = direction
+    # Side offset from the player's current heading: spawn close and visible.
+    sx, sy = -dy, dx
+    return (
+        px + sx * 3.0 + dx * 1.2,
+        py + sy * 3.0 + dy * 1.2,
+        pz + 0.6
+    )
 
 
 def _get_player_pos_from_lua(bng):
     pos, _ = _get_player_state_from_lua(bng)
-    return pos
+    if _valid_world_pos(pos):
+        return pos
+    return None
 
 
 def _get_player_damage_from_lua(bng):
@@ -173,6 +201,33 @@ def _draw_world_marker(bng, pos, r, g, b, label):
         return 'err:python_queue_failed'
 
 
+def _set_nav_target_fallback(bng, pos):
+    x, y, z = pos
+    lua = f"""
+    (function()
+      local ok = false
+      pcall(function()
+        if freeroam_bigMapMode and freeroam_bigMapMode.navigateToPos then
+          freeroam_bigMapMode.navigateToPos(vec3({x:.3f}, {y:.3f}, {z:.3f}))
+          ok = true
+        end
+      end)
+      pcall(function()
+        if not ok and extensions and extensions.freeroam_bigMapMode and extensions.freeroam_bigMapMode.navigateToPos then
+          extensions.freeroam_bigMapMode.navigateToPos(vec3({x:.3f}, {y:.3f}, {z:.3f}))
+          ok = true
+        end
+      end)
+      return ok and 'ok' or 'err:no_nav_api'
+    end)()
+    """
+    try:
+        res = bng.queue_lua_command(lua)
+        return str(res or '')
+    except Exception:
+        return 'err:nav_queue_failed'
+
+
 def _draw_taxi_mission_markers(bng, mission):
     if not mission or not mission.get('active'):
         return
@@ -182,9 +237,15 @@ def _draw_taxi_mission_markers(bng, mission):
 
     # Cyan = pickup, Yellow = dropoff
     if phase == 'to_pickup' and pickup:
-        return _draw_world_marker(bng, pickup, 0.1, 0.9, 1.0, 'PICKUP')
+        marker = _draw_world_marker(bng, pickup, 0.1, 0.9, 1.0, 'PICKUP')
+        if isinstance(marker, str) and marker.startswith('err:'):
+            _set_nav_target_fallback(bng, pickup)
+        return marker
     elif phase == 'to_dropoff' and dropoff:
-        return _draw_world_marker(bng, dropoff, 1.0, 0.85, 0.1, 'DROPOFF')
+        marker = _draw_world_marker(bng, dropoff, 1.0, 0.85, 0.1, 'DROPOFF')
+        if isinstance(marker, str) and marker.startswith('err:'):
+            _set_nav_target_fallback(bng, dropoff)
+        return marker
     return 'none'
 
 def _get_map_id_from_lua(bng):
@@ -234,7 +295,10 @@ def spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery):
       local pos = vec3(0, 0, 0)
       local playerVeh = be:getPlayerVehicle(0)
       if playerVeh then
-        pos = playerVeh:getPosition() + playerVeh:getDirectionVector() * 6 + vec3(0, 0, 1)
+        local p = playerVeh:getPosition()
+        local d = playerVeh:getDirectionVector()
+        local side = vec3(-d.y, d.x, 0)
+        pos = p + side * 3 + d * 1.2 + vec3(0, 0, 0.6)
       end
 
       local handler = (extensions and extensions.core_vehicles) or core_vehicles
@@ -299,12 +363,9 @@ def spawn_vehicle_via_py(bng, car_id):
     except Exception:
         before_ids = set()
 
-    pos, direction = _get_player_state_from_lua(bng)
-    pos = (
-        pos[0] + direction[0] * 8.0,
-        pos[1] + direction[1] * 8.0,
-        pos[2] + 1.0,
-    )
+    pos = _get_spawn_pos_near_player(bng)
+    if not _valid_world_pos(pos):
+        return "py_failed:no_player_state"
     vid_name = f"bot_{int(time.time() * 1000) % 1000000}"
     vehicle = Vehicle(vid=vid_name, model=str(car_id or 'pigeon'))
     errors = []
@@ -330,7 +391,12 @@ def spawn_vehicle_via_py(bng, car_id):
 
 
 def create_taxi_mission(bng, map_id='unknown'):
-    (px, py, pz), (dx, dy, dz) = _get_player_state_from_lua(bng)
+    pos, direction = _get_player_state_from_lua(bng)
+    if (not _valid_world_pos(pos)) or (not direction):
+        _show_game_message(bng, 'Taxi mission paused: cannot read player position yet.', 'warning')
+        return None
+    px, py, pz = pos
+    dx, dy, dz = direction
     map_key = str(map_id or 'unknown').lower()
     profile = TAXI_MAP_PROFILES['default']
     if 'west_coast_usa' in map_key or 'west coast' in map_key:
@@ -384,7 +450,10 @@ def update_taxi_mission(bng, mission):
     if not mission or not mission.get('active'):
         return None
 
-    px, py, pz = _get_player_pos_from_lua(bng)
+    cur = _get_player_pos_from_lua(bng)
+    if not _valid_world_pos(cur):
+        return None
+    px, py, pz = cur
     now = time.time()
 
     if mission['phase'] == 'to_pickup':
@@ -472,6 +541,7 @@ def main():
     map_id = 'unknown'
     marker_errors = 0
     work_vehicle_ids = set()
+    player_state_errors = 0
 
     try:
         print('[BRIDGE] Connecting to BeamNG...')
@@ -524,8 +594,8 @@ def main():
                             taxi_mission = create_taxi_mission(bng, map_id=map_id)
                             if taxi_mission:
                                 tx, ty, tz = taxi_mission['pickup']
-                                px, py, pz = _get_player_pos_from_lua(bng)
-                                dist_left = calc_distance((px, py, pz), (tx, ty, tz))
+                                cur = _get_player_pos_from_lua(bng)
+                                dist_left = calc_distance(cur, (tx, ty, tz)) if _valid_world_pos(cur) else 0.0
                                 push_order_status(report_order_url, {
                                     'user': username,
                                     'type': 'order',
@@ -591,6 +661,12 @@ def main():
                 if shift_active:
                     try:
                         cur_pos = _get_player_pos_from_lua(bng)
+                        if not _valid_world_pos(cur_pos):
+                            player_state_errors += 1
+                            if player_state_errors % 20 == 1:
+                                print('[BRIDGE] WARN: player state unavailable (position not readable).')
+                            continue
+                        player_state_errors = 0
                         if last_pos is not None:
                             total_distance += calc_distance(cur_pos, last_pos)
                         last_pos = cur_pos
