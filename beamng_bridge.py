@@ -3,6 +3,7 @@ import os
 import time
 import math
 import random
+import re
 import requests
 from beamngpy import BeamNGpy, Vehicle
 
@@ -62,16 +63,39 @@ def _observe_vehicle_ids(bng, before_ids, duration_sec=1.5):
     return final_count, sorted(list(final_ids - before_ids)), sorted(list(seen_new_ids))
 
 
-def _get_player_pos_from_lua(bng):
+def _get_player_state_from_lua(bng):
+    lua = """
+    (function()
+      local v = be:getPlayerVehicle(0)
+      if not v then return '' end
+      local p = v:getPosition()
+      local d = v:getDirectionVector()
+      return string.format('%.3f|%.3f|%.3f|%.4f|%.4f|%.4f', p.x, p.y, p.z, d.x, d.y, d.z)
+    end)()
+    """
     try:
-        pos_data = bng.queue_lua_command(
-            "local v=be:getPlayerVehicle(0); if v then local p=v:getPosition(); return {p.x,p.y,p.z} end"
-        )
-        if isinstance(pos_data, (list, tuple)) and len(pos_data) == 3:
-            return (float(pos_data[0]) + 6.0, float(pos_data[1]), float(pos_data[2]) + 1.0)
+        raw = bng.queue_lua_command(lua)
+        # beamngpy may return either a string or an array-like payload
+        if isinstance(raw, (list, tuple)) and len(raw) >= 6:
+            px, py, pz, dx, dy, dz = [float(x) for x in raw[:6]]
+        else:
+            text = str(raw or '')
+            parts = text.split('|')
+            if len(parts) != 6:
+                raise ValueError(f"Unexpected player state payload: {text}")
+            px, py, pz, dx, dy, dz = [float(x) for x in parts]
+        # Normalize direction for stability.
+        dlen = max(1e-4, math.sqrt(dx * dx + dy * dy + dz * dz))
+        dx, dy, dz = dx / dlen, dy / dlen, dz / dlen
+        return (px, py, pz), (dx, dy, dz)
     except Exception:
         pass
-    return (0.0, 0.0, 0.0)
+    return (0.0, 0.0, 0.0), (1.0, 0.0, 0.0)
+
+
+def _get_player_pos_from_lua(bng):
+    pos, _ = _get_player_state_from_lua(bng)
+    return pos
 
 
 def _get_player_damage_from_lua(bng):
@@ -88,24 +112,65 @@ def _show_game_message(bng, text, category='info'):
     bng.queue_lua_command(f"guihooks.trigger('Message', {{msg='{safe}', category='{cat}', icon='directions_car'}})")
 
 
-def _draw_world_marker(bng, pos, r, g, b):
-    x, y, z = pos
+def _extract_spawned_ids(result_text):
+    text = str(result_text or '')
+    found = set()
+    for match in re.findall(r"new_ids_final=\[([^\]]*)\]", text):
+        for token in match.split(','):
+            token = token.strip().strip("'").strip('"')
+            if not token:
+                continue
+            try:
+                found.add(int(token))
+            except Exception:
+                pass
+    return sorted(found)
+
+
+def _delete_vehicle_ids_via_lua(bng, vehicle_ids):
+    ids = []
+    for value in vehicle_ids:
+        try:
+            ids.append(int(value))
+        except Exception:
+            pass
+    if not ids:
+        return
+    ids_lua = ",".join(str(v) for v in sorted(set(ids)))
     lua = f"""
     (function()
-      local ok, err = pcall(function()
-        if not debugDrawer then return end
-        local p = vec3({x:.3f}, {y:.3f}, {z:.3f})
-        local c = ColorF({r:.3f}, {g:.3f}, {b:.3f}, 0.9)
-        debugDrawer:drawCylinder(p, p + vec3(0, 0, 8), 0.9, c)
-        debugDrawer:drawSphere(p + vec3(0, 0, 0.8), 1.6, c)
-      end)
-      return ok and 'ok' or ('err:' .. tostring(err))
+      local ids = {{{ids_lua}}}
+      for _, id in ipairs(ids) do
+        local obj = be:getObjectByID(id)
+        if obj then obj:delete() end
+      end
     end)()
     """
     try:
         bng.queue_lua_command(lua)
     except Exception:
         pass
+
+
+def _draw_world_marker(bng, pos, r, g, b, label):
+    x, y, z = pos
+    lua = f"""
+    (function()
+      local ok, err = pcall(function()
+        if not debugDrawer then return end
+        local p = vec3({x:.3f}, {y:.3f}, {z:.3f} + 0.2)
+        local c = ColorF({r:.3f}, {g:.3f}, {b:.3f}, 0.9)
+        debugDrawer:drawCylinder(p, p + vec3(0, 0, 16), 2.2, c)
+        debugDrawer:drawSphere(p + vec3(0, 0, 1.8), 3.0, c)
+      end)
+      return ok and 'ok' or ('err:' .. tostring(err))
+    end)()
+    """
+    try:
+        res = bng.queue_lua_command(lua)
+        return str(res or '')
+    except Exception:
+        return 'err:python_queue_failed'
 
 
 def _draw_taxi_mission_markers(bng, mission):
@@ -117,9 +182,10 @@ def _draw_taxi_mission_markers(bng, mission):
 
     # Cyan = pickup, Yellow = dropoff
     if phase == 'to_pickup' and pickup:
-        _draw_world_marker(bng, pickup, 0.1, 0.9, 1.0)
+        return _draw_world_marker(bng, pickup, 0.1, 0.9, 1.0, 'PICKUP')
     elif phase == 'to_dropoff' and dropoff:
-        _draw_world_marker(bng, dropoff, 1.0, 0.85, 0.1)
+        return _draw_world_marker(bng, dropoff, 1.0, 0.85, 0.1, 'DROPOFF')
+    return 'none'
 
 def _get_map_id_from_lua(bng):
     lua = """
@@ -128,7 +194,7 @@ def _get_map_id_from_lua(bng):
       pcall(function()
         if getMissionFilename then
           local mf = tostring(getMissionFilename() or '')
-          local level = string.match(mf, '/levels/([^/]+)/')
+          local level = string.match(mf, '[/\\\\]levels[/\\\\]([^/\\\\]+)[/\\\\]')
           if level and level ~= '' then id = level end
         end
       end)
@@ -140,12 +206,18 @@ def _get_map_id_from_lua(bng):
         end)
       end
       if id == '' then id = 'unknown' end
-      return string.lower(id)
+      return string.lower(tostring(id))
     end)()
     """
     try:
         value = bng.queue_lua_command(lua)
-        return str(value or 'unknown').lower()
+        text = str(value or 'unknown').lower().strip()
+        # common display names fallback
+        if 'west coast' in text:
+            return 'west_coast_usa'
+        if 'east coast' in text:
+            return 'east_coast_usa'
+        return text
     except Exception:
         return 'unknown'
 
@@ -227,7 +299,12 @@ def spawn_vehicle_via_py(bng, car_id):
     except Exception:
         before_ids = set()
 
-    pos = _get_player_pos_from_lua(bng)
+    pos, direction = _get_player_state_from_lua(bng)
+    pos = (
+        pos[0] + direction[0] * 8.0,
+        pos[1] + direction[1] * 8.0,
+        pos[2] + 1.0,
+    )
     vid_name = f"bot_{int(time.time() * 1000) % 1000000}"
     vehicle = Vehicle(vid=vid_name, model=str(car_id or 'pigeon'))
     errors = []
@@ -253,26 +330,29 @@ def spawn_vehicle_via_py(bng, car_id):
 
 
 def create_taxi_mission(bng, map_id='unknown'):
-    px, py, pz = _get_player_pos_from_lua(bng)
+    (px, py, pz), (dx, dy, dz) = _get_player_state_from_lua(bng)
+    map_key = str(map_id or 'unknown').lower()
     profile = TAXI_MAP_PROFILES['default']
-    if 'west_coast_usa' in map_id:
+    if 'west_coast_usa' in map_key or 'west coast' in map_key:
         profile = TAXI_MAP_PROFILES['west_coast_usa']
-    elif 'east_coast_usa' in map_id:
+    elif 'east_coast_usa' in map_key or 'east coast' in map_key:
         profile = TAXI_MAP_PROFILES['east_coast_usa']
 
+    # Side vector in XY plane
+    sx, sy = -dy, dx
     pickup_dist = random.uniform(profile['pickup_min'], profile['pickup_max'])
-    pickup_ang = random.uniform(0.0, math.tau)
+    pickup_side = random.uniform(-30.0, 30.0)
     pickup = (
-        px + math.cos(pickup_ang) * pickup_dist,
-        py + math.sin(pickup_ang) * pickup_dist,
+        px + dx * pickup_dist + sx * pickup_side,
+        py + dy * pickup_dist + sy * pickup_side,
         pz
     )
 
     drop_dist = random.uniform(profile['drop_min'], profile['drop_max'])
-    drop_ang = random.uniform(0.0, math.tau)
+    drop_side = random.uniform(-120.0, 120.0)
     dropoff = (
-        pickup[0] + math.cos(drop_ang) * drop_dist,
-        pickup[1] + math.sin(drop_ang) * drop_dist,
+        pickup[0] + dx * drop_dist + sx * drop_side,
+        pickup[1] + dy * drop_dist + sy * drop_side,
         pickup[2]
     )
 
@@ -347,6 +427,13 @@ def update_taxi_mission(bng, mission):
     return None
 
 
+def push_order_status(report_order_url, payload):
+    try:
+        requests.post(report_order_url, json=payload, timeout=1.2)
+    except Exception:
+        pass
+
+
 def main():
     config = load_config()
     if not config:
@@ -360,6 +447,7 @@ def main():
     relay_base = f"http://{relay_host}:{relay_port}"
     poll_url = f"{relay_base}/poll?user={username}"
     report_url = f"{relay_base}/report_shift"
+    report_order_url = f"{relay_base}/report_order"
 
     print('[BRIDGE] Starting bridge')
     print(f'[BRIDGE] Relay: {relay_base}')
@@ -380,7 +468,10 @@ def main():
     taxi_mission = None
     taxi_trips = 0
     taxi_earned = 0
+    taxi_completed_seq = 0
     map_id = 'unknown'
+    marker_errors = 0
+    work_vehicle_ids = set()
 
     try:
         print('[BRIDGE] Connecting to BeamNG...')
@@ -415,8 +506,15 @@ def main():
                             lua_result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery)
                             result = f'{result} | lua_fallback={lua_result}'
                         print(f'[BRIDGE] Spawn result: {result}')
+                        spawned_ids = _extract_spawned_ids(result)
+                        if spawned_ids:
+                            work_vehicle_ids.update(spawned_ids)
+                            print(f'[BRIDGE] Tracked work vehicle ids: {sorted(work_vehicle_ids)}')
 
                         if cmd_type == 'start_shift':
+                            if work_vehicle_ids:
+                                _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
+                                work_vehicle_ids.clear()
                             shift_active = True
                             total_distance = 0.0
                             last_pos = None
@@ -424,6 +522,19 @@ def main():
                             taxi_trips = 0
                             taxi_earned = 0
                             taxi_mission = create_taxi_mission(bng, map_id=map_id)
+                            if taxi_mission:
+                                tx, ty, tz = taxi_mission['pickup']
+                                px, py, pz = _get_player_pos_from_lua(bng)
+                                dist_left = calc_distance((px, py, pz), (tx, ty, tz))
+                                push_order_status(report_order_url, {
+                                    'user': username,
+                                    'type': 'order',
+                                    'active': True,
+                                    'phase': taxi_mission.get('phase'),
+                                    'distanceLeft': dist_left,
+                                    'price': int(taxi_mission.get('base_fare', 0)),
+                                    'completedSeq': taxi_completed_seq
+                                })
 
                     elif cmd_type == 'end_shift':
                         if shift_active:
@@ -436,6 +547,9 @@ def main():
                                 'taxiEarned': taxi_earned
                             }
                             requests.post(report_url, json=report, timeout=2)
+                        if work_vehicle_ids:
+                            _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
+                            print(f'[BRIDGE] Work vehicles removed on end_shift: {sorted(work_vehicle_ids)}')
                         shift_active = False
                         total_distance = 0.0
                         last_pos = None
@@ -443,14 +557,36 @@ def main():
                         taxi_mission = None
                         taxi_trips = 0
                         taxi_earned = 0
+                        work_vehicle_ids.clear()
+                        push_order_status(report_order_url, {
+                            'user': username,
+                            'type': 'order',
+                            'active': False,
+                            'phase': 'idle',
+                            'distanceLeft': 0,
+                            'price': 0,
+                            'completedSeq': taxi_completed_seq
+                        })
 
                     elif cmd_type == 'despawn_all':
                         bng.queue_lua_command("extensions.core_vehicles and extensions.core_vehicles.removeAllVehicles and extensions.core_vehicles.removeAllVehicles()")
+                        if work_vehicle_ids:
+                            _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
+                            work_vehicle_ids.clear()
                         shift_active = False
                         total_distance = 0.0
                         last_pos = None
                         shift_job = ''
                         taxi_mission = None
+                        push_order_status(report_order_url, {
+                            'user': username,
+                            'type': 'order',
+                            'active': False,
+                            'phase': 'idle',
+                            'distanceLeft': 0,
+                            'price': 0,
+                            'completedSeq': taxi_completed_seq
+                        })
 
                 if shift_active:
                     try:
@@ -461,15 +597,55 @@ def main():
 
                         if taxi_mission is None or not taxi_mission.get('active'):
                             taxi_mission = create_taxi_mission(bng, map_id=map_id)
+                            if taxi_mission:
+                                tx, ty, tz = taxi_mission['pickup']
+                                dist_left = calc_distance(cur_pos, (tx, ty, tz))
+                                push_order_status(report_order_url, {
+                                    'user': username,
+                                    'type': 'order',
+                                    'active': True,
+                                    'phase': taxi_mission.get('phase'),
+                                    'distanceLeft': dist_left,
+                                    'price': int(taxi_mission.get('base_fare', 0)),
+                                    'completedSeq': taxi_completed_seq
+                                })
                         else:
+                            target = taxi_mission.get('pickup') if taxi_mission.get('phase') == 'to_pickup' else taxi_mission.get('dropoff')
+                            if target:
+                                dist_left = calc_distance(cur_pos, target)
+                                push_order_status(report_order_url, {
+                                    'user': username,
+                                    'type': 'order',
+                                    'active': True,
+                                    'phase': taxi_mission.get('phase'),
+                                    'distanceLeft': dist_left,
+                                    'price': int(taxi_mission.get('base_fare', 0)),
+                                    'completedSeq': taxi_completed_seq
+                                })
                             taxi_done = update_taxi_mission(bng, taxi_mission)
                             if taxi_done:
                                 taxi_trips += 1
                                 taxi_earned += int(taxi_done.get('earned', 0))
-                                taxi_mission = create_taxi_mission(bng, map_id=map_id)
+                                taxi_completed_seq += 1
+                                push_order_status(report_order_url, {
+                                    'user': username,
+                                    'type': 'order',
+                                    'active': False,
+                                    'phase': 'completed',
+                                    'distanceLeft': 0,
+                                    'price': 0,
+                                    'completedSeq': taxi_completed_seq,
+                                    'rewardMoney': int(taxi_done.get('earned', 0)),
+                                    'rewardXp': max(15, int(taxi_done.get('earned', 0) / 25))
+                                })
+                                taxi_mission = None
 
                         # Draw visual mission marker in-world every loop.
-                        _draw_taxi_mission_markers(bng, taxi_mission)
+                        marker_state = _draw_taxi_mission_markers(bng, taxi_mission)
+                        if isinstance(marker_state, str) and marker_state.startswith('err:'):
+                            marker_errors += 1
+                            if marker_errors == 1:
+                                print(f'[TAXI] Marker draw error: {marker_state}')
                     except Exception:
                         pass
 

@@ -1032,6 +1032,8 @@
             const [dealerFilter, setDealerFilter] = useState({ sort: 'price_asc', type: 'all' });
             const [selectedDealerCarId, setSelectedDealerCarId] = useState(null);
             const [spawnedVehicles, setSpawnedVehicles] = useState([]); // Array of carIds
+            const [liveOrder, setLiveOrder] = useState(null);
+            const [lastOrderCompletionSeq, setLastOrderCompletionSeq] = useState(0);
             const avatarFileInputRef = useRef(null);
             const [nowTs, setNowTs] = useState(Date.now());
             const previousTabRef = useRef(activeTab);
@@ -1066,6 +1068,46 @@
             useEffect(() => {
                 if (activeTab === 'forbes') fetchLeaderboard();
             }, [activeTab, relayIP]);
+
+            useEffect(() => {
+                if (!working) {
+                    setLiveOrder(null);
+                    return;
+                }
+                let cancelled = false;
+                const poll = async () => {
+                    const url = getRelayUrl('/get_order_status');
+                    if (!url) return;
+                    try {
+                        const res = await fetch(`${url}?user=${encodeURIComponent(user.name)}`);
+                        const data = await res.json();
+                        if (cancelled) return;
+                        if (!data || data.type === 'none') return;
+                        setLiveOrder(data);
+
+                        const seq = Number(data.completedSeq || 0);
+                        if (seq > lastOrderCompletionSeq && Number(data.rewardMoney || 0) > 0) {
+                            const rewardMoney = Number(data.rewardMoney || 0);
+                            const rewardXp = Number(data.rewardXp || 0);
+                            setUser(prev => ({
+                                ...prev,
+                                balance: prev.balance + rewardMoney,
+                                xp: prev.xp + rewardXp
+                            }));
+                            showNotify(`Заказ завершен: +₽${rewardMoney.toLocaleString()} +${rewardXp} XP`, 'success');
+                            setLastOrderCompletionSeq(seq);
+                        }
+                    } catch (e) {
+                        // no-op, keep polling
+                    }
+                };
+                poll();
+                const timer = setInterval(poll, 1000);
+                return () => {
+                    cancelled = true;
+                    clearInterval(timer);
+                };
+            }, [working, relayIP, user.name, lastOrderCompletionSeq]);
 
             useEffect(() => {
                 const prevIndex = TAB_ORDER.indexOf(previousTabRef.current);
@@ -1340,10 +1382,13 @@
                 }
 
                 setWorking(true);
+                setLiveOrder(null);
+                setLastOrderCompletionSeq(0);
                 sendGameCommand({
                     type: 'start_shift',
                     carId: lvl.car,
                     user: user.name,
+                    jobId: id,
                     plate: id === 'police' ? 'POLICE' : id === 'ambulance' ? 'MEDIC' : 'SERVICE',
                     plateCountry: 'ru',
                     livery,
@@ -1423,11 +1468,14 @@
                 // Опрос сервера на отчет
                 setTimeout(async () => {
                     try {
-                        const res = await fetch(`http://${relayIP}:3000/get_shift_report?user=${encodeURIComponent(user.name)}`);
+                        const reportUrl = getRelayUrl('/get_shift_report');
+                        const res = await fetch(`${reportUrl}?user=${encodeURIComponent(user.name)}`);
                         const data = await res.json();
                         if (data.type !== 'none') {
                             const km = parseFloat(data.distance);
-                            const pay = Math.floor(km * 200);
+                            const isTaxiReport = String(data.job || '').toLowerCase() === 'taxi';
+                            const pay = isTaxiReport ? 0 : Math.floor(km * 200);
+                            const xpGain = isTaxiReport ? 0 : Math.floor(km * 10);
 
                             setUser(p => {
                                 const prog = p.jobProgress[id] || { level: 1, km: 0 };
@@ -1441,11 +1489,15 @@
                                     showNotify('Повышение ранга!', 'success');
                                 }
 
-                                showNotify(`Заработано: ₽${pay} за ${km.toFixed(2)} км`, 'success');
+                                if (!isTaxiReport) {
+                                    showNotify(`Заработано: ₽${pay} за ${km.toFixed(2)} км`, 'success');
+                                } else {
+                                    showNotify(`Смена завершена. Заказы учитывались по факту выполнения.`, 'success');
+                                }
                                 return {
                                     ...p,
                                     balance: p.balance + pay,
-                                    xp: p.xp + Math.floor(km * 10),
+                                    xp: p.xp + xpGain,
                                     jobProgress: { ...p.jobProgress, [id]: { level: nLvl, km: nKm } }
                                 };
                             });
@@ -1455,6 +1507,7 @@
                     } catch (e) {
                         showNotify('Ошибка получения отчета', 'danger');
                     }
+                    setLiveOrder(null);
                     setWorking(false);
                 }, 2000);
             };
@@ -1738,6 +1791,28 @@
                         <div className="pt-4">
                             {working ? (
                                 <div className="space-y-4">
+                                    {liveOrder && (
+                                        <Card className="bg-blue-900/20 border-blue-500/30 p-4 border">
+                                            <div className="flex items-center justify-between gap-3">
+                                                <div>
+                                                    <div className="text-[10px] text-blue-300 font-black uppercase tracking-widest mb-1">Текущий заказ</div>
+                                                    <div className="text-sm font-black uppercase">
+                                                        {String(liveOrder.phase || '') === 'to_pickup' ? 'Подача клиента' :
+                                                            String(liveOrder.phase || '') === 'to_dropoff' ? 'Поездка к точке' :
+                                                                String(liveOrder.phase || '') === 'completed' ? 'Завершен' : 'В работе'}
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-[10px] text-gray-400 font-bold uppercase">Расстояние</div>
+                                                    <div className="text-sm font-black text-cyan-300">{Math.max(0, Math.floor(Number(liveOrder.distanceLeft || 0)))} м</div>
+                                                </div>
+                                            </div>
+                                            <div className="mt-3 flex items-center justify-between">
+                                                <span className="text-[10px] text-gray-400 font-bold uppercase">Цена заказа</span>
+                                                <span className="text-sm font-black text-emerald-400">₽{Number(liveOrder.price || 0).toLocaleString()}</span>
+                                            </div>
+                                        </Card>
+                                    )}
                                     {selectedJobId === 'mafia' && mafiaTarget && (
                                         <Card className="bg-red-900/20 border-red-500/30 p-4 border-2 animate-pulse">
                                             <div className="text-[10px] text-red-400 font-black uppercase tracking-widest mb-1">Текущая цель</div>

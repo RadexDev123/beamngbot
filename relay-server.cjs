@@ -9,6 +9,7 @@ let db = { users: {} };
 let userQueues = {}; // { username: [commands] }
 let userReports = {}; // { username: reportData }
 let userVehicles = {}; // { username: [modelNames] }
+let userOrderStatus = {}; // { username: orderStatus }
 
 function normalizeUsername(value) {
     const raw = String(value || '').trim();
@@ -109,6 +110,20 @@ const server = http.createServer((req, res) => {
                 res.writeHead(400); res.end('Invalid JSON');
             }
         });
+    } else if (pathname === '/report_order' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const username = normalizeUsername(data.user || 'Unknown');
+                userOrderStatus[username] = data;
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ status: 'ok' }));
+            } catch (e) {
+                res.writeHead(400); res.end('Invalid JSON');
+            }
+        });
     } else if (pathname === '/sync_garage' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
@@ -133,6 +148,10 @@ const server = http.createServer((req, res) => {
         } else {
             res.end(JSON.stringify({ type: 'none' }));
         }
+    } else if (pathname === '/get_order_status' && req.method === 'GET') {
+        const username = normalizeUsername(query.user);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(userOrderStatus[username] || { type: 'none' }));
     } else if (pathname === '/get_user' && req.method === 'GET') {
         const userId = query.id;
         res.writeHead(200, { 'Content-Type': 'application/json' });
