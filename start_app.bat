@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title BeamNG RP Mini App
 echo Starting TMA on dev server...
 npm run dev

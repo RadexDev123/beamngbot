@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title BeamNG RP Relay Server
 echo [1/2] Killing previous Node processes...
 taskkill /F /IM node.exe >nul 2>&1

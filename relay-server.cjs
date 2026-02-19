@@ -1,25 +1,47 @@
-const http = require('http');
+﻿const http = require('http');
 const url = require('url');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const DB_PATH = path.join(__dirname, 'database.json');
 let db = { users: {} };
+let userQueues = {}; // { username: [commands] }
+let userReports = {}; // { username: reportData }
+let userVehicles = {}; // { username: [modelNames] }
 
-// Загрузка БД при старте
+function normalizeUsername(value) {
+    const raw = String(value || '').trim();
+    return raw ? raw.toLowerCase() : 'unknown';
+}
+
+function getLocalIPv4List() {
+    const interfaces = os.networkInterfaces();
+    const ips = [];
+    for (const list of Object.values(interfaces)) {
+        for (const addr of list || []) {
+            if (addr && addr.family === 'IPv4' && !addr.internal) {
+                ips.push(addr.address);
+            }
+        }
+    }
+    return Array.from(new Set(ips));
+}
+
+// Load DB on startup
 if (fs.existsSync(DB_PATH)) {
     try {
         db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-        console.log('[DB] База данных загружена. Пользователей:', Object.keys(db.users).length);
+        console.log('[DB] Database loaded. Users:', Object.keys(db.users).length);
 
-        // Восстановление кэша гаражей для моста
+        // Restore garage cache for bridge
         Object.values(db.users).forEach(u => {
             if (u.name && u.garageModels) {
-                userVehicles[u.name] = u.garageModels;
+                userVehicles[normalizeUsername(u.name)] = u.garageModels;
             }
         });
     } catch (e) {
-        console.error('[DB] Ошибка парсинга БД!', e);
+        console.error('[DB] Failed to parse DB!', e);
     }
 }
 
@@ -27,13 +49,9 @@ function saveToDisk() {
     try {
         fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
     } catch (e) {
-        console.error('[DB] Ошибка записи на диск!', e);
+        console.error('[DB] Failed to write DB to disk!', e);
     }
 }
-
-let userQueues = {}; // { username: [commands] }
-let userReports = {}; // { username: reportData }
-let userVehicles = {}; // { username: [modelNames] }
 
 const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -62,8 +80,8 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
-                const username = data.user || 'Unknown';
-                console.log(`[BOT] -> Команда для ${username}:`, data.type);
+                const username = normalizeUsername(data.user || 'Unknown');
+                console.log(`[BOT] -> Command for ${username}:`, data.type);
 
                 if (!userQueues[username]) userQueues[username] = [];
                 userQueues[username].push(data);
@@ -80,8 +98,8 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
-                const username = data.user || 'Unknown';
-                console.log(`[GAME] -> Отчет от ${username}:`, data.distance, 'км');
+                const username = normalizeUsername(data.user || 'Unknown');
+                console.log(`[GAME] -> Report from ${username}:`, data.distance, 'km');
 
                 userReports[username] = data;
 
@@ -97,9 +115,9 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
-                const username = data.user || 'Unknown';
+                const username = normalizeUsername(data.user || 'Unknown');
                 userVehicles[username] = data.vehicles || [];
-                console.log(`[BOT] -> Гараж синхронизирован для ${username}:`, userVehicles[username]);
+                console.log(`[BOT] -> Garage synced for ${username}:`, userVehicles[username]);
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ status: 'ok' }));
             } catch (e) {
@@ -107,9 +125,9 @@ const server = http.createServer((req, res) => {
             }
         });
     } else if (pathname === '/get_shift_report' && req.method === 'GET') {
-        const username = query.user;
+        const username = normalizeUsername(query.user);
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        if (username && userReports[username]) {
+        if (userReports[username]) {
             res.end(JSON.stringify(userReports[username]));
             delete userReports[username];
         } else {
@@ -133,14 +151,11 @@ const server = http.createServer((req, res) => {
                 if (userId) {
                     db.users[userId] = data;
 
-                    // Автоматически обновляем список машин для синхронизации с игрой
+                    // Update car list for game sync
                     if (data.garage && Array.isArray(data.garage)) {
-                        // Нам нужны названия моделей для Lua мода
-                        // В идеале бот должен присылать их, или мы можем хранить карту тут
-                        // Но проще пусть бот шлет уже готовый список в отдельном поле или мы его вытащим
-                        // Для надежности, пусть бот шлет поле 'garageModels'
+                        // Bot should send resolved model list in `garageModels`
                         if (data.garageModels) {
-                            userVehicles[data.name || 'Unknown'] = data.garageModels;
+                            userVehicles[normalizeUsername(data.name)] = data.garageModels;
                         }
                     }
 
@@ -155,12 +170,17 @@ const server = http.createServer((req, res) => {
             }
         });
     } else if (pathname === '/poll') {
-        const username = query.user || 'Unknown';
+        const username = normalizeUsername(query.user || 'Unknown');
         res.writeHead(200, { 'Content-Type': 'application/json' });
 
-        if (userQueues[username] && userQueues[username].length > 0) {
-            const command = userQueues[username].shift();
-            console.log(`[GAME] <<< Подана команда игроку ${username}:`, command.type);
+        let queue = userQueues[username];
+        if ((!queue || queue.length === 0) && username !== 'unknown' && userQueues.unknown && userQueues.unknown.length > 0) {
+            queue = userQueues.unknown;
+        }
+
+        if (queue && queue.length > 0) {
+            const command = queue.shift();
+            console.log(`[GAME] <<< Command delivered to ${username}:`, command.type);
             res.end(JSON.stringify({ ...command, garage: userVehicles[username] || [] }));
         } else {
             res.end(JSON.stringify({ type: 'none', garage: userVehicles[username] || [] }));
@@ -168,7 +188,7 @@ const server = http.createServer((req, res) => {
     } else if (pathname === '/get_leaderboard' && req.method === 'GET') {
         const users = Object.values(db.users)
             .sort((a, b) => b.balance - a.balance)
-            .slice(0, 50); // Лимит 50 человек
+            .slice(0, 50); // limit 50 users
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(users));
     } else {
@@ -179,6 +199,14 @@ const server = http.createServer((req, res) => {
 
 const PORT = 3000;
 server.listen(PORT, '0.0.0.0', () => {
-    console.log(`\n=== МУЛЬТИПЛЕЕРНЫЙ СЕРВЕР ЗАПУЩЕН НА ПОРТУ ${PORT} ===`);
-    console.log(`Игроки должны указать ваш IP в настройках приложения и в моде.`);
+    console.log(`\n=== MULTIPLAYER RELAY STARTED ON PORT ${PORT} ===`);
+    const ips = getLocalIPv4List();
+    if (ips.length === 0) {
+        console.log(`[NET] No external IPv4 found. Localhost: http://127.0.0.1:${PORT}`);
+    } else {
+        console.log('[NET] Use one of these IPs in mini-app and mod config:');
+        ips.forEach((ip) => console.log(` - http://${ip}:${PORT}`));
+    }
+    console.log('Players must set your PC IP in mini-app settings and in the game mod config.');
 });
+

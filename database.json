@@ -53,6 +53,8 @@
         }
       },
       "garageSlots": 1,
+      "dailyStreak": 0,
+      "dailyRewardNextAt": 0,
       "garageModels": [
         "covet",
         "porsche_911_992"
