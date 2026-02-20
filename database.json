@@ -4,7 +4,7 @@
       "id": 6422329319,
       "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 1520054,
+      "balance": 1520055,
       "xp": 10202,
       "level": 7,
       "garage": [
@@ -27,7 +27,7 @@
       "jobProgress": {
         "taxi": {
           "level": 1,
-          "km": 5.8828427524162255
+          "km": 5.891813336230023
         },
         "mafia": {
           "level": 1,
@@ -69,8 +69,8 @@
       "dailyRewardNextAt": 1771588100874,
       "jobVehicleState": {
         "taxi": {
-          "condition": 100,
-          "mileageTotal": 0.4780213304935729,
+          "condition": 99.99928235329489,
+          "mileageTotal": 0.4869919143073707,
           "lastServiceAtKm": 0.4780213304935729
         }
       },

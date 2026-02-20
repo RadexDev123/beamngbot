@@ -33,6 +33,8 @@ PLAYER_STATE_CACHE = {
     'dir': (1.0, 0.0, 0.0),
 }
 PLAYER_STATE_FILE = None
+WORK_VEHICLE_MISSING_LIMIT = 4
+PLAYER_ABSENT_LIMIT = 8
 
 
 def load_config(path='beamng_config.json'):
@@ -49,6 +51,174 @@ def calc_distance(a, b):
 def to_lua_str(value):
     s = str(value or '')
     return s.replace('\\', '\\\\').replace("'", "\\'")
+
+
+LIVERY_KEYWORDS = {
+    'taxi': ['taxi', 'cab'],
+    'police': ['police', 'cop', 'patrol', 'sheriff'],
+    'ambulance': ['ambulance', 'ems', 'rescue', 'medic'],
+    'bus': ['bus', 'transit', 'coach'],
+    'delivery': ['delivery', 'courier', 'cargo', 'van'],
+    'executive': ['lux', 'executive', 'vip', 'limo'],
+    'cargo': ['cargo', 'truck', 'hauler'],
+    'street': ['street', 'gang', 'black'],
+}
+
+
+def _safe_int(value):
+    try:
+        return int(value)
+    except Exception:
+        return None
+
+
+def _get_current_vehicle_ids(bng):
+    ids = set()
+    try:
+        vehicles = bng.vehicles.get_current() or {}
+        for key in vehicles.keys():
+            iv = _safe_int(key)
+            if iv is not None:
+                ids.add(iv)
+    except Exception:
+        pass
+    return ids
+
+
+def _get_player_vehicle_id_safe(bng):
+    try:
+        vid = bng.get_player_vehicle_id(0)
+        iv = _safe_int(vid)
+        if iv is not None:
+            return iv
+    except Exception:
+        pass
+
+    lua = """
+    (function()
+      local v = be:getPlayerVehicle(0)
+      if not v then return '' end
+      if v.getID then return tostring(v:getID()) end
+      return ''
+    end)()
+    """
+    try:
+        raw = bng.queue_lua_command(lua)
+        iv = _safe_int(str(raw or '').strip())
+        return iv
+    except Exception:
+        return None
+
+
+def _list_model_configs_via_lua(bng, car_id):
+    model = to_lua_str(car_id or '')
+    lua = f"""
+    (function()
+      local handler = (extensions and extensions.core_vehicles) or core_vehicles
+      if not handler or not handler.getModel then return '' end
+      local ok, modelData = pcall(handler.getModel, '{model}')
+      if not ok or not modelData or not modelData.configs then return '' end
+      local lines = {{}}
+      for cfgKey, cfgData in pairs(modelData.configs) do
+        local name = tostring(cfgData and cfgData.name or '')
+        local desc = tostring(cfgData and cfgData.description or '')
+        lines[#lines + 1] = tostring(cfgKey) .. '\\t' .. name .. '\\t' .. desc
+      end
+      table.sort(lines)
+      return table.concat(lines, '\\n')
+    end)()
+    """
+    try:
+        raw = str(bng.queue_lua_command(lua) or '').strip()
+        if not raw:
+            return []
+        return [line.strip() for line in raw.splitlines() if line.strip()]
+    except Exception:
+        return []
+
+
+def _log_livery_candidates(bng, car_id, livery):
+    lines = _list_model_configs_via_lua(bng, car_id)
+    if not lines:
+        print(f"[BRIDGE] Livery debug: no configs found for model {car_id}")
+        return
+
+    token = str(livery or '').strip().lower()
+    keywords = [k.lower() for k in LIVERY_KEYWORDS.get(token, [token] if token else []) if k]
+    if keywords:
+        matched = [line for line in lines if any(kw in line.lower() for kw in keywords)]
+    else:
+        matched = []
+
+    print(f"[BRIDGE] Livery debug for model={car_id} hint={token or '-'}")
+    if matched:
+        for row in matched[:30]:
+            print(f"[BRIDGE]   match: {row}")
+        return
+
+    print("[BRIDGE]   no matches by keywords; first configs:")
+    for row in lines[:20]:
+        print(f"[BRIDGE]   cfg: {row}")
+
+
+def resolve_config_key_via_lua(bng, car_id, livery='', config_key=''):
+    car_id = to_lua_str(car_id or '')
+    config_key = to_lua_str(config_key or '')
+    livery = to_lua_str(livery or '').lower()
+    keywords = LIVERY_KEYWORDS.get(livery, [livery] if livery else [])
+    keywords_lua = '{' + ','.join([f"'{to_lua_str(kw)}'" for kw in keywords]) + '}'
+
+    lua = f"""
+    (function()
+      local model = '{car_id}'
+      local requested = '{config_key}'
+      if requested ~= '' then return requested end
+      local kws = {keywords_lua}
+      if #kws == 0 then return '' end
+      local handler = (extensions and extensions.core_vehicles) or core_vehicles
+      if not handler or not handler.getModel then return '' end
+      local ok, modelData = pcall(handler.getModel, model)
+      if not ok or not modelData or not modelData.configs then return '' end
+      for cfgKey, cfgData in pairs(modelData.configs) do
+        local haystack = (
+          tostring(cfgKey) .. ' ' ..
+          tostring(cfgData and cfgData.name or '') .. ' ' ..
+          tostring(cfgData and cfgData.description or '')
+        ):lower()
+        for _, kw in ipairs(kws) do
+          if string.find(haystack, kw, 1, true) then
+            return tostring(cfgKey)
+          end
+        end
+      end
+      return ''
+    end)()
+    """
+    try:
+        return str(bng.queue_lua_command(lua) or '').strip()
+    except Exception:
+        return ''
+
+
+def normalize_part_config(model, config_key):
+    cfg = str(config_key or '').strip()
+    if not cfg:
+        return []
+    candidates = [cfg]
+    if '.pc' not in cfg.lower():
+        candidates.append(f"{cfg}.pc")
+    if '/' not in cfg and '\\' not in cfg:
+        if '.pc' in cfg.lower():
+            candidates.append(f"vehicles/{model}/{cfg}")
+        else:
+            candidates.append(f"vehicles/{model}/{cfg}.pc")
+    seen = set()
+    ordered = []
+    for c in candidates:
+        if c not in seen:
+            ordered.append(c)
+            seen.add(c)
+    return ordered
 
 
 def _observe_vehicle_ids(bng, before_ids, duration_sec=1.5):
@@ -529,7 +699,7 @@ def spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery, config_key='
     return f"{lua_result}; vehicles_now={final_count}; new_ids_final={new_ids_final}; seen_new_ids={seen_new_ids}"
 
 
-def spawn_vehicle_via_py(bng, car_id):
+def spawn_vehicle_via_py(bng, car_id, plate='', part_config=''):
     try:
         before = bng.vehicles.get_current() or {}
         before_ids = set(before.keys())
@@ -540,21 +710,34 @@ def spawn_vehicle_via_py(bng, car_id):
     if not _valid_world_pos(pos):
         return "py_failed:no_player_state"
     vid_name = f"bot_{int(time.time() * 1000) % 1000000}"
-    vehicle = Vehicle(vid=vid_name, model=str(car_id or 'pigeon'))
+    model = str(car_id or 'pigeon')
+    plate = str(plate or '')
     errors = []
     spawned = False
+    config_candidates = normalize_part_config(model, part_config)
+    if not config_candidates:
+        config_candidates = [None]
 
-    try:
-        bng.vehicles.spawn(vehicle, pos=pos, rot_quat=(0, 0, 0, 1), cling=True)
-        spawned = True
-    except TypeError:
+    for cfg in config_candidates:
+        vehicle = Vehicle(
+            vid=vid_name,
+            model=model,
+            license=(plate or None),
+            part_config=cfg
+        )
         try:
-            bng.vehicles.spawn(vehicle, pos, (0, 0, 0, 1))
+            bng.vehicles.spawn(vehicle, pos=pos, rot_quat=(0, 0, 0, 1), cling=True)
             spawned = True
+            break
+        except TypeError:
+            try:
+                bng.vehicles.spawn(vehicle, pos, (0, 0, 0, 1))
+                spawned = True
+                break
+            except Exception as e:
+                errors.append(f"legacy_spawn[{cfg}]:{e}")
         except Exception as e:
-            errors.append(f"legacy_spawn:{e}")
-    except Exception as e:
-        errors.append(f"spawn:{e}")
+            errors.append(f"spawn[{cfg}]:{e}")
 
     if not spawned:
         return f"py_failed:{';'.join(errors) if errors else 'unknown'}"
@@ -704,6 +887,45 @@ def main():
     map_id = 'unknown'
     work_vehicle_ids = set()
     player_state_errors = 0
+    work_vehicle_missing_ticks = 0
+    player_absent_ticks = 0
+
+    def finalize_shift(reason='manual', report=True, remove_work_vehicles=True):
+        nonlocal shift_active
+        nonlocal total_distance
+        nonlocal last_pos
+        nonlocal shift_job
+        nonlocal work_vehicle_ids
+        nonlocal player_state_errors
+        nonlocal work_vehicle_missing_ticks
+        nonlocal player_absent_ticks
+
+        if report and shift_active:
+            payload = {
+                'user': username,
+                'distance': total_distance / 1000.0,
+                'type': 'shift_done',
+                'job': shift_job,
+                'reason': reason,
+            }
+            try:
+                requests.post(report_url, json=payload, timeout=2)
+                print(f"[BRIDGE] Shift report sent ({reason}): {payload['distance']:.3f} km")
+            except Exception as e:
+                print(f'[BRIDGE] WARN: failed to send shift report ({reason}): {e}')
+
+        if remove_work_vehicles and work_vehicle_ids:
+            _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
+            print(f'[BRIDGE] Work vehicles removed on shift finalization: {sorted(work_vehicle_ids)}')
+
+        shift_active = False
+        total_distance = 0.0
+        last_pos = None
+        shift_job = ''
+        work_vehicle_ids.clear()
+        player_state_errors = 0
+        work_vehicle_missing_ticks = 0
+        player_absent_ticks = 0
 
     try:
         print('[BRIDGE] Connecting to BeamNG...')
@@ -740,60 +962,84 @@ def main():
                         plate_design = data.get('plateDesign', 'htnv_russian_regular')
                         livery = data.get('livery', '')
                         config_key = data.get('config', '')
-                        print(f'[BRIDGE] Spawn request: car={car_id} plate={plate}')
-                        prefer_lua = bool(livery) or bool(config_key)
-                        if prefer_lua:
-                            result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery, config_key)
-                            if result.startswith('ERR:'):
-                                py_result = spawn_vehicle_via_py(bng, car_id)
-                                result = f'{result} | py_fallback={py_result}'
-                        else:
-                            result = spawn_vehicle_via_py(bng, car_id)
-                            if not result.startswith('py_ok'):
-                                lua_result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery, config_key)
-                                result = f'{result} | lua_fallback={lua_result}'
+                        resolved_config = resolve_config_key_via_lua(bng, car_id, livery, config_key)
+                        print(f'[BRIDGE] Spawn request: car={car_id} plate={plate} config={resolved_config or "-"}')
+                        if cmd_type == 'start_shift' and livery:
+                            _log_livery_candidates(bng, car_id, livery)
+
+                        # Reliability first: Python spawn is the most stable path in this setup.
+                        result = spawn_vehicle_via_py(bng, car_id, plate, resolved_config)
+                        if not result.startswith('py_ok'):
+                            lua_result = spawn_vehicle_via_lua(
+                                bng,
+                                car_id,
+                                plate,
+                                plate_design,
+                                livery,
+                                resolved_config or config_key
+                            )
+                            result = f'{result} | lua_fallback={lua_result}'
                         print(f'[BRIDGE] Spawn result: {result}')
+                        spawn_success = (
+                            result.startswith('py_ok')
+                            or 'OK:' in result
+                            or 'OK:replaced' in result
+                        )
                         spawned_ids = _extract_spawned_ids(result)
                         if spawned_ids:
                             work_vehicle_ids.update(spawned_ids)
                             print(f'[BRIDGE] Tracked work vehicle ids: {sorted(work_vehicle_ids)}')
+                        elif cmd_type == 'start_shift' and spawn_success:
+                            # Fallback tracking when spawn API did not report new IDs
+                            player_vid = _get_player_vehicle_id_safe(bng)
+                            if player_vid is not None:
+                                work_vehicle_ids.add(player_vid)
+                                print(f'[BRIDGE] Tracked fallback work vehicle id: {player_vid}')
 
                         if cmd_type == 'start_shift':
-                            shift_active = True
-                            total_distance = 0.0
-                            last_pos = None
-                            shift_job = str(data.get('jobId') or data.get('job') or 'shift').lower()
+                            if spawn_success:
+                                shift_active = True
+                                total_distance = 0.0
+                                last_pos = None
+                                shift_job = str(data.get('jobId') or data.get('job') or 'shift').lower()
+                                work_vehicle_missing_ticks = 0
+                                player_absent_ticks = 0
+                            else:
+                                print('[BRIDGE] WARN: start_shift ignored because vehicle spawn failed')
 
                     elif cmd_type == 'end_shift':
-                        if shift_active:
-                            report = {
-                                'user': username,
-                                'distance': total_distance / 1000.0,
-                                'type': 'shift_done',
-                                'job': shift_job
-                            }
-                            requests.post(report_url, json=report, timeout=2)
-                        if work_vehicle_ids:
-                            _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
-                            print(f'[BRIDGE] Work vehicles removed on end_shift: {sorted(work_vehicle_ids)}')
-                        shift_active = False
-                        total_distance = 0.0
-                        last_pos = None
-                        shift_job = ''
-                        work_vehicle_ids.clear()
+                        finalize_shift(reason='manual_end', report=True, remove_work_vehicles=True)
 
                     elif cmd_type == 'despawn_all':
                         bng.queue_lua_command("extensions.core_vehicles and extensions.core_vehicles.removeAllVehicles and extensions.core_vehicles.removeAllVehicles()")
-                        if work_vehicle_ids:
-                            _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
-                            work_vehicle_ids.clear()
-                        shift_active = False
-                        total_distance = 0.0
-                        last_pos = None
-                        shift_job = ''
+                        finalize_shift(reason='despawn_all', report=False, remove_work_vehicles=True)
 
                 if shift_active:
                     try:
+                        player_vid = _get_player_vehicle_id_safe(bng)
+                        if player_vid is None:
+                            player_absent_ticks += 1
+                            if player_absent_ticks >= PLAYER_ABSENT_LIMIT:
+                                print('[BRIDGE] Auto end shift: player vehicle is unavailable (likely left map/game).')
+                                finalize_shift(reason='player_left_game', report=True, remove_work_vehicles=False)
+                                continue
+                        else:
+                            player_absent_ticks = 0
+                            if not work_vehicle_ids:
+                                work_vehicle_ids.add(player_vid)
+
+                        if work_vehicle_ids:
+                            alive_ids = _get_current_vehicle_ids(bng)
+                            if work_vehicle_ids.intersection(alive_ids):
+                                work_vehicle_missing_ticks = 0
+                            else:
+                                work_vehicle_missing_ticks += 1
+                                if work_vehicle_missing_ticks >= WORK_VEHICLE_MISSING_LIMIT:
+                                    print('[BRIDGE] Auto end shift: work vehicle no longer exists.')
+                                    _show_game_message(bng, 'Shift ended: work vehicle removed.', 'warning')
+                                    finalize_shift(reason='work_vehicle_removed', report=True, remove_work_vehicles=False)
+                                    continue
+
                         cur_pos = _get_player_pos_from_lua(bng)
                         if not _valid_world_pos(cur_pos):
                             player_state_errors += 1

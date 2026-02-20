@@ -1251,6 +1251,7 @@
             const [viewingUser, setViewingUser] = useState(null); // { name, avatar, balance, level, garage, realEstate, houseUpgrades, businesses }
             const [showCases, setShowCases] = useState(false);
             const [working, setWorking] = useState(false);
+            const [activeShiftJobId, setActiveShiftJobId] = useState(null);
             const [showEditProfile, setShowEditProfile] = useState(false);
             const [showAdminPanel, setShowAdminPanel] = useState(false);
             const [leaderboard, setLeaderboard] = useState([]);
@@ -1669,6 +1670,105 @@
                 }
             };
 
+            const shiftEndReasonMessage = (reason) => {
+                const map = {
+                    work_vehicle_removed: 'Смена завершена автоматически: рабочая машина удалена.',
+                    player_left_game: 'Смена завершена автоматически: игрок вышел из игры.',
+                    manual_end: 'Смена завершена.',
+                };
+                return map[String(reason || '').toLowerCase()] || '';
+            };
+
+            const applyShiftReport = (jobId, data) => {
+                const id = jobId || activeShiftJobId || selectedJobId;
+                if (!id) return false;
+                if (!data || data.type === 'none') return false;
+
+                const km = Math.max(0, parseFloat(data.distance || 0));
+                setUser(p => {
+                    const prog = p.jobProgress[id] || { level: 1, km: 0 };
+                    const job = JOBS_DATA[id];
+                    if (!job) return p;
+                    const lvlData = job.levels[prog.level];
+                    const fleetState = getJobVehicleState(id, p);
+                    const wearRate = JOB_WEAR_RATE[id] ?? 0.08;
+                    const efficiency = getJobPayEfficiency(id, p);
+                    const baseRate = Number(lvlData?.salary || 200);
+                    const pay = Math.floor(km * baseRate * efficiency);
+                    const xpGain = Math.floor(km * 10 * efficiency);
+                    let nLvl = prog.level, nKm = prog.km + km;
+                    const nextCondition = clamp(fleetState.condition - km * wearRate, 0, 100);
+                    const updatedGarage = addMileageToFirstOwnedModel(p.garage, lvlData?.car, km);
+
+                    if (lvlData.req_km > 0 && nKm >= lvlData.req_km) {
+                        nLvl = Math.min(3, nLvl + 1);
+                        nKm = 0;
+                        showNotify('Повышение ранга!', 'success');
+                    }
+
+                    showNotify(`Заработано: ₽${pay} за ${km.toFixed(2)} км`, 'success');
+                    return {
+                        ...p,
+                        balance: p.balance + pay,
+                        xp: p.xp + xpGain,
+                        garage: updatedGarage,
+                        jobProgress: { ...p.jobProgress, [id]: { level: nLvl, km: nKm } },
+                        jobVehicleState: {
+                            ...(p.jobVehicleState || {}),
+                            [id]: {
+                                condition: nextCondition,
+                                mileageTotal: fleetState.mileageTotal + km,
+                                lastServiceAtKm: fleetState.lastServiceAtKm
+                            }
+                        }
+                    };
+                });
+
+                const reasonMessage = shiftEndReasonMessage(data.reason);
+                if (reasonMessage && data.reason !== 'manual_end') {
+                    showNotify(reasonMessage, 'warning');
+                }
+                return true;
+            };
+
+            const pollShiftReport = async (jobId, notifyIfEmpty = false) => {
+                const reportUrl = getRelayUrl('/get_shift_report');
+                if (!reportUrl) return false;
+                try {
+                    const res = await fetch(`${reportUrl}?user=${encodeURIComponent(user.name)}`);
+                    const data = await res.json();
+                    const applied = applyShiftReport(jobId, data);
+                    if (!applied && notifyIfEmpty) {
+                        showNotify('Данные не получены. Вы точно проехали хоть сколько-то?', 'danger');
+                    }
+                    return applied;
+                } catch (e) {
+                    if (notifyIfEmpty) showNotify('Ошибка получения отчета', 'danger');
+                    return false;
+                }
+            };
+
+            useEffect(() => {
+                if (!working || !activeShiftJobId) return;
+                let isDisposed = false;
+                const tick = async () => {
+                    if (isDisposed) return;
+                    const applied = await pollShiftReport(activeShiftJobId, false);
+                    if (applied && !isDisposed) {
+                        setWorking(false);
+                        setActiveShiftJobId(null);
+                        setSpawnedVehicles([]);
+                        if (typeof setMafiaTarget === 'function') setMafiaTarget(null);
+                    }
+                };
+                const timer = setInterval(tick, 2500);
+                tick();
+                return () => {
+                    isDisposed = true;
+                    clearInterval(timer);
+                };
+            }, [working, activeShiftJobId, relayIP, user.name]);
+
             const handleWork = (id) => {
                 const job = JOBS_DATA[id];
                 const reqLicense = JOB_LICENSE_REQUIREMENTS[id];
@@ -1712,6 +1812,7 @@
                     mafiaData = { mafiaTarget: target };
                 }
 
+                setActiveShiftJobId(id);
                 setWorking(true);
                 sendGameCommand({
                     type: 'start_shift',
@@ -1844,62 +1945,15 @@
             };
 
             const handleFinishShift = async (id) => {
+                const jobId = id || activeShiftJobId || selectedJobId;
                 await sendGameCommand({ type: 'end_shift' });
                 showNotify('Завершаем смену, получаем данные...', 'success');
 
                 // Опрос сервера на отчет
                 setTimeout(async () => {
-                    try {
-                        const reportUrl = getRelayUrl('/get_shift_report');
-                        const res = await fetch(`${reportUrl}?user=${encodeURIComponent(user.name)}`);
-                        const data = await res.json();
-                        if (data.type !== 'none') {
-                            const km = parseFloat(data.distance);
-
-                            setUser(p => {
-                                const prog = p.jobProgress[id] || { level: 1, km: 0 };
-                                const job = JOBS_DATA[id];
-                                const lvlData = job.levels[prog.level];
-                                const fleetState = getJobVehicleState(id, p);
-                                const wearRate = JOB_WEAR_RATE[id] ?? 0.08;
-                                const efficiency = getJobPayEfficiency(id, p);
-                                const baseRate = Number(lvlData?.salary || 200);
-                                const pay = Math.floor(km * baseRate * efficiency);
-                                const xpGain = Math.floor(km * 10 * efficiency);
-                                let nLvl = prog.level, nKm = prog.km + km;
-                                const nextCondition = clamp(fleetState.condition - km * wearRate, 0, 100);
-                                const updatedGarage = addMileageToFirstOwnedModel(p.garage, lvlData?.car, km);
-
-                                if (lvlData.req_km > 0 && nKm >= lvlData.req_km) {
-                                    nLvl = Math.min(3, nLvl + 1);
-                                    nKm = 0;
-                                    showNotify('Повышение ранга!', 'success');
-                                }
-
-                                showNotify(`Заработано: ₽${pay} за ${km.toFixed(2)} км`, 'success');
-                                return {
-                                    ...p,
-                                    balance: p.balance + pay,
-                                    xp: p.xp + xpGain,
-                                    garage: updatedGarage,
-                                    jobProgress: { ...p.jobProgress, [id]: { level: nLvl, km: nKm } },
-                                    jobVehicleState: {
-                                        ...(p.jobVehicleState || {}),
-                                        [id]: {
-                                            condition: nextCondition,
-                                            mileageTotal: fleetState.mileageTotal + km,
-                                            lastServiceAtKm: fleetState.lastServiceAtKm
-                                        }
-                                    }
-                                };
-                            });
-                        } else {
-                            showNotify('Данные не получены. Вы точно проехали хоть сколько-то?', 'danger');
-                        }
-                    } catch (e) {
-                        showNotify('Ошибка получения отчета', 'danger');
-                    }
+                    await pollShiftReport(jobId, true);
                     setWorking(false);
+                    setActiveShiftJobId(null);
                 }, 2000);
             };
 
