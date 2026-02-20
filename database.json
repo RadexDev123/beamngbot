@@ -4,18 +4,30 @@
       "id": 6422329319,
       "name": "Alex_Drifter",
       "avatar": "https://t.me/i/userpic/320/KcijWqjyRyplM9JpyyxgYeYxV_MZb83ohV9JYBhtweFqVYPyYGwZO6qhYYEQ_rx7.svg",
-      "balance": 1519977,
-      "xp": 10198,
+      "balance": 1520054,
+      "xp": 10202,
       "level": 7,
       "garage": [
-        "c2",
-        "c6"
+        {
+          "id": "legacy_c2",
+          "carId": "c2",
+          "mileage": 0,
+          "configLevel": 0,
+          "selectedConfigIndex": 0
+        },
+        {
+          "id": "legacy_c6",
+          "carId": "c6",
+          "mileage": 0,
+          "configLevel": 0,
+          "selectedConfigIndex": 0
+        }
       ],
       "businesses": [],
       "jobProgress": {
         "taxi": {
           "level": 1,
-          "km": 5.4048214219226525
+          "km": 5.8828427524162255
         },
         "mafia": {
           "level": 1,
@@ -55,6 +67,19 @@
       "garageSlots": 1,
       "dailyStreak": 1,
       "dailyRewardNextAt": 1771588100874,
+      "jobVehicleState": {
+        "taxi": {
+          "condition": 100,
+          "mileageTotal": 0.4780213304935729,
+          "lastServiceAtKm": 0.4780213304935729
+        }
+      },
+      "licenses": {
+        "B": true,
+        "C": false,
+        "D": false
+      },
+      "licenseCooldowns": {},
       "garageModels": [
         "covet",
         "porsche_911_992"

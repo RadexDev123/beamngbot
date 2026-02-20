@@ -129,10 +129,8 @@ def _get_player_state_from_api(bng):
                 candidate_list.append(v)
 
         for vehicle in candidate_list:
-            try:
-                vehicle.connect(bng)
-            except Exception:
-                pass
+            # Avoid per-tick vehicle socket reconnects here:
+            # repeated connect() calls can exhaust BeamNG tech sockets.
             try:
                 vehicle.update_vehicle()
             except Exception:
@@ -203,13 +201,13 @@ def _get_player_state(bng):
         PLAYER_STATE_CACHE['dir'] = direction
         return pos, direction
 
-    pos, direction = _get_player_state_from_api(bng)
+    pos, direction = _get_player_state_via_file_bridge(bng)
     if _valid_world_pos(pos) and direction:
         PLAYER_STATE_CACHE['pos'] = pos
         PLAYER_STATE_CACHE['dir'] = direction
         return pos, direction
 
-    pos, direction = _get_player_state_via_file_bridge(bng)
+    pos, direction = _get_player_state_from_api(bng)
     if _valid_world_pos(pos) and direction:
         PLAYER_STATE_CACHE['pos'] = pos
         PLAYER_STATE_CACHE['dir'] = direction
@@ -271,7 +269,7 @@ def _show_game_message(bng, text, category='info'):
 def _extract_spawned_ids(result_text):
     text = str(result_text or '')
     found = set()
-    for match in re.findall(r"new_ids_final=\[([^\]]*)\]", text):
+    for match in re.findall(r"(?:new_ids_final|seen_new_ids)=\[([^\]]*)\]", text):
         for token in match.split(','):
             token = token.strip().strip("'").strip('"')
             if not token:
@@ -411,11 +409,12 @@ def _get_map_id_from_lua(bng):
         return 'unknown'
 
 
-def spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery):
+def spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery, config_key=''):
     car_id = to_lua_str(car_id or 'pigeon')
     plate = to_lua_str(plate or '')
     plate_design = to_lua_str(plate_design or 'htnv_russian_regular')
     livery = to_lua_str(livery or '')
+    config_key = to_lua_str(config_key or '')
 
     lua = f"""
     (function()
@@ -434,8 +433,51 @@ def spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery):
         return 'ERR:no_core_vehicles'
       end
 
-      -- Stable mode: ignore livery config to avoid invalid-config spawn failures.
-      local vid = handler.spawnVehicle(model, nil, pos, quat(0,0,0,1))
+      local requestedConfig = '{config_key}'
+      local liveryHint = string.lower('{livery}')
+      local configFromHint = nil
+      local liveryKeywords = {{
+        taxi = {{'taxi', 'cab'}},
+        police = {{'police', 'cop', 'patrol', 'sheriff'}},
+        ambulance = {{'ambulance', 'ems', 'rescue', 'medic'}},
+        bus = {{'bus', 'transit', 'coach'}},
+        delivery = {{'delivery', 'courier', 'cargo', 'van'}},
+        executive = {{'lux', 'executive', 'vip', 'limo'}},
+        cargo = {{'cargo', 'truck', 'hauler'}},
+        street = {{'street', 'gang', 'black'}}
+      }}
+
+      local function pickConfigByLivery(modelName, hint)
+        if not hint or hint == '' then return nil end
+        if not handler.getModel then return nil end
+        local keywords = liveryKeywords[hint] or {{hint}}
+        local ok, modelData = pcall(handler.getModel, modelName)
+        if not ok or not modelData or not modelData.configs then return nil end
+        for cfgKey, cfgData in pairs(modelData.configs) do
+          local haystack = (
+            tostring(cfgKey) .. ' ' ..
+            tostring(cfgData and cfgData.name or '') .. ' ' ..
+            tostring(cfgData and cfgData.description or '')
+          ):lower()
+          for _, kw in ipairs(keywords) do
+            if string.find(haystack, kw, 1, true) then
+              return cfgKey
+            end
+          end
+        end
+        return nil
+      end
+
+      if requestedConfig ~= '' then
+        configFromHint = requestedConfig
+      else
+        configFromHint = pickConfigByLivery(model, liveryHint)
+      end
+
+      local vid = handler.spawnVehicle(model, configFromHint, pos, quat(0,0,0,1))
+      if not vid and configFromHint ~= nil then
+        vid = handler.spawnVehicle(model, nil, pos, quat(0,0,0,1))
+      end
 
       if not vid and model ~= 'pigeon' then
         vid = handler.spawnVehicle('pigeon', nil, pos, quat(0,0,0,1))
@@ -448,7 +490,7 @@ def spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery):
         local replaced = false
         pcall(function()
           if handler.replaceVehicle then
-            handler.replaceVehicle(model, nil)
+            handler.replaceVehicle(model, configFromHint)
             replaced = true
           end
         end)
@@ -478,10 +520,13 @@ def spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery):
     except Exception:
         before_ids = set()
 
-    bng.queue_lua_command(lua)
+    try:
+        lua_result = str(bng.queue_lua_command(lua) or '')
+    except Exception as e:
+        lua_result = f'ERR:lua_queue_failed:{e}'
 
     final_count, new_ids_final, seen_new_ids = _observe_vehicle_ids(bng, before_ids, duration_sec=1.5)
-    return f"queued; vehicles_now={final_count}; new_ids_final={new_ids_final}; seen_new_ids={seen_new_ids}"
+    return f"{lua_result}; vehicles_now={final_count}; new_ids_final={new_ids_final}; seen_new_ids={seen_new_ids}"
 
 
 def spawn_vehicle_via_py(bng, car_id):
@@ -687,16 +732,26 @@ def main():
                             print(f'[BRIDGE] DENY: {car_id} not in owned list {garage}')
                             continue
 
+                        if cmd_type == 'start_shift' and work_vehicle_ids:
+                            _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
+                            work_vehicle_ids.clear()
+
                         plate = data.get('plate', '')
                         plate_design = data.get('plateDesign', 'htnv_russian_regular')
                         livery = data.get('livery', '')
+                        config_key = data.get('config', '')
                         print(f'[BRIDGE] Spawn request: car={car_id} plate={plate}')
-                        # In some BeamNG tech/tcom sessions Python state read is unavailable.
-                        # Use Lua spawn as primary path so vehicle appears near current player vehicle.
-                        result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery)
-                        if result.startswith('ERR:no_core_vehicles'):
-                            py_result = spawn_vehicle_via_py(bng, car_id)
-                            result = f'{result} | py_fallback={py_result}'
+                        prefer_lua = bool(livery) or bool(config_key)
+                        if prefer_lua:
+                            result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery, config_key)
+                            if result.startswith('ERR:'):
+                                py_result = spawn_vehicle_via_py(bng, car_id)
+                                result = f'{result} | py_fallback={py_result}'
+                        else:
+                            result = spawn_vehicle_via_py(bng, car_id)
+                            if not result.startswith('py_ok'):
+                                lua_result = spawn_vehicle_via_lua(bng, car_id, plate, plate_design, livery, config_key)
+                                result = f'{result} | lua_fallback={lua_result}'
                         print(f'[BRIDGE] Spawn result: {result}')
                         spawned_ids = _extract_spawned_ids(result)
                         if spawned_ids:
@@ -704,9 +759,6 @@ def main():
                             print(f'[BRIDGE] Tracked work vehicle ids: {sorted(work_vehicle_ids)}')
 
                         if cmd_type == 'start_shift':
-                            if work_vehicle_ids:
-                                _delete_vehicle_ids_via_lua(bng, work_vehicle_ids)
-                                work_vehicle_ids.clear()
                             shift_active = True
                             total_distance = 0.0
                             last_pos = None
@@ -759,6 +811,7 @@ def main():
                 pass
             except Exception as e:
                 print(f'[BRIDGE] Loop error: {e}')
+            time.sleep(0.05)
 
             time.sleep(1)
 
